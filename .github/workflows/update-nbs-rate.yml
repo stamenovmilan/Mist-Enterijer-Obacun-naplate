@@ -1,0 +1,100 @@
+name: Ažuriranje srednjeg kursa NBS
+
+on:
+  schedule:
+    - cron: "15 7 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-rate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preuzmi repozitorijum
+        uses: actions/checkout@v4
+
+      - name: Preuzmi srednji kurs EUR sa sajta NBS
+        run: |
+          python - <<'PY'
+          import json, re
+          from html.parser import HTMLParser
+          from urllib.request import Request, urlopen
+          from datetime import datetime
+
+          URL = "https://webappcenter.nbs.rs/ExchangeRateWebApp/ExchangeRate/CurrentMiddleRate"
+
+          class TableParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.rows, self.row, self.cell = [], None, None
+              def handle_starttag(self, tag, attrs):
+                  tag = tag.lower()
+                  if tag == "tr":
+                      self.row = []
+                  elif tag in ("td", "th") and self.row is not None:
+                      self.cell = []
+              def handle_data(self, data):
+                  if self.cell is not None:
+                      self.cell.append(data.strip())
+              def handle_endtag(self, tag):
+                  tag = tag.lower()
+                  if tag in ("td", "th") and self.cell is not None and self.row is not None:
+                      self.row.append(" ".join(x for x in self.cell if x))
+                      self.cell = None
+                  elif tag == "tr" and self.row is not None:
+                      if self.row:
+                          self.rows.append(self.row)
+                      self.row = None
+
+          req = Request(URL, headers={"User-Agent": "MiSt-Enterijer kurs updater"})
+          with urlopen(req, timeout=30) as response:
+              html = response.read().decode("utf-8", errors="replace")
+
+          parser = TableParser()
+          parser.feed(html)
+          rate = None
+          for row in parser.rows:
+              if row and row[0].strip().upper() == "EUR":
+                  for value in reversed(row[1:]):
+                      candidate = value.replace(".", "").replace(",", ".") if "," in value else value
+                      try:
+                          number = float(candidate)
+                          if number > 0:
+                              rate = number
+                              break
+                      except ValueError:
+                          pass
+                  if rate:
+                      break
+
+          plain = re.sub(r"<[^>]+>", " ", html)
+          plain = re.sub(r"\s+", " ", plain)
+          date_match = re.search(r"(?:FORMIRANA NA DAN|ФОРМИРАНА НА ДАН)\s*(\d{2}\.\d{2}\.\d{4})", plain, re.I)
+          list_match = re.search(r"(?:KURSNA LISTA BR\.|КУРСНА ЛИСТА БР\.)\s*(\d+)", plain, re.I)
+          if not rate:
+              raise SystemExit("Nije pronađen EUR srednji kurs u zvaničnoj NBS tabeli.")
+
+          payload = {
+              "source": "Narodna banka Srbije - zvanični srednji kurs",
+              "currency": "EUR",
+              "eurMiddleRate": round(rate, 4),
+              "date": date_match.group(1) if date_match else datetime.utcnow().strftime("%d.%m.%Y"),
+              "validFrom": date_match.group(1) if date_match else "",
+              "listNumber": list_match.group(1) if list_match else "",
+              "updatedAt": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+              "sourceUrl": URL
+          }
+          with open("kurs.json", "w", encoding="utf-8") as f:
+              json.dump(payload, f, ensure_ascii=False, indent=2)
+              f.write("\n")
+          print("Ažuriran EUR srednji kurs:", payload["eurMiddleRate"])
+          PY
+
+      - name: Sačuvaj novu kursnu listu u repozitorijum
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add kurs.json
+          git diff --cached --quiet || (git commit -m "Automatsko ažuriranje srednjeg kursa NBS" && git push)
