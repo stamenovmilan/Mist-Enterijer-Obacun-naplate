@@ -975,6 +975,10 @@ function buildKl() {
 }
 
 const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/^\uFEFF/, "").trim().toLowerCase();
+const csvMatch = (text, pattern) => {
+    const p = norm(pattern);
+    return Boolean(p) && text.includes(p);
+};
 const mm = s => {
     const m = String(s || "").replace(",", ".").match(/-?\d+(\.\d+)?/);
     return m ? parseFloat(m[0]) : 0;
@@ -1030,9 +1034,9 @@ function analiza(t) {
         n++;
         const d = mm(c[iD]);
         
-        if (naz.includes(norm(builtinCsvRules.side.keyword)) && !csvMatch(naz, builtinCsvRules.drawer.keyword)) r.s450 += (Number(builtinCsvRules.side.factor) || 0) * kol;
+        if (csvMatch(naz, builtinCsvRules.side.keyword) && !csvMatch(naz, builtinCsvRules.drawer.keyword)) r.s450 += (Number(builtinCsvRules.side.factor) || 0) * kol;
         
-        if (naz.includes(norm(builtinCsvRules.front.keyword))) {
+        if (csvMatch(naz, builtinCsvRules.front.keyword)) {
             r.front += kol;
             r.sarke += (Number(builtinCsvRules.front.hinges) || 0) * kol;
             r.s418 += (Number(builtinCsvRules.front.screws) || 0) * kol;
@@ -1074,7 +1078,7 @@ function analiza(t) {
         rows.slice(h + 1).forEach(c => {
             const naziv = norm(c[iN]);
             const kol = parseFloat(String(c[iK] || "").replace(",", "."));
-            if (naziv && Number.isFinite(kol) && naziv.includes(keyword)) total += kol;
+            if (naziv && Number.isFinite(kol) && csvMatch(naziv, keyword)) total += kol;
         });
         rule.qty = Math.ceil(total * (Number(rule.multiplier) || 1));
     });
@@ -1095,7 +1099,7 @@ function analiza(t) {
         sarke: R(r.sarke), 
         rucice: R(ukupnoFrontovaFioka), 
         klizaci: R(r.fioka), 
-        pinovi: R(r.polica * 4), 
+        pinovi: R(r.polica * (Number(builtinCsvRules.shelf.pins) || 0)), 
         silikon: R(r.sil), 
         nogice: R(r.nog), 
         nosaci: R(r.nos), 
@@ -1555,11 +1559,6 @@ function tekst() {
         const n = k.n || 0;
         if (n > 0) { const c = cene["Klizač " + k.d + " mm (po paru)"] || 0; okov += n * c; R.push([priceLabels["Klizač " + k.d + " mm (po paru)"] || ("Teleskopski klizač za fioku " + k.d + " mm, par"), n, c]); }
     });
-    customCsvRules.forEach(rule => {
-        const n = Number(rule.qty) || 0, c = Number(rule.price) || 0;
-        if (n > 0) { okov += n * c; R.push([rule.name || "Dodatni okov", n, c]); }
-    });
-
     customCsvRules.forEach(rule => {
         const n = Number(rule.qty) || 0, c = Number(rule.price) || 0;
         if (n > 0) { okov += n * c; R.push([rule.name || "Dodatni okov", n, c]); }
