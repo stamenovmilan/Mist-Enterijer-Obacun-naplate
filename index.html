@@ -132,9 +132,22 @@
         .rule-row { display:grid; grid-template-columns:1.2fr 1.2fr .65fr .75fr .65fr auto; gap:6px; padding:8px 0; border-bottom:1px solid var(--bd); align-items:center; }
         .rule-row input { width:100%; min-width:0; box-sizing:border-box; text-align:left; }
         .rule-row input[type=number] { text-align:right; }
-        .custom-item-row { display:grid; grid-template-columns:minmax(0,1fr) 7em 7em; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--bd); }
+        .custom-item-row { display:grid; grid-template-columns:minmax(0,1fr) 7em 7em auto; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--bd); }
         .custom-item-row input { width:100%; min-width:0; box-sizing:border-box; }
-        .danger { background:#8b2e2e; border-color:#8b2e2e; color:white; }
+        .rule-card { border:1px solid var(--bd); border-radius:8px; padding:10px 12px; margin:10px 0; background:var(--bg); }
+        .rule-head { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .rule-head input[type=text] { flex:1; min-width:11em; text-align:left; }
+        .rule-badge { font-size:.8rem; color:var(--mu); white-space:nowrap; }
+        .rule-sub { margin:10px 0 2px; font-size:.82rem; color:var(--mu); font-weight:600; }
+        .rule-item { display:grid; grid-template-columns:minmax(0,2fr) 8em 5.5em auto; gap:6px; align-items:center; padding:6px 0; border-top:1px dashed var(--bd); }
+        .rule-item.new { grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) 8em 5.5em auto; }
+        .rule-item select, .rule-item input[type=text], .rule-item input[type=number] { width:100%; min-width:0; box-sizing:border-box; text-align:left; }
+        .rule-item input[type=number] { text-align:right; }
+        .rule-mult { display:flex; align-items:center; gap:4px; font-size:.85rem; color:var(--mu); }
+        .rule-qty { font-size:.85rem; color:var(--tx); text-align:right; font-variant-numeric:tabular-nums; }
+        .custom-item-row small { color:var(--mu); }
+        .danger { background:#d32f2f; border-color:#d32f2f; color:#fff; font-weight:700; min-width:2.4em; line-height:1; }
+        .danger:hover { background:#b71c1c; opacity:1; }
         .online-price-card { border:1px solid var(--bd); border-radius:8px; padding:10px; margin:9px 0; background:var(--card); }
         .online-price-offer { display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:8px; align-items:center; padding:7px 0; border-top:1px solid var(--bd); }
         .online-price-offer input { width:auto; }
@@ -149,6 +162,7 @@
             .header-actions { width:100%; min-width:0; }
             .rule-row { grid-template-columns:1fr 1fr; }
             .custom-item-row { grid-template-columns:1fr 1fr; }
+            .rule-item, .rule-item.new { grid-template-columns:1fr 1fr; }
         }
 
         @media(max-width: 600px) {
@@ -182,13 +196,13 @@
 
     <section id="csvRulesSection" hidden>
         <h2>Pravila prepoznavanja okova iz CSV krojne liste</h2>
-        <p class="msg">Svako pravilo traži zadati tekst u koloni „Naziv“. Količina iz CSV-a množi se zadatim faktorom. Artikal i cena se dodaju u obračun. Pravila se čuvaju na ovom uređaju i ulaze u sačuvani projekat.</p>
+        <p class="msg">Za svaku šifru upiši tekst koji se nalazi u nazivu dela iz SketchUp-a (kolona „Naziv“). Zatim izaberi stavke okova iz cenovnika i koliko komada okova ide na jedan pronađeni deo. Količine i cene se automatski ubacuju u obračun. Pravila se čuvaju na ovom uređaju i ulaze u sačuvani projekat.</p>
         <h3 class="price-category">Ugrađena pravila prepoznavanja</h3>
         <p class="msg">Ovde menjaš tekst koji aplikacija traži u CSV nazivima i faktore količine za standardni okov. Izmene važe pri sledećem učitavanju CSV fajla.</p>
         <div id="builtinCsvRulesEditor"></div>
-        <h3 class="price-category">Dodatna pravila i novi artikli</h3>
+        <h3 class="price-category">Pravila po šifri dela (SketchUp)</h3>
         <div id="csvRulesEditor"></div>
-        <div class="btns"><button type="button" id="addCsvRuleBtn">＋ Dodaj novu stavku / pravilo</button><button type="button" class="alt" id="saveCsvRulesBtn">Sačuvaj pravila</button></div>
+        <div class="btns"><button type="button" id="addCsvRuleBtn">＋ Dodaj šifru</button><button type="button" class="alt" id="saveCsvRulesBtn">Sačuvaj pravila</button></div>
         <p class="msg" id="rulesMsg"></p>
     </section>
 
@@ -453,8 +467,63 @@ try {
 let customCsvRules = [];
 try {
     const savedRules = localStorage.getItem(RULES_KEY);
-    if (savedRules) customCsvRules = JSON.parse(savedRules);
+    if (savedRules) customCsvRules = normalizeRules(JSON.parse(savedRules));
 } catch (e) { customCsvRules = []; }
+
+let lastCsvParts = null; // delovi iz poslednje učitane CSV liste: [{naz, kol}]
+const hasKey = k => Object.prototype.hasOwnProperty.call(DEF, k);
+const labelFor = k => priceLabels[k] || k;
+
+// Pravilo: { code, matches, items:[{key, mult, qty}], newItems:[{name, price, mult, qty}] }
+function normalizeRules(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(Boolean).map(r => {
+        if (Array.isArray(r.items) || Array.isArray(r.newItems)) {
+            return {
+                code: String(r.code || ""), matches: Number(r.matches) || 0,
+                items: (r.items || []).map(i => ({ key: String(i.key || ""), mult: Number(i.mult) || 0, qty: Number(i.qty) || 0 })),
+                newItems: (r.newItems || []).map(i => ({ name: String(i.name || ""), price: Number(i.price) || 0, mult: Number(i.mult) || 0, qty: Number(i.qty) || 0 }))
+            };
+        }
+        // staro pravilo (naziv + tekst + faktor + cena) pretvaramo u šifru sa jednom novom stavkom
+        return { code: String(r.keyword || ""), matches: 0, items: [],
+                 newItems: [{ name: String(r.name || "Novi okov"), price: Number(r.price) || 0, mult: Number(r.multiplier) || 1, qty: Number(r.qty) || 0 }] };
+    });
+}
+function applyCustomRules() {
+    if (!lastCsvParts) return;
+    customCsvRules.forEach(rule => {
+        let total = 0;
+        if (norm(rule.code)) lastCsvParts.forEach(p => { if (csvMatch(p.naz, rule.code)) total += p.kol; });
+        rule.matches = total;
+        const q = m => Math.ceil(total * (Number(m) || 0) - 1e-9);
+        rule.items.forEach(i => i.qty = q(i.mult));
+        rule.newItems.forEach(i => i.qty = q(i.mult));
+    });
+}
+function customLines() {
+    const L = [];
+    customCsvRules.forEach(rule => {
+        rule.items.forEach(i => {
+            if (i.key && hasKey(i.key)) L.push({ name: labelFor(i.key), key: i.key, qty: Number(i.qty) || 0, price: Number(cene[i.key]) || 0, item: i, code: rule.code });
+        });
+        rule.newItems.forEach(i => L.push({ name: i.name || "Nova stavka", key: null, qty: Number(i.qty) || 0, price: Number(i.price) || 0, item: i, code: rule.code }));
+    });
+    return L;
+}
+// Nazivi i cene u svim sekcijama prate cenovnik (VMCene).
+function applyLabels() {
+    document.querySelectorAll("[data-pkey]").forEach(el => {
+        const k = el.dataset.pkey;
+        const t = priceLabels[k] || el.dataset.def || k;
+        if (el.textContent !== t) el.textContent = t;
+    });
+    document.querySelectorAll("[data-pricekey]").forEach(el => {
+        const t = fmt(Number(cene[el.dataset.pricekey]) || 0) + " Din/kom";
+        if (el.textContent !== t) el.textContent = t;
+    });
+}
+
 let cene = { ...DEF };
 let q = {};
 let spec = {
@@ -532,6 +601,7 @@ function mk(box, rows) {
         const nameSpan = document.createElement("span");
         nameSpan.textContent = r.l;
         nameSpan.style.fontWeight = "500";
+        if (r.pkey) { nameSpan.dataset.pkey = r.pkey; nameSpan.dataset.def = r.l; }
         labelContainer.appendChild(nameSpan);
 
         if (r.showQtyLabel) {
@@ -572,25 +642,28 @@ function buildOkov() {
     mk($("okov"), ST.map(s => ({
         id: "q_" + s[0],
         l: s[1],
+        pkey: s[2],
         showQtyLabel: true,
         el: num("q_" + s[0], q[s[0]], v => { q[s[0]] = v; calc(); }, 1)
     })));
+    applyLabels();
 }
 
 function buildAmerickiPlakar() {
     mk($("americki_plakar"), [
-        { id: "ap_vert", l: "Vertikalna lajsna za vrata 2,7m", showQtyLabel: true, el: num("ap_vert", spec.vertLajsna, v => { spec.vertLajsna = v; calc(); }, 1) },
-        { id: "ap_donja", l: "Donja šina 1m", showQtyLabel: true, el: num("ap_donja", spec.donjaSina, v => { spec.donjaSina = v; calc(); }, 1) },
-        { id: "ap_gornja", l: "Gornja šina 1m", showQtyLabel: true, el: num("ap_gornja", spec.gornjaSina, v => { spec.gornjaSina = v; calc(); }, 1) },
-        { id: "ap_usp", l: "Usporivači", showQtyLabel: true, el: num("ap_usp", spec.usporivaci, v => { spec.usporivaci = v; calc(); }, 1) }
+        { id: "ap_vert", pkey: "Vertikalna lajsna za vrata 2,7m", l: "Vertikalna lajsna za vrata 2,7m", showQtyLabel: true, el: num("ap_vert", spec.vertLajsna, v => { spec.vertLajsna = v; calc(); }, 1) },
+        { id: "ap_donja", pkey: "Donja šina 1m", l: "Donja šina 1m", showQtyLabel: true, el: num("ap_donja", spec.donjaSina, v => { spec.donjaSina = v; calc(); }, 1) },
+        { id: "ap_gornja", pkey: "Gornja šina 1m", l: "Gornja šina 1m", showQtyLabel: true, el: num("ap_gornja", spec.gornjaSina, v => { spec.gornjaSina = v; calc(); }, 1) },
+        { id: "ap_usp", pkey: "Usporivači", l: "Usporivači", showQtyLabel: true, el: num("ap_usp", spec.usporivaci, v => { spec.usporivaci = v; calc(); }, 1) }
     ]);
+    applyLabels();
 }
 
 function buildSpecijalno() {
     const box = $("specijalno");
     box.innerHTML = `
         <div class="spec-row">
-            <span class="spec-name">LED traka</span>
+            <span class="spec-name" data-pkey="LED traka (po m)" data-def="LED traka">LED traka</span>
             <div class="spec-controls">
                 <select id="s_ledBoja"><option value="3000k">3000K</option><option value="4000k">4000K</option><option value="5000k">5000K</option><option value="6000k">6000K</option></select>
                 <input type="number" id="s_ledM" value="${spec.ledM}" step="0.1" min="0" placeholder="m">
@@ -598,28 +671,28 @@ function buildSpecijalno() {
             </div>
         </div>
         <div class="spec-row">
-            <span class="spec-name">LED profil</span>
+            <span class="spec-name" data-pkey="LED profil (po m)" data-def="LED profil">LED profil</span>
             <div class="spec-controls">
                 <select id="s_ledTip"><option value="ugradni">Ugradni</option><option value="ugaoni">Ugaoni</option></select>
                 <input type="number" id="s_ledProfM" value="${spec.ledProfM}" step="0.1" min="0" placeholder="m">
             </div>
         </div>
         <div class="spec-row">
-            <span class="spec-name">LED napajanje 12V</span>
+            <span class="spec-name" data-pkey="LED napajanje 12V" data-def="LED napajanje 12V">LED napajanje 12V</span>
             <div class="spec-controls">
                 <select id="s_napSnaga"><option value="30W">30W</option><option value="60W">60W</option><option value="100W">100W</option><option value="150W">150W</option><option value="200W">200W</option><option value="300W">300W</option></select>
                 <span id="c_napKol"></span>
             </div>
         </div>
-        <div class="spec-row"><span class="spec-name">Daljinska kontrola LED</span><div class="spec-controls" id="c_daljKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Kabal 220V 3x1.5 (m)</span><div class="spec-controls" id="c_k220Kol"></div></div>
-        <div class="spec-row"><span class="spec-name">Kabal za LED 2x0.35 (m)</span><div class="spec-controls" id="c_kLedKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Duplex traka</span><div class="spec-controls" id="c_duplexKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Alu traka</span><div class="spec-controls" id="c_aluKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Spojnice</span><div class="spec-controls" id="c_spojKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Streč folija</span><div class="spec-controls" id="c_strecKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Daljinska kontrola LED" data-def="Daljinska kontrola LED">Daljinska kontrola LED</span><div class="spec-controls" id="c_daljKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Kabal 220V 3x1.5 (po m)" data-def="Kabal 220V 3x1.5 (m)">Kabal 220V 3x1.5 (m)</span><div class="spec-controls" id="c_k220Kol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Kabal za LED 2x0.35 (po m)" data-def="Kabal za LED 2x0.35 (m)">Kabal za LED 2x0.35 (m)</span><div class="spec-controls" id="c_kLedKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Duplex traka" data-def="Duplex traka">Duplex traka</span><div class="spec-controls" id="c_duplexKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Alu traka" data-def="Alu traka">Alu traka</span><div class="spec-controls" id="c_aluKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Spojnice" data-def="Spojnice">Spojnice</span><div class="spec-controls" id="c_spojKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Streč folija" data-def="Streč folija">Streč folija</span><div class="spec-controls" id="c_strecKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name">Amortizeri</span>
+            <span class="spec-name" data-pkey="Amortizer" data-def="Amortizeri">Amortizeri</span>
             <div class="spec-controls">
                 <select id="s_amortSnaga"><option value="60">60N</option><option value="80">80N</option></select>
                 <select id="s_amortDuzina"><option value="kraci">Kraći</option><option value="duzi">Duži</option></select>
@@ -627,61 +700,61 @@ function buildSpecijalno() {
             </div>
         </div>
         <div class="spec-row">
-            <span class="spec-name">Dekorativne nogice</span>
+            <span class="spec-name" data-pkey="Dekorativne nogice" data-def="Dekorativne nogice">Dekorativne nogice</span>
             <div class="spec-controls">
                 <input type="number" id="s_dekVisina" value="${spec.dekNogiceVisina}" min="0" placeholder="visina mm" style="width:90px">
                 <span>mm</span>
                 <span id="c_dekKol"></span>
             </div>
         </div>
-        <div class="spec-row"><span class="spec-name">Nogica štelujuća 10mm</span><div class="spec-controls" id="c_stelKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Dvonavojna matica</span><div class="spec-controls" id="c_maticKol"></div></div>
-        <div class="spec-row"><span class="spec-name">Push sistem za vrata</span><div class="spec-controls" id="c_pushKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Nogica štelujuća 10mm" data-def="Nogica štelujuća 10mm">Nogica štelujuća 10mm</span><div class="spec-controls" id="c_stelKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Dvonavojna matica" data-def="Dvonavojna matica">Dvonavojna matica</span><div class="spec-controls" id="c_maticKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Push sistem za vrata" data-def="Push sistem za vrata">Push sistem za vrata</span><div class="spec-controls" id="c_pushKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name">Žičana korpa za korpus</span>
+            <span class="spec-name" data-pkey="Žičana korpa za korpus" data-def="Žičana korpa za korpus">Žičana korpa za korpus</span>
             <div class="spec-controls">
                 <select id="s_zicaSirina"><option value="15">15 cm</option><option value="20">20 cm</option><option value="25">25 cm</option><option value="30">30 cm</option><option value="40">40 cm</option></select>
                 <span id="c_zicaKol"></span>
             </div>
         </div>
         <div class="spec-row">
-            <span class="spec-name">Vinkle</span>
+            <span class="spec-name" data-pkey="Vinkla" data-def="Vinkle">Vinkle</span>
             <div class="spec-controls">
                 <select id="s_vinklaTip"><option value="2">2 rupe</option><option value="4">4 rupe</option></select>
                 <span id="c_vinklaKol"></span>
             </div>
         </div>
-        <div class="spec-row"><span class="spec-name">Ugaona lajsna za radnu ploču 4m</span><div class="spec-controls" id="c_lajsnaKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Ugaona lajsna za radnu ploču 4m" data-def="Ugaona lajsna za radnu ploču 4m">Ugaona lajsna za radnu ploču 4m</span><div class="spec-controls" id="c_lajsnaKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name">Crevo za aspirator</span>
+            <span class="spec-name" data-pkey="Crevo za aspirator" data-def="Crevo za aspirator">Crevo za aspirator</span>
             <div class="spec-controls">
                 <select id="s_crevoPrecnik"><option value="100">100 mm</option><option value="120">120 mm</option><option value="125">125 mm</option><option value="150">150 mm</option></select>
                 <span id="c_crevoKol"></span>
             </div>
         </div>
-        <div class="spec-row"><span class="spec-name">Garderoberna šipka (po m)</span><div class="spec-controls" id="c_gardM"></div></div>
-        <div class="spec-row"><span class="spec-name">Nosač garderoberne šipke</span><div class="spec-controls" id="c_gardNosac"></div></div>
-        <div class="spec-row"><span class="spec-name">Šnale za coklu</span><div class="spec-controls" id="c_snaleKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Garderoberna šipka (po m)" data-def="Garderoberna šipka (po m)">Garderoberna šipka (po m)</span><div class="spec-controls" id="c_gardM"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Nosač garderoberne šipke" data-def="Nosač garderoberne šipke">Nosač garderoberne šipke</span><div class="spec-controls" id="c_gardNosac"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Šnale za coklu" data-def="Šnale za coklu">Šnale za coklu</span><div class="spec-controls" id="c_snaleKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name">Dodatak za escajg</span>
+            <span class="spec-name" data-pkey="Dodatak za escajg" data-def="Dodatak za escajg">Dodatak za escajg</span>
             <div class="spec-controls">
                 <input type="number" id="s_escSirina" value="${spec.escajgSirina}" min="0" placeholder="širina fioke" style="width:100px">
                 <span>mm</span>
                 <span id="c_escKol"></span>
             </div>
         </div>
-        <div class="spec-row"><span class="spec-name">Pop up šuko utičnica</span><div class="spec-controls" id="c_popKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="Pop up šuko utičnica" data-def="Pop up šuko utičnica">Pop up šuko utičnica</span><div class="spec-controls" id="c_popKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name">Sudopera</span>
+            <span class="spec-name" data-pkey="Sudopera" data-def="Sudopera">Sudopera</span>
             <div class="spec-controls">
                 <input type="number" id="s_sudSirina" value="${spec.sudoperaSirina}" min="0" placeholder="širina korpusa" style="width:110px">
                 <span>mm</span>
                 <span id="c_sudKol"></span>
             </div>
         </div>
-        <div class="spec-row"><span class="spec-name">T lajsna za radnu ploču</span><div class="spec-controls" id="c_tLajsnaKol"></div></div>
+        <div class="spec-row"><span class="spec-name" data-pkey="T lajsna za radnu ploču" data-def="T lajsna za radnu ploču">T lajsna za radnu ploču</span><div class="spec-controls" id="c_tLajsnaKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name">Kanta za đubre</span>
+            <span class="spec-name" data-pkey="Kanta za đubre" data-def="Kanta za đubre">Kanta za đubre</span>
             <div class="spec-controls">
                 <input type="number" id="s_kantaSirina" value="${spec.kantaSirina}" min="0" placeholder="širina cm" style="width:90px">
                 <span>mm</span>
@@ -748,6 +821,7 @@ function buildSpecijalno() {
     $("s_escSirina").onchange = e => { spec.escajgSirina = parseFloat(e.target.value) || 0; save(); };
     $("s_sudSirina").onchange = e => { spec.sudoperaSirina = parseFloat(e.target.value) || 0; save(); };
     $("s_kantaSirina").onchange = e => { spec.kantaSirina = parseFloat(e.target.value) || 0; save(); };
+    applyLabels();
 }
 
 function buildFin() {
@@ -772,10 +846,7 @@ function buildFin() {
     ]);
 }
 
-function buildCene() {
-    const box = $("cene");
-    box.innerHTML = "";
-    const groups = [
+const PRICE_GROUPS = [
         ["Šarke za nameštaj", ["Klap šarka ravna", "Klap šarka polu koleno", "Klap šarka koleno", "Klap šarka slepi ugao", "Klap šarka žaba"]],
         ["Klizači za fioke", ["Klizač 200 mm (po paru)", "Klizač 250 mm (po paru)", "Klizač 300 mm (po paru)", "Klizač 350 mm (po paru)", "Klizač 400 mm (po paru)", "Klizač 450 mm (po paru)", "Klizač 500 mm (po paru)"]],
         ["Šrafovi i spojni materijal", ["Šraf 4x1", "Šraf 4x16", "Šraf 4x18", "Šraf 4x30", "Šraf 4x50", "Šraf 5x80", "Šraf za ručicu", "Tipl", "Dvonavojna matica", "Vinkla", "Spojnice"]],
@@ -791,6 +862,11 @@ function buildCene() {
         ["Aspiracija i ventilacija", ["Crevo za aspirator"]],
         ["Potrošni materijal", ["Silikon sanitarni", "Amortizer"]]
     ];
+
+function buildCene() {
+    const box = $("cene");
+    box.innerHTML = "";
+    const groups = PRICE_GROUPS;
     // Ova stavka se više ne prikazuje kao zaseban artikal u cenovniku.
     const hiddenItems = new Set(["Američki ormar - komplet"]);
     const seen = new Set(hiddenItems);
@@ -803,7 +879,8 @@ function buildCene() {
             const row = document.createElement("div"); row.className = "price-edit-row";
             const name = document.createElement("input"); name.type = "text"; name.className = "price-name-input";
             name.value = priceLabels[k] || k; name.setAttribute("aria-label", "Naziv artikla: " + k);
-            name.addEventListener("change", () => { priceLabels[k] = name.value.trim() || k; save(); populatePriceUpdateSelect(); });
+            name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
+            name.addEventListener("change", () => { populatePriceUpdateSelect(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => {
                 cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc();
             }, "1");
@@ -818,7 +895,8 @@ function buildCene() {
             const row = document.createElement("div"); row.className = "price-edit-row";
             const name = document.createElement("input"); name.type = "text"; name.className = "price-name-input"; name.value = priceLabels[k] || k;
             name.setAttribute("aria-label", "Naziv artikla: " + k);
-            name.addEventListener("change", () => { priceLabels[k] = name.value.trim() || k; save(); populatePriceUpdateSelect(); });
+            name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
+            name.addEventListener("change", () => { populatePriceUpdateSelect(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             row.appendChild(name); row.appendChild(price); box.appendChild(row);
@@ -904,7 +982,7 @@ function calc() {
     autoOkov += (spec.donjaSina || 0) * (cene["Donja šina 1m"] || 0);
     autoOkov += (spec.gornjaSina || 0) * (cene["Gornja šina 1m"] || 0);
     autoOkov += (spec.usporivaci || 0) * (cene["Usporivači"] || 0);
-    autoOkov += customCsvRules.reduce((sum, rule) => sum + (Number(rule.qty) || 0) * (Number(rule.price) || 0), 0);
+    autoOkov += customLines().reduce((sum, l) => sum + l.qty * l.price, 0);
 
     autoOkov = Math.round(autoOkov);
     const okovBase = manualSum.okov !== null ? manualSum.okov : autoOkov;
@@ -937,6 +1015,7 @@ function calc() {
 
     $("tdin").textContent = fmt(din);
     $("teur").textContent = fmt(eur);
+    applyLabels();
     save();
 }
 
@@ -975,6 +1054,7 @@ function buildKl() {
 }
 
 const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/^\uFEFF/, "").trim().toLowerCase();
+const bm = (key, text) => !(builtinCsvRules[key] && builtinCsvRules[key].deleted) && csvMatch(text, builtinCsvRules[key].keyword);
 const csvMatch = (text, pattern) => {
     const p = norm(pattern);
     return Boolean(p) && text.includes(p);
@@ -1034,15 +1114,15 @@ function analiza(t) {
         n++;
         const d = mm(c[iD]);
         
-        if (csvMatch(naz, builtinCsvRules.side.keyword) && !csvMatch(naz, builtinCsvRules.drawer.keyword)) r.s450 += (Number(builtinCsvRules.side.factor) || 0) * kol;
+        if (bm("side", naz) && !csvMatch(naz, builtinCsvRules.drawer.keyword)) r.s450 += (Number(builtinCsvRules.side.factor) || 0) * kol;
         
-        if (csvMatch(naz, builtinCsvRules.front.keyword)) {
+        if (bm("front", naz)) {
             r.front += kol;
             r.sarke += (Number(builtinCsvRules.front.hinges) || 0) * kol;
             r.s418 += (Number(builtinCsvRules.front.screws) || 0) * kol;
         }
         
-        if (csvMatch(naz, builtinCsvRules.drawer.keyword)) {
+        if (bm("drawer", naz)) {
             const p = kol / (Number(builtinCsvRules.drawer.divisor) || 1);
             r.fioka += p;
             r.s450 += (Number(builtinCsvRules.drawer.screws450) || 0) * p;
@@ -1050,11 +1130,11 @@ function analiza(t) {
             const m = klizac(d);
             kl[m] = (kl[m] || 0) + p;
         }
-        if (csvMatch(naz, builtinCsvRules.shelf.keyword)) r.polica += kol;
-        if (csvMatch(naz, builtinCsvRules.sink.keyword)) r.sil += kol;
-        if (csvMatch(naz, builtinCsvRules.bottom.keyword)) r.nog += (Number(builtinCsvRules.bottom.legs) || 0) * kol;
+        if (bm("shelf", naz)) r.polica += kol;
+        if (bm("sink", naz)) r.sil += kol;
+        if (bm("bottom", naz)) r.nog += (Number(builtinCsvRules.bottom.legs) || 0) * kol;
         
-        if (csvMatch(naz, builtinCsvRules.wallBottom.keyword)) {
+        if (bm("wallBottom", naz)) {
             const factor = Number(builtinCsvRules.wallBottom.factor) || 0;
             r.s680 += factor * kol; r.tipl += factor * kol; r.nos += factor * kol;
             sumaDnoViseciMM += d * kol;
@@ -1065,23 +1145,16 @@ function analiza(t) {
             brojRadnihPločaKomada += kol;
         }
 
-        if (csvMatch(naz, builtinCsvRules.aspirator.keyword)) {
+        if (bm("aspirator", naz)) {
             imaAspirator = true;
         }
     });
     
-    // Dodatna, korisnički podesiva pravila: naziv iz CSV-a + faktor količine.
-    customCsvRules.forEach(rule => {
-        const keyword = norm(rule.keyword);
-        if (!keyword) { rule.qty = Number(rule.qty) || 0; return; }
-        let total = 0;
-        rows.slice(h + 1).forEach(c => {
-            const naziv = norm(c[iN]);
-            const kol = parseFloat(String(c[iK] || "").replace(",", "."));
-            if (naziv && Number.isFinite(kol) && csvMatch(naziv, keyword)) total += kol;
-        });
-        rule.qty = Math.ceil(total * (Number(rule.multiplier) || 1));
-    });
+    // Pravila po šifri: količine okova iz cenovnika i novih stavki.
+    lastCsvParts = rows.slice(h + 1)
+        .map(c => ({ naz: norm(c[iN]), kol: parseFloat(String(c[iK] || "").replace(",", ".")) }))
+        .filter(p => p.naz && Number.isFinite(p.kol));
+    applyCustomRules();
 
     if (spec.ledM === 0 && sumaDnoViseciMM > 0) {
         spec.ledM = Math.round(((sumaDnoViseciMM / 1000) * 1.25) * 10) / 10;
@@ -1138,11 +1211,12 @@ function buildBuiltinCsvRulesEditor() {
     if (!box) return;
     box.innerHTML = "";
     BUILTIN_RULE_FIELDS.forEach(([key, title, fields]) => {
+        if (builtinCsvRules[key] && builtinCsvRules[key].deleted) return;
         const wrap = document.createElement("div");
         wrap.style.cssText = "padding:9px 0;border-bottom:1px solid var(--bd)";
         const heading = document.createElement("strong"); heading.textContent = title;
         wrap.appendChild(heading);
-        const row = document.createElement("div"); row.className = "rule-row";
+        const row = document.createElement("div"); row.className = "rule-row"; row.style.display = "flex"; row.style.gap = "6px";
         fields.forEach(([field, placeholder, type]) => {
             const input = document.createElement("input");
             input.type = type; input.value = builtinCsvRules[key][field] ?? "";
@@ -1155,63 +1229,159 @@ function buildBuiltinCsvRulesEditor() {
             });
             row.appendChild(input);
         });
+        const del = document.createElement("button"); del.type = "button"; del.className = "danger"; del.textContent = "✕";
+        del.title = "Obriši ovo pravilo"; del.style.flex = "0 0 auto";
+        del.onclick = () => {
+            if (!confirm("Obrisati pravilo „" + title + "“? Ugrađeno pravilo se više neće primenjivati pri učitavanju CSV-a.")) return;
+            builtinCsvRules[key].deleted = true; save(); buildBuiltinCsvRulesEditor();
+            $("rulesMsg").textContent = "Pravilo je obrisano. Ponovo učitaj CSV da primeniš promene.";
+        };
+        row.appendChild(del);
         wrap.appendChild(row); box.appendChild(wrap);
     });
+    if (BUILTIN_RULE_FIELDS.some(([key]) => builtinCsvRules[key] && builtinCsvRules[key].deleted)) {
+        const rb = document.createElement("button"); rb.type = "button"; rb.className = "alt"; rb.style.marginTop = "10px";
+        rb.textContent = "↺ Vrati obrisana ugrađena pravila";
+        rb.onclick = () => { BUILTIN_RULE_FIELDS.forEach(([key]) => { if (builtinCsvRules[key]) builtinCsvRules[key].deleted = false; }); save(); buildBuiltinCsvRulesEditor(); $("rulesMsg").textContent = "Ugrađena pravila su vraćena. Ponovo učitaj CSV."; };
+        box.appendChild(rb);
+    }
 }
 
 function saveCustomRules() {
     try { localStorage.setItem(RULES_KEY, JSON.stringify(customCsvRules)); } catch (e) {}
     save();
 }
+function ruleChanged(rebuildEditor) {
+    manualSum.okov = null; manualSum.mat = null;
+    applyCustomRules();
+    saveCustomRules();
+    if (rebuildEditor) buildCustomRulesEditor();
+    buildCustomCsvItems();
+    calc();
+}
+function ruleEl(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+}
+function ruleInput(type, value, placeholder, onChange, title) {
+    const i = document.createElement("input");
+    i.type = type; i.value = value ?? ""; i.placeholder = placeholder || ""; i.title = title || placeholder || "";
+    if (type === "number") { i.min = "0"; i.step = "0.1"; }
+    i.addEventListener("change", () => onChange(type === "number" ? (Number(i.value) || 0) : i.value.trim()));
+    return i;
+}
+function priceSelect(value, onChange) {
+    const sel = document.createElement("select");
+    sel.title = "Stavka okova iz cenovnika";
+    sel.appendChild(new Option("— izaberi okov —", ""));
+    const used = new Set();
+    const addGroup = (heading, keys) => {
+        const og = document.createElement("optgroup"); og.label = heading;
+        keys.filter(k => hasKey(k) && !used.has(k)).forEach(k => {
+            used.add(k);
+            const o = new Option(labelFor(k), k); o.dataset.pkey = k; o.dataset.def = k; og.appendChild(o);
+        });
+        if (og.children.length) sel.appendChild(og);
+    };
+    PRICE_GROUPS.forEach(([h, keys]) => addGroup(h, keys));
+    addGroup("Ostalo", Object.keys(DEF));
+    sel.value = value || "";
+    sel.addEventListener("change", () => onChange(sel.value));
+    return sel;
+}
+function removeBtn(title, onClick) {
+    const b = ruleEl("button", "danger", "✕"); b.type = "button"; b.title = title; b.onclick = onClick; return b;
+}
+function multBox(value, onChange) {
+    const w = ruleEl("div", "rule-mult");
+    w.append(ruleEl("span", "", "×"), ruleInput("number", value, "Kom", onChange, "Koliko komada ide na jedan pronađeni deo"), ruleEl("span", "", "kom"));
+    return w;
+}
+const qtyText = n => "= " + (Math.round((Number(n) || 0) * 100) / 100).toLocaleString("sr-RS") + " kom";
+
 function buildCustomRulesEditor() {
     const box = $("csvRulesEditor");
     if (!box) return;
     box.innerHTML = "";
     if (!customCsvRules.length) {
-        const p = document.createElement("p"); p.className = "msg";
-        p.textContent = "Još nema dodatnih pravila. Dodaj pravilo za novi okov koji želiš da prepoznaješ iz krojne liste.";
-        box.appendChild(p);
+        box.appendChild(ruleEl("p", "msg", "Još nema pravila. Dodaj šifru dela iz SketchUp-a i izaberi okov koji ide uz nju."));
     }
-    customCsvRules.forEach((rule, index) => {
-        const row = document.createElement("div"); row.className = "rule-row";
-        const make = (value, placeholder, type, onChange) => {
-            const input = document.createElement("input");
-            input.type = type || "text"; input.value = value ?? ""; input.placeholder = placeholder;
-            if (type === "number") { input.min = "0"; input.step = "0.1"; }
-            input.addEventListener("change", () => { onChange(type === "number" ? (Number(input.value) || 0) : input.value); manualSum.okov = null; manualSum.mat = null; saveCustomRules(); buildCustomCsvItems(); calc(); });
-            return input;
-        };
-        row.append(
-            make(rule.name, "Naziv artikla", "text", v => rule.name = v),
-            make(rule.keyword, "Tekst iz CSV naziva", "text", v => rule.keyword = v),
-            make(rule.multiplier, "Faktor", "number", v => rule.multiplier = v),
-            make(rule.price, "Cena Din", "number", v => rule.price = v),
-            make(rule.qty, "Količina", "number", v => rule.qty = v)
-        );
-        const del = document.createElement("button"); del.type = "button"; del.className = "danger"; del.textContent = "✕";
-        del.title = "Obriši pravilo";
-        del.onclick = () => { customCsvRules.splice(index, 1); manualSum.okov = null; manualSum.mat = null; saveCustomRules(); buildCustomRulesEditor(); buildCustomCsvItems(); calc(); };
-        row.appendChild(del);
-        box.appendChild(row);
+    customCsvRules.forEach((rule, ri) => {
+        const card = ruleEl("div", "rule-card");
+        const head = ruleEl("div", "rule-head");
+        const code = ruleInput("text", rule.code, "Šifra dela iz SketchUp-a (npr. FR-01)", v => { rule.code = v; ruleChanged(true); }, "Tekst koji se traži u koloni Naziv");
+        const found = (lastCsvParts || rule.matches) ? "Pronađeno u CSV-u: " + (Math.round((rule.matches || 0) * 100) / 100).toLocaleString("sr-RS") + " kom" : "CSV nije učitan";
+        head.append(code, ruleEl("span", "rule-badge", found),
+            removeBtn("Obriši šifru", () => { if (!confirm("Obrisati šifru „" + (rule.code || "bez šifre") + "“ i sve njene stavke?")) return; customCsvRules.splice(ri, 1); ruleChanged(true); }));
+        card.appendChild(head);
+
+        if (rule.items.length) card.appendChild(ruleEl("div", "rule-sub", "Okov iz cenovnika (količina po jednom pronađenom delu)"));
+        rule.items.forEach((it, ii) => {
+            const row = ruleEl("div", "rule-item");
+            row.append(
+                priceSelect(it.key, v => { it.key = v; ruleChanged(true); }),
+                multBox(it.mult, v => { it.mult = v; ruleChanged(true); }),
+                ruleEl("span", "rule-qty", qtyText(it.qty)),
+                removeBtn("Ukloni stavku", () => { rule.items.splice(ii, 1); ruleChanged(true); })
+            );
+            card.appendChild(row);
+        });
+
+        if (rule.newItems.length) card.appendChild(ruleEl("div", "rule-sub", "Nove stavke (nisu u cenovniku): naziv, cena u dinarima, količina po delu"));
+        rule.newItems.forEach((it, ii) => {
+            const row = ruleEl("div", "rule-item new");
+            row.append(
+                ruleInput("text", it.name, "Naziv nove stavke", v => { it.name = v; ruleChanged(false); }),
+                ruleInput("number", it.price, "Cena Din", v => { it.price = v; ruleChanged(false); }, "Cena po komadu u dinarima"),
+                multBox(it.mult, v => { it.mult = v; ruleChanged(true); }),
+                ruleEl("span", "rule-qty", qtyText(it.qty)),
+                removeBtn("Ukloni stavku", () => { rule.newItems.splice(ii, 1); ruleChanged(true); })
+            );
+            card.appendChild(row);
+        });
+
+        const btns = ruleEl("div", "btns");
+        const addItem = ruleEl("button", "alt", "＋ Stavka okova iz cenovnika"); addItem.type = "button";
+        addItem.onclick = () => { rule.items.push({ key: "", mult: 1, qty: 0 }); buildCustomRulesEditor(); };
+        const addNew = ruleEl("button", "alt", "＋ Nova stavka za ovu šifru"); addNew.type = "button";
+        addNew.onclick = () => { rule.newItems.push({ name: "", price: 0, mult: 1, qty: 0 }); buildCustomRulesEditor(); };
+        btns.append(addItem, addNew);
+        card.appendChild(btns);
+        box.appendChild(card);
     });
+    applyLabels();
 }
+
 function buildCustomCsvItems() {
     const box = $("customCsvItems");
     if (!box) return;
     box.innerHTML = "";
-    if (!customCsvRules.length) {
-        const p = document.createElement("p"); p.className = "msg"; p.textContent = "Nema dodatnih stavki.";
-        box.appendChild(p); return;
-    }
-    customCsvRules.forEach((rule, index) => {
-        const row = document.createElement("div"); row.className = "custom-item-row";
-        const name = document.createElement("span"); name.textContent = rule.name || "Nova stavka";
-        const qty = document.createElement("input"); qty.type = "number"; qty.min = "0"; qty.step = "0.1"; qty.value = Number(rule.qty) || 0;
-        qty.title = "Količina"; qty.setAttribute("aria-label", "Količina: " + name.textContent);
-        qty.addEventListener("input", () => { rule.qty = Number(qty.value) || 0; manualSum.okov = null; manualSum.mat = null; saveCustomRules(); calc(); });
-        const price = document.createElement("span"); price.textContent = fmt(Number(rule.price) || 0) + " Din/kom";
-        row.append(name, qty, price); box.appendChild(row);
+    const lines = customLines();
+    if (!lines.length) { box.appendChild(ruleEl("p", "msg", "Nema dodatnih stavki.")); return; }
+    lines.forEach(l => {
+        const row = ruleEl("div", "custom-item-row");
+        const nameBox = document.createElement("div");
+        const name = ruleEl("span", "", l.name);
+        if (l.key) { name.dataset.pkey = l.key; name.dataset.def = l.key; }
+        nameBox.appendChild(name);
+        if (l.code) { nameBox.appendChild(document.createElement("br")); nameBox.appendChild(ruleEl("small", "", "šifra: " + l.code)); }
+        const qty = document.createElement("input"); qty.type = "number"; qty.min = "0"; qty.step = "0.1"; qty.value = Number(l.item.qty) || 0;
+        qty.title = "Količina"; qty.setAttribute("aria-label", "Količina: " + l.name);
+        qty.addEventListener("input", () => { l.item.qty = Number(qty.value) || 0; manualSum.okov = null; manualSum.mat = null; saveCustomRules(); calc(); });
+        const price = ruleEl("span", "", fmt(l.price) + " Din/kom");
+        if (l.key) price.dataset.pricekey = l.key;
+        const del = removeBtn("Ukloni ovu stavku iz pravila", () => {
+            const rule = customCsvRules.find(r => r.items.includes(l.item) || r.newItems.includes(l.item));
+            if (!rule) return;
+            rule.items = rule.items.filter(x => x !== l.item);
+            rule.newItems = rule.newItems.filter(x => x !== l.item);
+            ruleChanged(true);
+        });
+        row.append(nameBox, qty, price, del); box.appendChild(row);
     });
+    applyLabels();
 }
 $("rulesToggleBtn").addEventListener("click", () => {
     const panel = $("csvRulesSection");
@@ -1219,8 +1389,7 @@ $("rulesToggleBtn").addEventListener("click", () => {
     if (!panel.hidden) { buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); panel.scrollIntoView({ behavior: "smooth", block: "start" }); }
 });
 $("addCsvRuleBtn").addEventListener("click", () => {
-    customCsvRules.push({ name: "Novi okov", keyword: "", multiplier: 1, price: 0, qty: 0 });
-    manualSum.okov = null; manualSum.mat = null;
+    customCsvRules.push({ code: "", matches: 0, items: [{ key: "", mult: 1, qty: 0 }], newItems: [] });
     saveCustomRules(); buildCustomRulesEditor(); buildCustomCsvItems(); calc();
 });
 $("saveCsvRulesBtn").addEventListener("click", () => {
@@ -1264,7 +1433,7 @@ $("loadProjectFile").addEventListener("change", event => {
             fin = { ...fin, ...(data.fin || {}) };
             manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
             KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
-            customCsvRules = Array.isArray(data.customCsvRules) ? data.customCsvRules : [];
+            customCsvRules = normalizeRules(data.customCsvRules); lastCsvParts = null;
             builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...(data.builtinCsvRules || {}) };
             $("kupac").value = data.kupac || "";
             $("verzija").value = data.verzija || "m";
@@ -1292,7 +1461,8 @@ $("resetProjectBtn").addEventListener("click", () => {
     fin = { prevoz:0, plocasti:0, staklo:0, izrada:0, plast:0, proc:30, okovProc:0, kurs:fin.kurs || 117.6203 };
     manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null };
     KL = [{ d:400, n:0 }];
-    customCsvRules.forEach(rule => rule.qty = 0);
+    lastCsvParts = null;
+    customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
     $("kupac").value = ""; $("verzija").value = "m"; $("csv").value = "";
     buildOkov(); buildFin(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
     buildCustomRulesEditor(); buildCustomCsvItems(); calc();
@@ -1307,10 +1477,13 @@ $("csv").addEventListener("change", e => {
         try {
             const n = analiza(rd.result);
             buildOkov();
+            buildCustomRulesEditor();
             buildCustomCsvItems();
             saveCustomRules();
             calc();
-            $("msg").textContent = "Učitano " + n + " redova.";
+            const withCode = customCsvRules.filter(r => norm(r.code));
+            const hit = withCode.filter(r => r.matches > 0).length;
+            $("msg").textContent = "Učitano " + n + " redova." + (withCode.length ? " Šifre pronađene: " + hit + " od " + withCode.length + "." : "");
         } catch (x) {
             $("msg").textContent = "Greška: " + x.message;
         }
@@ -1559,9 +1732,8 @@ function tekst() {
         const n = k.n || 0;
         if (n > 0) { const c = cene["Klizač " + k.d + " mm (po paru)"] || 0; okov += n * c; R.push([priceLabels["Klizač " + k.d + " mm (po paru)"] || ("Teleskopski klizač za fioku " + k.d + " mm, par"), n, c]); }
     });
-    customCsvRules.forEach(rule => {
-        const n = Number(rule.qty) || 0, c = Number(rule.price) || 0;
-        if (n > 0) { okov += n * c; R.push([rule.name || "Dodatni okov", n, c]); }
+    customLines().forEach(l => {
+        if (l.qty > 0) { okov += l.qty * l.price; R.push([l.name, l.qty, l.price]); }
     });
 
     const dodajSpecTekst = (naz, kol, jedinica) => {
@@ -1638,7 +1810,7 @@ function stampajPDF() {
     ST.forEach(s => { const n = q[s[0]] || 0; if (n > 0) { const c = cene[s[2]] || 0; okov += n * c; R.push([priceLabels[s[2]] || s[1], n, c]); } });
     KL.forEach(k => { const n = k.n || 0; if (n > 0) { const c = cene["Klizač " + k.d + " mm (po paru)"] || 0; okov += n * c; R.push([priceLabels["Klizač " + k.d + " mm (po paru)"] || ("Teleskopski klizač za fioku " + k.d + " mm, par"), n, c]); } });
     
-    customCsvRules.forEach(rule => { const n = Number(rule.qty) || 0, c = Number(rule.price) || 0; if (n > 0) { okov += n * c; R.push([rule.name || "Dodatni okov", n, c]); } });
+    customLines().forEach(l => { if (l.qty > 0) { okov += l.qty * l.price; R.push([l.name, l.qty, l.price]); } });
 
     const dodajSpecPDF = (naz, kol) => {
         if (kol > 0) { const c = cene[naz] || 0; okov += kol * c; R.push([priceLabels[naz] || naz, kol, c]); }
