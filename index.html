@@ -125,8 +125,14 @@
         .btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap }
         
 
-        .header-actions { display:flex; flex-direction:column; gap:7px; min-width:190px; align-items:stretch; }
-        .header-actions button, .header-actions .file-top { width:100%; box-sizing:border-box; justify-content:center; font-size:.84rem; }
+        .header-wrap { flex-direction:column !important; align-items:stretch !important; justify-content:flex-start !important; }
+        .header-actions { display:flex; flex-direction:row; flex-wrap:wrap; gap:6px; align-items:center; }
+        .header-actions button, .header-actions .file-top { padding:8px 10px; }
+        .header-actions button, .header-actions .file-top { width:auto; box-sizing:border-box; justify-content:center; font-size:.84rem; white-space:nowrap; }
+        .header-actions .msg { flex-basis:100%; margin:0; }
+        .top-rate { padding-top:10px; border-top:1px solid var(--bd); }
+        .top-rate .rate-line { margin:0; }
+        .top-rate .msg { margin:4px 0 0; font-size:.75rem; }
         .header-actions .file-top input { display:none; }
         .rate-line { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
         .rule-row { display:grid; grid-template-columns:1.2fr 1.2fr .65fr .75fr .65fr auto; gap:6px; padding:8px 0; border-bottom:1px solid var(--bd); align-items:center; }
@@ -160,6 +166,7 @@
             .header-wrap { flex-direction:column; align-items:stretch; text-align:center; }
             .brand-container { flex-direction:column; }
             .header-actions { width:100%; min-width:0; }
+            .header-actions button, .header-actions .file-top { width:100%; }
             .rule-row { grid-template-columns:1fr 1fr; }
             .custom-item-row { grid-template-columns:1fr 1fr; }
             .rule-item, .rule-item.new { grid-template-columns:1fr 1fr; }
@@ -190,7 +197,16 @@
             <label class="file-top">📁 Učitaj sačuvani projekat<input type="file" id="loadProjectFile" accept=".json,application/json"></label>
             <button type="button" class="danger" id="resetProjectBtn">↺ Reset svih polja</button>
             <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
+            <button type="button" class="alt" id="pricesMenuBtn">💲 Cene i GitHub</button>
             <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
+        </div>
+        <div class="top-rate">
+            <div class="rate-line">
+                <strong>Srednji kurs NBS:</strong>
+                <span id="nbsRateLabel">Učitavanje kursa...</span>
+                <button type="button" class="alt" id="refreshRateBtn">↻ Osveži kurs</button>
+            </div>
+            <p class="msg" id="nbsRateMsg">Kurs se preuzima iz zvanične kursne liste NBS.</p>
         </div>
     </div>
 
@@ -206,10 +222,9 @@
         <p class="msg" id="rulesMsg"></p>
     </section>
 
-    <section>
-        <details>
-            <summary>VMCene - Cene okova i materijala</summary>
-            <div class="price-update-panel" style="margin-top:12px;padding:12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)">
+    <section id="pricesMenuSection" hidden>
+        <h2>Ažuriranje cena i podrazumevani cenovnik</h2>
+            <div class="price-update-panel" style="margin-top:4px;padding:12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)">
                 <h3 style="margin:0 0 8px;font-size:.95rem;">Ažuriranje maloprodajne cene</h3>
                 <div class="rate-line">
                     <select id="priceUpdateSelect" style="width:min(100%,25em);text-align:left"></select>
@@ -244,16 +259,25 @@
                     </div>
                     <p class="msg" id="githubDefaultsMsg" aria-live="polite">Podešavanja GitHub-a nisu uneta.</p>
                 </div>
-                <div class="rate-line" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--bd)">
-                    <strong>Srednji kurs NBS:</strong>
-                    <span id="nbsRateLabel">Učitavanje kursa...</span>
-                    <button type="button" class="alt" id="refreshRateBtn">↻ Osveži kurs</button>
-                </div>
-                <p class="msg" id="nbsRateMsg">Kurs se preuzima iz zvanične kursne liste NBS.</p>
             </div>
+    </section>
+
+    <section>
+        <details>
+            <summary>VMCene - Cene okova i materijala</summary>
             <p class="msg">Nazive artikala menjaš direktno u poljima levo, a cenu u polju desno. Promena naziva ne prekida postojeće veze sa obračunom.</p>
             <div id="cene" style="margin-top: 12px"></div>
-            <div class="btns"><button id="reset" class="alt">Vrati podrazumevane</button></div>
+            <div class="btns"><button type="button" id="addArticleBtn">＋ Dodaj novi artikal</button><button id="reset" class="alt">Vrati podrazumevane</button></div>
+            <div id="newArticleForm" hidden style="margin-top:10px;padding:12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)">
+                <h3 style="margin:0 0 8px;font-size:.95rem">Novi artikal</h3>
+                <div class="rate-line" style="margin-top:0">
+                    <input id="newArtName" type="text" placeholder="Naziv artikla" style="width:min(100%,24em);text-align:left">
+                    <input id="newArtPrice" type="number" min="0" step="1" placeholder="Cena (Din)">
+                    <button type="button" id="saveNewArtBtn">Dodaj u cenovnik</button>
+                    <button type="button" class="alt" id="cancelNewArtBtn">Otkaži</button>
+                </div>
+                <p class="msg" id="newArtMsg" aria-live="polite">Artikal se dodaje na kraj cenovnika i odmah je dostupan u pravilima CSV-a i u sekciji Okov.</p>
+            </div>
             <p class="msg" style="margin-top: 12px;">Za prenos na drugi uređaj: kopiraj tekst ispod, a na drugom uređaju ga nalepi i pritisni Primeni.</p>
             <textarea id="json" spellcheck="false" style="margin-top: 6px;"></textarea>
             <div class="btns">
@@ -265,29 +289,28 @@
 
     <section>
         <details>
-            <summary>Osnovni okov (automatski i ručni unos)</summary>
+            <summary>Okov</summary>
             <div style="margin-top: 12px">
+                <h3 class="price-category" style="margin-top:0">Osnovni okov (automatski i ručni unos)</h3>
                 <details style="background: var(--bg); border: 1px solid var(--bd); border-radius: 6px; padding: 10px; margin-bottom: 10px;">
                     <summary style="font-size: 0.95rem;">Klizači za fioke</summary>
                     <div id="klizaci" style="margin-top: 8px"></div>
                     <div class="btns"><button id="addkl" class="alt">Dodaj novi klizač</button></div>
                 </details>
                 <div id="okov"></div>
-            </div>
-        </details>
-    </section>
 
-    <section>
-        <details>
-            <summary>Specijalni okov i dodaci</summary>
-            <div style="margin-top: 12px">
+                <h3 class="price-category">Specijalni okov i dodaci</h3>
                 <details style="background: var(--bg); border: 1px solid var(--bd); border-radius: 6px; padding: 10px; margin-bottom: 10px;">
                     <summary style="font-size: 0.95rem;">Američki plakar</summary>
                     <div id="americki_plakar" style="margin-top: 8px"></div>
                 </details>
                 <div id="specijalno"></div>
+
                 <h3 class="price-category">Dodatni okov po pravilima CSV-a</h3>
                 <div id="customCsvItems"></div>
+
+                <h3 class="price-category">Novi artikli (dodati u cenovnik)</h3>
+                <div id="newArticles"></div>
             </div>
         </details>
     </section>
@@ -428,6 +451,31 @@ const PRICE_LABELS = {
     "Gornja šina 1m": "Gornja aluminijumska šina za klizna vrata plakara, cena po metru",
     "Usporivači": "Usporivač za klizna vrata američkog plakara"
 };
+// Novi artikli koje korisnik dodaje u cenovnik (ostaju u cenovniku, pravilima i sekciji Okov).
+const ARTICLES_KEY = "mist_custom_articles_v1";
+let customArticles = [];
+function registerArticles(list) {
+    if (!Array.isArray(list)) return;
+    list.forEach(a => {
+        if (!a || !a.key) return;
+        const key = String(a.key);
+        let art = customArticles.find(x => x.key === key);
+        if (!art) {
+            if (Object.prototype.hasOwnProperty.call(DEF, key)) return; // ključ zauzima ugrađeni artikal
+            art = { key, name: String(a.name || key), price: Number(a.price) || 0, qty: 0 };
+            customArticles.push(art);
+            DEF[key] = art.price;
+            PRICE_LABELS[key] = art.name;
+        }
+        if ("qty" in a) art.qty = Number(a.qty) || 0;
+    });
+}
+try { registerArticles(JSON.parse(localStorage.getItem(ARTICLES_KEY) || "[]")); } catch (e) {}
+const isArticle = k => customArticles.some(a => a.key === k);
+function articlesForExport() {
+    return customArticles.map(a => ({ key: a.key, name: (priceLabels[a.key] || a.name), price: Number(cene[a.key]) || 0 }));
+}
+
 // Pojmovi za internet pretragu. Ne menjaju interne ključeve kalkulacije.
 const PRICE_SEARCH_TERMS = Object.fromEntries(Object.keys(DEF).map(key => [key, PRICE_LABELS[key] || key]));
 const PRICE_SEARCH_UNITS = Object.fromEntries(Object.keys(DEF).map(key => [key, "kom"]));
@@ -501,6 +549,10 @@ function applyCustomRules() {
         rule.newItems.forEach(i => i.qty = q(i.mult));
     });
 }
+function articleLines() {
+    return customArticles.map(a => ({ name: labelFor(a.key), key: a.key, qty: Number(a.qty) || 0, price: Number(cene[a.key]) || 0, item: a, code: "" }));
+}
+function extraLines() { return customLines().concat(articleLines()); }
 function customLines() {
     const L = [];
     customCsvRules.forEach(rule => {
@@ -581,6 +633,7 @@ function save() {
         localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
         localStorage.setItem(FKEY, JSON.stringify({ proc: fin.proc, okovProc: fin.okovProc, kurs: fin.kurs }));
         localStorage.setItem(RULES_KEY, JSON.stringify(customCsvRules));
+        localStorage.setItem(ARTICLES_KEY, JSON.stringify(customArticles));
         localStorage.setItem(BUILTIN_RULES_KEY, JSON.stringify(builtinCsvRules));
     } catch (e) {}
 }
@@ -888,7 +941,7 @@ function buildCene() {
             row.appendChild(name); row.appendChild(price); box.appendChild(row);
         });
     });
-    const leftovers = Object.keys(DEF).filter(k => !seen.has(k));
+    const leftovers = Object.keys(DEF).filter(k => !seen.has(k) && !isArticle(k));
     if (leftovers.length) {
         const h = document.createElement("h3"); h.className = "price-category"; h.textContent = "Ostali artikli"; box.appendChild(h);
         leftovers.forEach(k => {
@@ -900,6 +953,21 @@ function buildCene() {
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             row.appendChild(name); row.appendChild(price); box.appendChild(row);
+        });
+    }
+    if (customArticles.length) {
+        const h = document.createElement("h3"); h.className = "price-category"; h.textContent = "Novi artikli"; box.appendChild(h);
+        customArticles.forEach(a => {
+            const k = a.key;
+            const row = document.createElement("div"); row.className = "price-edit-row"; row.style.gridTemplateColumns = "minmax(0,1fr) 8.5em auto";
+            const name = document.createElement("input"); name.type = "text"; name.className = "price-name-input"; name.value = priceLabels[k] || k;
+            name.setAttribute("aria-label", "Naziv artikla: " + k);
+            name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
+            name.addEventListener("change", () => { populatePriceUpdateSelect(); });
+            const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
+            price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
+            const del = removeBtn("Obriši artikal iz cenovnika", () => removeArticle(k));
+            row.append(name, price, del); box.appendChild(row);
         });
     }
 }
@@ -982,7 +1050,7 @@ function calc() {
     autoOkov += (spec.donjaSina || 0) * (cene["Donja šina 1m"] || 0);
     autoOkov += (spec.gornjaSina || 0) * (cene["Gornja šina 1m"] || 0);
     autoOkov += (spec.usporivaci || 0) * (cene["Usporivači"] || 0);
-    autoOkov += customLines().reduce((sum, l) => sum + l.qty * l.price, 0);
+    autoOkov += extraLines().reduce((sum, l) => sum + l.qty * l.price, 0);
 
     autoOkov = Math.round(autoOkov);
     const okovBase = manualSum.okov !== null ? manualSum.okov : autoOkov;
@@ -1286,6 +1354,7 @@ function priceSelect(value, onChange) {
         if (og.children.length) sel.appendChild(og);
     };
     PRICE_GROUPS.forEach(([h, keys]) => addGroup(h, keys));
+    addGroup("Novi artikli", customArticles.map(a => a.key));
     addGroup("Ostalo", Object.keys(DEF));
     sel.value = value || "";
     sel.addEventListener("change", () => onChange(sel.value));
@@ -1383,6 +1452,11 @@ function buildCustomCsvItems() {
     });
     applyLabels();
 }
+$("pricesMenuBtn").addEventListener("click", () => {
+    const panel = $("pricesMenuSection");
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) { populatePriceUpdateSelect(); panel.scrollIntoView({ behavior: "smooth", block: "start" }); }
+});
 $("rulesToggleBtn").addEventListener("click", () => {
     const panel = $("csvRulesSection");
     panel.hidden = !panel.hidden;
@@ -1399,7 +1473,7 @@ $("saveCsvRulesBtn").addEventListener("click", () => {
 function projectSnapshot() {
     return {
         format: "mist-enterijer-project", version: 1, savedAt: new Date().toISOString(),
-        cene, priceLabels, q, spec, fin, manualSum, KL, customCsvRules, builtinCsvRules,
+        cene, priceLabels, customArticles, q, spec, fin, manualSum, KL, customCsvRules, builtinCsvRules,
         kupac: $("kupac").value, verzija: $("verzija").value
     };
 }
@@ -1424,6 +1498,8 @@ $("loadProjectFile").addEventListener("change", event => {
         try {
             const data = JSON.parse(reader.result);
             if (!data || data.format !== "mist-enterijer-project") throw new Error("Ovo nije MiSt projekat.");
+            customArticles.forEach(a => { if (!(data.customArticles || []).some(x => x && x.key === a.key)) a.qty = 0; });
+            registerArticles(data.customArticles);
             cene = { ...DEF, ...(data.cene || {}) };
             priceLabels = { ...PRICE_LABELS, ...(data.priceLabels || {}), "Tipl": "Tipl Double Power 8 × 65 mm (produženi)" };
             Object.keys(q).forEach(k => delete q[k]);
@@ -1439,7 +1515,7 @@ $("loadProjectFile").addEventListener("change", event => {
             $("verzija").value = data.verzija || "m";
             saveCustomRules(); save();
             buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
-            buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); populatePriceUpdateSelect(); calc();
+            buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); populatePriceUpdateSelect(); calc();
             $("msg").textContent = "Projekat je uspešno učitan: " + file.name;
         } catch (err) { $("msg").textContent = "Učitavanje nije uspelo: " + err.message; }
         event.target.value = "";
@@ -1462,10 +1538,11 @@ $("resetProjectBtn").addEventListener("click", () => {
     manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null };
     KL = [{ d:400, n:0 }];
     lastCsvParts = null;
+    customArticles.forEach(a => a.qty = 0);
     customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
     $("kupac").value = ""; $("verzija").value = "m"; $("csv").value = "";
     buildOkov(); buildFin(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
-    buildCustomRulesEditor(); buildCustomCsvItems(); calc();
+    buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
     $("msg").textContent = "Obračun je resetovan. Cenovnik i CSV pravila su sačuvani.";
 });
 
@@ -1632,9 +1709,10 @@ async function loadGithubDefaults() {
         if (!r.ok) return;
         const d = await r.json();
         if (d && d.format === "mist-defaults" && d.cene && d.priceLabels) {
+            registerArticles((d.customArticles || []).map(a => ({ key: a.key, name: a.name, price: a.price })));
             cene = { ...DEF, ...d.cene };
             priceLabels = { ...PRICE_LABELS, ...d.priceLabels };
-            save(); buildCene(); populatePriceUpdateSelect(); calc();
+            save(); buildCene(); buildNewArticles(); buildCustomRulesEditor(); populatePriceUpdateSelect(); calc();
             $("githubDefaultsMsg").textContent = "Podrazumevani cenovnik je učitan sa GitHub Pages-a.";
         }
     } catch (e) { /* fajl još nije objavljen ili mreža nije dostupna */ }
@@ -1653,7 +1731,7 @@ $("saveDefaultsGithubBtn").addEventListener("click", async () => {
         const existing = await fetch(api + "?ref=" + encodeURIComponent(cfg.branch), {headers});
         if (existing.ok) sha = (await existing.json()).sha;
         else if (existing.status !== 404) throw new Error("GitHub provera nije uspela: HTTP " + existing.status);
-        const payload = {format:"mist-defaults", version:1, updatedAt:new Date().toISOString(), cene, priceLabels};
+        const payload = {format:"mist-defaults", version:1, updatedAt:new Date().toISOString(), cene, priceLabels, customArticles: articlesForExport()};
         const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
         const body = {message:"Update MiSt default price list", content, branch:cfg.branch}; if (sha) body.sha = sha;
         const put = await fetch(api, {method:"PUT", headers:{...headers,"Content-Type":"application/json"}, body:JSON.stringify(body)});
@@ -1695,20 +1773,72 @@ async function refreshNbsRate() {
 $("refreshRateBtn").addEventListener("click", refreshNbsRate);
 
 
-$("exp").onclick = () => { $("json").value = JSON.stringify({ cene, nazivi: priceLabels }, null, 2); };
+$("exp").onclick = () => { $("json").value = JSON.stringify({ cene, nazivi: priceLabels, customArticles: articlesForExport() }, null, 2); };
 $("imp").onclick = () => {
     try {
         const o = JSON.parse($("json").value);
+        registerArticles((o.customArticles || []).map(a => ({ key: a.key, name: a.name, price: a.price })));
         const importedPrices = o.cene && typeof o.cene === "object" ? o.cene : o;
         Object.keys(importedPrices).forEach(k => { if (k in DEF) cene[k] = Math.round(parseFloat(importedPrices[k]) || 0); });
         if (o.nazivi && typeof o.nazivi === "object") priceLabels = { ...PRICE_LABELS, ...o.nazivi };
         manualSum.okov = null;
         manualSum.mat = null;
         save();
-        buildCene();
+        buildCene(); buildNewArticles(); buildCustomRulesEditor(); populatePriceUpdateSelect();
         calc();
     } catch (x) { $("json").value = "Neispravan tekst cena: " + x.message; }
 };
+
+function refreshAfterArticleChange() {
+    save(); saveCustomRules();
+    buildCene(); buildNewArticles(); buildCustomRulesEditor(); buildCustomCsvItems(); populatePriceUpdateSelect();
+    manualSum.okov = null; manualSum.mat = null;
+    calc();
+}
+function removeArticle(key) {
+    const label = priceLabels[key] || key;
+    if (!confirm("Obrisati artikal „" + label + "“ iz cenovnika? Biće uklonjen i iz pravila CSV-a i iz obračuna.")) return;
+    customArticles = customArticles.filter(a => a.key !== key);
+    delete DEF[key]; delete PRICE_LABELS[key]; delete priceLabels[key]; delete cene[key];
+    customCsvRules.forEach(r => { r.items = r.items.filter(i => i.key !== key); });
+    refreshAfterArticleChange();
+}
+function buildNewArticles() {
+    const box = $("newArticles");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!customArticles.length) { box.appendChild(ruleEl("p", "msg", "Nema novih artikala. Dodaj ih dugmetom „＋ Dodaj novi artikal“ u sekciji VMCene.")); return; }
+    customArticles.forEach(a => {
+        const row = ruleEl("div", "custom-item-row");
+        const name = ruleEl("span", "", labelFor(a.key)); name.dataset.pkey = a.key; name.dataset.def = a.key;
+        const qty = document.createElement("input"); qty.type = "number"; qty.min = "0"; qty.step = "0.1"; qty.value = Number(a.qty) || 0;
+        qty.title = "Količina"; qty.setAttribute("aria-label", "Količina: " + labelFor(a.key));
+        qty.addEventListener("input", () => { a.qty = Number(qty.value) || 0; manualSum.okov = null; manualSum.mat = null; save(); calc(); });
+        const price = ruleEl("span", "", fmt(Number(cene[a.key]) || 0) + " Din/kom"); price.dataset.pricekey = a.key;
+        row.append(name, qty, price, removeBtn("Obriši artikal iz cenovnika", () => removeArticle(a.key)));
+        box.appendChild(row);
+    });
+    applyLabels();
+}
+$("addArticleBtn").addEventListener("click", () => {
+    const f = $("newArticleForm"); f.hidden = !f.hidden;
+    if (!f.hidden) { $("newArtName").focus(); f.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+});
+$("cancelNewArtBtn").addEventListener("click", () => { $("newArticleForm").hidden = true; });
+$("saveNewArtBtn").addEventListener("click", () => {
+    const name = $("newArtName").value.trim();
+    const price = Math.round(Number($("newArtPrice").value));
+    const msg = $("newArtMsg");
+    if (!name) { msg.textContent = "Upiši naziv artikla."; return; }
+    if (!Number.isFinite(price) || price < 0 || $("newArtPrice").value === "") { msg.textContent = "Upiši cenu u dinarima."; return; }
+    let key = name, n = 2;
+    while (Object.prototype.hasOwnProperty.call(DEF, key)) key = name + " (" + (n++) + ")";
+    customArticles.push({ key, name, price, qty: 0 });
+    DEF[key] = price; PRICE_LABELS[key] = name; priceLabels[key] = name; cene[key] = price; PRICE_SEARCH_UNITS[key] = "kom";
+    $("newArtName").value = ""; $("newArtPrice").value = "";
+    refreshAfterArticleChange();
+    msg.textContent = "Dodato u cenovnik: " + name + " — " + fmt(price) + " Din. Količinu unosiš u sekciji Okov → Novi artikli.";
+});
 $("reset").onclick = () => { cene = { ...DEF }; manualSum.okov = null; manualSum.mat = null; save(); buildCene(); calc(); };
 $("addkl").onclick = () => { KL.push({ d: 400, n: 1 }); buildKl(); };
 
@@ -1732,7 +1862,7 @@ function tekst() {
         const n = k.n || 0;
         if (n > 0) { const c = cene["Klizač " + k.d + " mm (po paru)"] || 0; okov += n * c; R.push([priceLabels["Klizač " + k.d + " mm (po paru)"] || ("Teleskopski klizač za fioku " + k.d + " mm, par"), n, c]); }
     });
-    customLines().forEach(l => {
+    extraLines().forEach(l => {
         if (l.qty > 0) { okov += l.qty * l.price; R.push([l.name, l.qty, l.price]); }
     });
 
@@ -1810,7 +1940,7 @@ function stampajPDF() {
     ST.forEach(s => { const n = q[s[0]] || 0; if (n > 0) { const c = cene[s[2]] || 0; okov += n * c; R.push([priceLabels[s[2]] || s[1], n, c]); } });
     KL.forEach(k => { const n = k.n || 0; if (n > 0) { const c = cene["Klizač " + k.d + " mm (po paru)"] || 0; okov += n * c; R.push([priceLabels["Klizač " + k.d + " mm (po paru)"] || ("Teleskopski klizač za fioku " + k.d + " mm, par"), n, c]); } });
     
-    customLines().forEach(l => { if (l.qty > 0) { okov += l.qty * l.price; R.push([l.name, l.qty, l.price]); } });
+    extraLines().forEach(l => { if (l.qty > 0) { okov += l.qty * l.price; R.push([l.name, l.qty, l.price]); } });
 
     const dodajSpecPDF = (naz, kol) => {
         if (kol > 0) { const c = cene[naz] || 0; okov += kol * c; R.push([priceLabels[naz] || naz, kol, c]); }
@@ -1978,6 +2108,7 @@ populatePriceUpdateSelect();
 buildBuiltinCsvRulesEditor();
 buildCustomRulesEditor();
 buildCustomCsvItems();
+buildNewArticles();
 buildKl();
 buildSpecijalno();
 buildAmerickiPlakar();
