@@ -154,13 +154,6 @@
         .custom-item-row small { color:var(--mu); }
         .danger { background:#d32f2f; border-color:#d32f2f; color:#fff; font-weight:700; min-width:2.4em; line-height:1; }
         .danger:hover { background:#b71c1c; opacity:1; }
-        .online-price-card { border:1px solid var(--bd); border-radius:8px; padding:10px; margin:9px 0; background:var(--card); }
-        .online-price-offer { display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:8px; align-items:center; padding:7px 0; border-top:1px solid var(--bd); }
-        .online-price-offer input { width:auto; }
-        .online-price-offer a { color:var(--oak); }
-        .online-price-highest { font-weight:700; }
-        .online-price-meta { color:var(--mu); font-size:.8rem; }
-        @media(max-width:600px) { .online-price-offer { grid-template-columns:24px minmax(0,1fr); } .online-price-offer strong { grid-column:2; } }
 
         @media(max-width:600px) {
             .header-wrap { flex-direction:column; align-items:stretch; text-align:center; }
@@ -197,7 +190,7 @@
             <label class="file-top">📁 Učitaj sačuvani projekat<input type="file" id="loadProjectFile" accept=".json,application/json"></label>
             <button type="button" class="danger" id="resetProjectBtn">↺ Reset svih polja</button>
             <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
-            <button type="button" class="alt" id="pricesMenuBtn">💲 Cene i GitHub</button>
+            <button type="button" class="alt" id="priceSearchBtn">🔎 Pretraga cena</button>
             <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
         </div>
         <div class="top-rate">
@@ -222,67 +215,19 @@
         <p class="msg" id="rulesMsg"></p>
     </section>
 
-    <section id="pricesMenuSection" hidden>
-        <h2>Ažuriranje cena i podrazumevani cenovnik</h2>
-            <div class="price-update-panel" style="margin-top:4px;padding:12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)">
-                <h3 style="margin:0 0 8px;font-size:.95rem;">Ažuriranje maloprodajne cene</h3>
-                <div class="rate-line">
-                    <select id="priceUpdateSelect" style="width:min(100%,25em);text-align:left"></select>
-                    <input id="newRetailPrice" type="number" min="0" step="1" placeholder="Nova cena (Din)">
-                    <button id="applyRetailPriceBtn" type="button">Primeni cenu</button>
-                </div>
-                <p class="msg" id="priceUpdateMsg" aria-live="polite">Izaberi artikal, upiši novu maloprodajnu cenu i primeni izmenu.</p>
-                <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
-                    <h3 style="margin:0 0 8px;font-size:.95rem">Ažuriranje cena okova preko interneta</h3>
-                    <p class="msg">Aplikacija šalje pripremljene nazive artikala servisu za pretragu. Prikazuju se samo pronađene cene različite od postojećih, od najviše ka najnižoj. Nijedna cena se ne menja bez tvoje potvrde.</p>
-                    <div class="rate-line">
-                        <input id="priceSearchEndpoint" type="url" placeholder="Adresa internet servisa za pretragu cena" style="width:min(100%,32em);text-align:left">
-                        <button type="button" class="alt" id="savePriceSearchEndpointBtn">Sačuvaj adresu</button>
-                        <button type="button" id="searchOnlinePricesBtn">Ažuriranje cena okova</button>
-                    </div>
-                    <p class="msg" id="onlinePriceSearchMsg" aria-live="polite">Pretraga koristi samo prodavnice sa javno prikazanim cenama. Uz svaku ponudu prikazuje se prodavnica i direktan link ka proizvodu.</p>
-                    <div id="onlinePriceResults" style="margin-top:10px"></div>
-                    <button type="button" id="applyOnlinePricesBtn" style="display:none;margin-top:10px">Primeni izabrane cene</button>
-                </div>
-                <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
-                    <h3 style="margin:0 0 8px;font-size:.95rem">Cene sa Pinolesa (pinoles.com)</h3>
-                    <p class="msg">GitHub jednom dnevno čita cene sa linkova koje ovde uneseš i upisuje ih u pinoles-cene.json. Ovde ih povučeš, vidiš razlike i potvrdiš koje se primenjuju. Linkovi se šalju na GitHub kad pritisneš „Sačuvaj kao podrazumevano na GitHub-u“.</p>
-                    <div class="rate-line">
-                        <select id="pinolesMode" style="width:auto;text-align:left">
-                            <option value="current">Važeća cena (akcijska ako postoji)</option>
-                            <option value="regular">Redovna cena (bez akcije)</option>
-                        </select>
-                        <select id="pinolesPdv" style="width:auto;text-align:left">
-                            <option value="keep">Moje cene su sa PDV-om (bez preračuna)</option>
-                            <option value="minus20">Moje cene su bez PDV-a (podeli sa 1,2)</option>
-                        </select>
-                        <button type="button" id="pinolesFetchBtn">Povuci cene sa Pinolesa</button>
-                    </div>
-                    <p class="msg" id="pinolesMsg" aria-live="polite">Pinoles prikazuje cene sa PDV-om.</p>
-                    <div id="pinolesResults" style="margin-top:8px"></div>
-                    <button type="button" id="pinolesApplyBtn" style="display:none;margin-top:10px">Primeni izabrane cene</button>
-                    <details style="margin-top:12px">
-                        <summary style="font-size:.9rem">Linkovi artikala na pinoles.com <span id="pinolesLinksCount" class="msg"></span></summary>
-                        <p class="msg">Nalepi link stranice artikla (https://www.pinoles.com/proizvod/…). Prazno polje znači da se taj artikal ne prati.</p>
-                        <div id="pinolesLinks"></div>
-                    </details>
-                </div>
-                <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
-                    <h3 style="margin:0 0 8px;font-size:.95rem">Podrazumevani cenovnik na GitHub-u</h3>
-                    <p class="msg">Ovo čuva izmenjene nazive i cene u fajl mist-defaults.json u tvom GitHub repozitorijumu. Potreban je GitHub fine-grained token sa dozvolom Contents: Read and write. Token se čuva samo u ovom pregledaču.</p>
-                    <div class="rate-line">
-                        <input id="ghOwner" type="text" placeholder="GitHub korisnik / organizacija" style="width:13em;text-align:left">
-                        <input id="ghRepo" type="text" placeholder="Naziv repozitorijuma" style="width:13em;text-align:left">
-                        <input id="ghBranch" type="text" placeholder="Grana (npr. main)" value="main" style="width:8em;text-align:left">
-                    </div>
-                    <div class="rate-line" style="margin-top:6px">
-                        <input id="ghToken" type="password" placeholder="GitHub token (fine-grained)" autocomplete="off" style="width:min(100%,28em);text-align:left">
-                        <button type="button" class="alt" id="saveGithubConfigBtn">Sačuvaj podešavanja</button>
-                        <button type="button" id="saveDefaultsGithubBtn">Sačuvaj kao podrazumevano na GitHub-u</button>
-                    </div>
-                    <p class="msg" id="githubDefaultsMsg" aria-live="polite">Podešavanja GitHub-a nisu uneta.</p>
-                </div>
-            </div>
+    <section id="priceSearchSection" hidden>
+        <h2>Pretraga cena po nazivu artikala</h2>
+        <p class="msg"><strong>1.</strong> Pritisni „Kopiraj spisak za pretragu“. <strong>2.</strong> Nalepi ga u Claude ćaskanje (sa uključenom web pretragom). Claude pretraži cene u srpskim prodavnicama i vrati tabelu sa izvorima i JSON. <strong>3.</strong> Nalepi taj JSON ispod i pritisni „Pregledaj cene“. Vidiš staru i novu cenu, prodavnicu i link izvora, pa čekiraš koje prihvataš. Ništa se ne menja bez tvoje potvrde.</p>
+        <div class="btns"><button type="button" id="psCopyBtn">📋 Kopiraj spisak za pretragu</button></div>
+        <details style="margin-top:8px"><summary style="font-size:.9rem">Prikaži tekst koji se kopira</summary>
+            <textarea id="psPrompt" readonly spellcheck="false" style="margin-top:6px;min-height:140px"></textarea>
+        </details>
+        <p class="msg" id="psMsg" aria-live="polite"></p>
+        <h3 class="price-category">Odgovor iz pretrage</h3>
+        <textarea id="psPaste" spellcheck="false" placeholder='Nalepi ovde JSON niz, na primer: [{"key":"Klap šarka ravna","cena":175,"prodavnica":"…","link":"https://…"}]' style="min-height:110px"></textarea>
+        <div class="btns"><button type="button" id="psReviewBtn">Pregledaj cene</button></div>
+        <div id="psResults" style="margin-top:8px"></div>
+        <button type="button" id="psApplyBtn" style="display:none;margin-top:10px">Primeni izabrane cene</button>
     </section>
 
     <section>
@@ -500,12 +445,6 @@ function articlesForExport() {
 }
 
 
-// Pinoles: linkovi artikala (čuvaju se lokalno i u mist-defaults.json), podešavanja preuzimanja.
-const PINOLES_LINKS_KEY = "mist_pinoles_links_v1";
-const PINOLES_OPTS_KEY = "mist_pinoles_opts_v1";
-let pinolesLinks = {};
-try { pinolesLinks = JSON.parse(localStorage.getItem(PINOLES_LINKS_KEY) || "{}") || {}; } catch (e) { pinolesLinks = {}; }
-const isPinolesUrl = u => /^https:\/\/(www\.)?pinoles\.com\/\S+$/i.test(String(u || ""));
 // Pojmovi za internet pretragu. Ne menjaju interne ključeve kalkulacije.
 const PRICE_SEARCH_TERMS = Object.fromEntries(Object.keys(DEF).map(key => [key, PRICE_LABELS[key] || key]));
 const PRICE_SEARCH_UNITS = Object.fromEntries(Object.keys(DEF).map(key => [key, "kom"]));
@@ -517,10 +456,6 @@ const PRICE_SEARCH_UNITS = Object.fromEntries(Object.keys(DEF).map(key => [key, 
 
 const PRICE_LABEL_KEY = "mist_price_labels_v1";
 let priceLabels = { ...PRICE_LABELS };
-let PRICE_UPDATE_ENDPOINT = localStorage.getItem("mist_price_update_endpoint_v1") || ""; // Serverski servis je potreban zbog CORS-a i zaštite API ključa.
-const GH_CONFIG_KEY = "mist_github_defaults_config_v1";
-let ghConfig = {};
-try { ghConfig = JSON.parse(localStorage.getItem(GH_CONFIG_KEY) || "{}"); } catch (e) { ghConfig = {}; }
 
 
 const KEY = "mist_cene_v12";
@@ -644,6 +579,16 @@ try {
         fin.okovProc = Number.isFinite(Number(o.okovProc)) ? Number(o.okovProc) : fin.okovProc;
     }
 } catch (e) {}
+// Jednokratno vraćanje cena na ugrađene (iz prvobitne verzije); cene novih artikala ostaju kako su bile.
+try {
+    if (!localStorage.getItem("mist_prices_restored_v2")) {
+        const keep = {};
+        customArticles.forEach(a => { keep[a.key] = cene[a.key]; });
+        cene = { ...DEF, ...keep };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        localStorage.setItem("mist_prices_restored_v2", "1");
+    }
+} catch (e) {}
 // Migracija starog naziva u svim postojećim lokalnim cenovnicima.
 if (priceLabels["Tipl"] === "Plastični tipl za spajanje pločastog nameštaja" || !priceLabels["Tipl"]) {
     priceLabels["Tipl"] = "Tipl Double Power 8 × 65 mm (produženi)";
@@ -664,7 +609,6 @@ function save() {
         localStorage.setItem(FKEY, JSON.stringify({ proc: fin.proc, okovProc: fin.okovProc, kurs: fin.kurs }));
         localStorage.setItem(RULES_KEY, JSON.stringify(customCsvRules));
         localStorage.setItem(ARTICLES_KEY, JSON.stringify(customArticles));
-        localStorage.setItem(PINOLES_LINKS_KEY, JSON.stringify(pinolesLinks));
         localStorage.setItem(BUILTIN_RULES_KEY, JSON.stringify(builtinCsvRules));
     } catch (e) {}
 }
@@ -964,7 +908,6 @@ function buildCene() {
             const name = document.createElement("input"); name.type = "text"; name.className = "price-name-input";
             name.value = priceLabels[k] || k; name.setAttribute("aria-label", "Naziv artikla: " + k);
             name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
-            name.addEventListener("change", () => { populatePriceUpdateSelect(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => {
                 cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc();
             }, "1");
@@ -980,7 +923,6 @@ function buildCene() {
             const name = document.createElement("input"); name.type = "text"; name.className = "price-name-input"; name.value = priceLabels[k] || k;
             name.setAttribute("aria-label", "Naziv artikla: " + k);
             name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
-            name.addEventListener("change", () => { populatePriceUpdateSelect(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             row.appendChild(name); row.appendChild(price); box.appendChild(row);
@@ -994,7 +936,6 @@ function buildCene() {
             const name = document.createElement("input"); name.type = "text"; name.className = "price-name-input"; name.value = priceLabels[k] || k;
             name.setAttribute("aria-label", "Naziv artikla: " + k);
             name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
-            name.addEventListener("change", () => { populatePriceUpdateSelect(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             const del = removeBtn("Obriši artikal iz cenovnika", () => removeArticle(k));
@@ -1483,11 +1424,6 @@ function buildCustomCsvItems() {
     });
     applyLabels();
 }
-$("pricesMenuBtn").addEventListener("click", () => {
-    const panel = $("pricesMenuSection");
-    panel.hidden = !panel.hidden;
-    if (!panel.hidden) { populatePriceUpdateSelect(); buildPinolesLinks(); panel.scrollIntoView({ behavior: "smooth", block: "start" }); }
-});
 $("rulesToggleBtn").addEventListener("click", () => {
     const panel = $("csvRulesSection");
     panel.hidden = !panel.hidden;
@@ -1546,7 +1482,7 @@ $("loadProjectFile").addEventListener("change", event => {
             $("verzija").value = data.verzija || "m";
             saveCustomRules(); save();
             buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
-            buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); populatePriceUpdateSelect(); calc();
+            buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles();calc();
             $("msg").textContent = "Projekat je uspešno učitan: " + file.name;
         } catch (err) { $("msg").textContent = "Učitavanje nije uspelo: " + err.message; }
         event.target.value = "";
@@ -1600,179 +1536,6 @@ $("csv").addEventListener("change", e => {
     rd.readAsText(f);
 });
 
-// Ažuriranje odabrane maloprodajne cene: bez nagađanja cena sa interneta.
-function populatePriceUpdateSelect() {
-    const sel = $("priceUpdateSelect");
-    if (!sel) return;
-    const previous = sel.value;
-    sel.innerHTML = "";
-    Object.keys(DEF).forEach(key => {
-        const o = document.createElement("option");
-        o.value = key;
-        o.textContent = (priceLabels[key] || key) + " — " + fmt(cene[key] || 0) + " Din";
-        sel.appendChild(o);
-    });
-    sel.value = previous && previous in DEF ? previous : Object.keys(DEF)[0];
-}
-$("applyRetailPriceBtn").addEventListener("click", () => {
-    const key = $("priceUpdateSelect").value;
-    const value = Number($("newRetailPrice").value);
-    if (!key || !Number.isFinite(value) || value < 0) {
-        $("priceUpdateMsg").textContent = "Unesi ispravnu cenu koja nije negativna.";
-        return;
-    }
-    cene[key] = Math.round(value);
-    $("newRetailPrice").value = "";
-    save(); buildCene(); populatePriceUpdateSelect();
-    manualSum.okov = null; manualSum.mat = null; calc();
-    $("priceUpdateMsg").textContent = "Nova cena je sačuvana za: " + (priceLabels[key] || key) + ".";
-});
-
-// Internet pretraga cena: zahteva serverski endpoint koji vraća proverene ponude.
-const onlinePriceSelections = new Map();
-if ($("priceSearchEndpoint")) $("priceSearchEndpoint").value = PRICE_UPDATE_ENDPOINT;
-$("savePriceSearchEndpointBtn").addEventListener("click", () => {
-    const value = $("priceSearchEndpoint").value.trim();
-    if (value && !/^https:\/\//i.test(value)) {
-        $("onlinePriceSearchMsg").textContent = "Adresa servisa mora počinjati sa https://";
-        return;
-    }
-    PRICE_UPDATE_ENDPOINT = value;
-    try { localStorage.setItem("mist_price_update_endpoint_v1", value); } catch (e) {}
-    $("onlinePriceSearchMsg").textContent = value ? "Adresa servisa je sačuvana na ovom uređaju." : "Adresa servisa je obrisana.";
-});
-function renderOnlinePriceResults(results) {
-    const box = $("onlinePriceResults");
-    box.innerHTML = "";
-    onlinePriceSelections.clear();
-    let shown = 0;
-    (results || []).forEach(group => {
-        const key = group.key;
-        if (!(key in DEF)) return;
-        const current = Number(cene[key]) || 0;
-        const offers = (Array.isArray(group.offers) ? group.offers : [])
-            .filter(o => Number.isFinite(Number(o.price)) && Number(o.price) > 0 && String(o.currency || "RSD").toUpperCase() === "RSD")
-            .filter(o => String(o.unit || "").toLowerCase() === String(PRICE_SEARCH_UNITS[key] || "kom").toLowerCase())
-            .filter(o => Math.round(Number(o.price)) !== Math.round(current))
-            .filter(o => o.url && /^https?:\/\//i.test(o.url) && o.publicPrice === true)
-            .sort((a,b) => Number(b.price) - Number(a.price));
-        if (!offers.length) return;
-        shown++;
-        const card = document.createElement("div"); card.className = "online-price-card";
-        const heading = document.createElement("div");
-        heading.innerHTML = "<strong></strong><div class=\"online-price-meta\"></div>";
-        heading.querySelector("strong").textContent = priceLabels[key] || key;
-        heading.querySelector(".online-price-meta").textContent = "Trenutna cena: " + fmt(current) + " Din. Pronađene različite cene:";
-        card.appendChild(heading);
-        offers.forEach((offer, idx) => {
-            const row = document.createElement("label"); row.className = "online-price-offer" + (idx === 0 ? " online-price-highest" : "");
-            const radio = document.createElement("input"); radio.type = "radio"; radio.name = "online-price-" + key; radio.value = String(idx);
-            radio.addEventListener("change", () => onlinePriceSelections.set(key, offer));
-            const desc = document.createElement("span");
-            const title = document.createElement("span"); title.textContent = offer.title || offer.name || (priceLabels[key] || key); desc.appendChild(title);
-            const meta = document.createElement("div"); meta.className = "online-price-meta";
-            meta.textContent = ["Izvor: " + (offer.store || offer.retailer || "Prodavnica"), offer.unit ? "Jedinica: " + offer.unit : "", offer.updatedAt || offer.updated_at ? "Provereno: " + (offer.updatedAt || offer.updated_at) : ""].filter(Boolean).join(" · "); desc.appendChild(meta);
-            const price = document.createElement("strong"); price.textContent = fmt(Number(offer.price)) + " Din" + (idx === 0 ? " · NAJVIŠA PRONAĐENA" : "");
-            row.append(radio, desc, price);
-            if (offer.url && /^https?:\/\//i.test(offer.url)) {
-                const link = document.createElement("a"); link.href = offer.url; link.target = "_blank"; link.rel = "noopener"; link.textContent = "Izvor"; link.style.gridColumn = "2 / -1"; row.appendChild(link);
-            }
-            card.appendChild(row);
-        });
-        box.appendChild(card);
-    });
-    $("applyOnlinePricesBtn").style.display = shown ? "inline-block" : "none";
-    $("onlinePriceSearchMsg").textContent = shown ? "Pronađene su različite ponude za " + shown + " artikala. Najviša cena je prva; izaberi najviše jednu ponudu po artiklu." : "Nisu pronađene proverljive cene različite od postojećeg cenovnika.";
-}
-$("searchOnlinePricesBtn").addEventListener("click", async () => {
-    if (!PRICE_UPDATE_ENDPOINT) {
-        $("onlinePriceSearchMsg").textContent = "Internet pretraga nije aktivna: prvo je potrebno postaviti serverski servis i uneti njegovu HTTPS adresu. Sama HTML aplikacija ne može pouzdano da pretražuje i čita cene sa različitih prodavnica zbog CORS zaštite i pravila sajtova.";
-        return;
-    }
-    const btn = $("searchOnlinePricesBtn"); btn.disabled = true;
-    $("onlinePriceSearchMsg").textContent = "Pretražujem dostupne ponude...";
-    $("onlinePriceResults").innerHTML = ""; $("applyOnlinePricesBtn").style.display = "none";
-    try {
-        const items = Object.keys(DEF).map(key => ({ key, name: priceLabels[key] || key, query: priceLabels[key] || PRICE_SEARCH_TERMS[key] || key, unit: PRICE_SEARCH_UNITS[key] || "kom", currentPrice: Number(cene[key]) || 0, currency:"RSD" }));
-        const allResults = [];
-        for (let i = 0; i < items.length; i += 12) {
-            const response = await fetch(PRICE_UPDATE_ENDPOINT, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({items:items.slice(i, i + 12)}) });
-            if (!response.ok) throw new Error("Servis je vratio HTTP " + response.status);
-            const data = await response.json();
-            if (!data || !Array.isArray(data.results)) throw new Error("Odgovor servisa nema očekivanu listu rezultata.");
-            allResults.push(...data.results);
-            $("onlinePriceSearchMsg").textContent = "Pretraženo " + Math.min(i + 12, items.length) + " od " + items.length + " artikala...";
-        }
-        renderOnlinePriceResults(allResults);
-    } catch (error) {
-        $("onlinePriceSearchMsg").textContent = "Pretraga nije uspela: " + error.message + ". Proveri adresu servisa i njegovu dostupnost.";
-    } finally { btn.disabled = false; }
-});
-$("applyOnlinePricesBtn").addEventListener("click", () => {
-    if (!onlinePriceSelections.size) { $("onlinePriceSearchMsg").textContent = "Nisi izabrao nijednu cenu."; return; }
-    const changed = [];
-    onlinePriceSelections.forEach((offer, key) => {
-        const value = Math.round(Number(offer.price));
-        if (Number.isFinite(value) && value > 0) { cene[key] = value; changed.push(priceLabels[key] || key); }
-    });
-    manualSum.okov = null; manualSum.mat = null; save(); buildCene(); populatePriceUpdateSelect(); calc();
-    $("onlinePriceSearchMsg").textContent = "Ažurirano " + changed.length + " cena: " + changed.join(", ") + ". Ostale cene su ostale nepromenjene.";
-    $("onlinePriceResults").innerHTML = ""; $("applyOnlinePricesBtn").style.display = "none"; onlinePriceSelections.clear();
-});
-
-// GitHub: učitaj podrazumevani cenovnik sa Pages-a; sačuvaj izmene kroz GitHub Contents API.
-function fillGithubConfig() {
-    $("ghOwner").value = ghConfig.owner || "";
-    $("ghRepo").value = ghConfig.repo || "";
-    $("ghBranch").value = ghConfig.branch || "main";
-    $("ghToken").value = ghConfig.token || "";
-}
-fillGithubConfig();
-$("saveGithubConfigBtn").addEventListener("click", () => {
-    ghConfig = { owner:$("ghOwner").value.trim(), repo:$("ghRepo").value.trim(), branch:$("ghBranch").value.trim() || "main", token:$("ghToken").value.trim() };
-    localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(ghConfig));
-    $("githubDefaultsMsg").textContent = "Podešavanja su sačuvana u ovom pregledaču. Token nije deo javnog HTML fajla.";
-});
-async function loadGithubDefaults() {
-    const url = "./mist-defaults.json?v=" + Date.now();
-    try {
-        const r = await fetch(url, {cache:"no-store"});
-        if (!r.ok) return;
-        const d = await r.json();
-        if (d && d.format === "mist-defaults" && d.cene && d.priceLabels) {
-            registerArticles((d.customArticles || []).map(a => ({ key: a.key, name: a.name, price: a.price })));
-            if (d.pinolesLinks && typeof d.pinolesLinks === "object") Object.entries(d.pinolesLinks).forEach(([k, u]) => { if (isPinolesUrl(u)) pinolesLinks[k] = u; });
-            cene = { ...DEF, ...d.cene };
-            priceLabels = { ...PRICE_LABELS, ...d.priceLabels };
-            save(); buildCene(); buildNewArticles(); buildCustomRulesEditor(); populatePriceUpdateSelect(); buildPinolesLinks(); calc();
-            $("githubDefaultsMsg").textContent = "Podrazumevani cenovnik je učitan sa GitHub Pages-a.";
-        }
-    } catch (e) { /* fajl još nije objavljen ili mreža nije dostupna */ }
-}
-$("saveDefaultsGithubBtn").addEventListener("click", async () => {
-    const cfg = { owner:$("ghOwner").value.trim(), repo:$("ghRepo").value.trim(), branch:$("ghBranch").value.trim() || "main", token:$("ghToken").value.trim() };
-    if (!cfg.owner || !cfg.repo || !cfg.token) { $("githubDefaultsMsg").textContent = "Unesi GitHub korisnika, repozitorijum i token."; return; }
-    localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg)); ghConfig = cfg;
-    const path = "mist-defaults.json";
-    const api = "https://api.github.com/repos/" + encodeURIComponent(cfg.owner) + "/" + encodeURIComponent(cfg.repo) + "/contents/" + path;
-    const headers = {"Accept":"application/vnd.github+json", "Authorization":"Bearer " + cfg.token, "X-GitHub-Api-Version":"2022-11-28"};
-    const btn = $("saveDefaultsGithubBtn"); btn.disabled = true;
-    $("githubDefaultsMsg").textContent = "Čuvam podrazumevani cenovnik na GitHub-u...";
-    try {
-        let sha;
-        const existing = await fetch(api + "?ref=" + encodeURIComponent(cfg.branch), {headers});
-        if (existing.ok) sha = (await existing.json()).sha;
-        else if (existing.status !== 404) throw new Error("GitHub provera nije uspela: HTTP " + existing.status);
-        const payload = {format:"mist-defaults", version:1, updatedAt:new Date().toISOString(), cene, priceLabels, customArticles: articlesForExport(), pinolesLinks};
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-        const body = {message:"Update MiSt default price list", content, branch:cfg.branch}; if (sha) body.sha = sha;
-        const put = await fetch(api, {method:"PUT", headers:{...headers,"Content-Type":"application/json"}, body:JSON.stringify(body)});
-        if (!put.ok) { const err = await put.json().catch(()=>({})); throw new Error(err.message || ("HTTP " + put.status)); }
-        $("githubDefaultsMsg").textContent = "Uspešno sačuvano kao podrazumevani cenovnik. Ostali uređaji će ga učitati kada otvore aplikaciju.";
-    } catch (e) { $("githubDefaultsMsg").textContent = "GitHub čuvanje nije uspelo: " + e.message + ". Proveri token, dozvole Contents i naziv grane."; }
-    finally { btn.disabled = false; }
-});
-loadGithubDefaults();
 
 // Kurs se učitava iz kurs.json koji se automatski osvežava GitHub Actions-om.
 // Ovo omogućava rad na GitHub Pages bez oslanjanja na CORS pristup NBS sajtu.
@@ -1805,26 +1568,25 @@ async function refreshNbsRate() {
 $("refreshRateBtn").addEventListener("click", refreshNbsRate);
 
 
-$("exp").onclick = () => { $("json").value = JSON.stringify({ cene, nazivi: priceLabels, customArticles: articlesForExport(), pinolesLinks }, null, 2); };
+$("exp").onclick = () => { $("json").value = JSON.stringify({ cene, nazivi: priceLabels, customArticles: articlesForExport() }, null, 2); };
 $("imp").onclick = () => {
     try {
         const o = JSON.parse($("json").value);
         registerArticles((o.customArticles || []).map(a => ({ key: a.key, name: a.name, price: a.price })));
-        if (o.pinolesLinks && typeof o.pinolesLinks === "object") Object.entries(o.pinolesLinks).forEach(([k, u]) => { if (k in DEF && isPinolesUrl(u)) pinolesLinks[k] = u; });
         const importedPrices = o.cene && typeof o.cene === "object" ? o.cene : o;
         Object.keys(importedPrices).forEach(k => { if (k in DEF) cene[k] = Math.round(parseFloat(importedPrices[k]) || 0); });
         if (o.nazivi && typeof o.nazivi === "object") priceLabels = { ...PRICE_LABELS, ...o.nazivi };
         manualSum.okov = null;
         manualSum.mat = null;
         save();
-        buildCene(); buildNewArticles(); buildCustomRulesEditor(); populatePriceUpdateSelect();
+        buildCene(); buildNewArticles(); buildCustomRulesEditor();
         calc();
     } catch (x) { $("json").value = "Neispravan tekst cena: " + x.message; }
 };
 
 function refreshAfterArticleChange() {
     save(); saveCustomRules();
-    buildCene(); buildNewArticles(); buildCustomRulesEditor(); buildCustomCsvItems(); populatePriceUpdateSelect(); buildPinolesLinks();
+    buildCene(); buildNewArticles(); buildCustomRulesEditor(); buildCustomCsvItems();
     manualSum.okov = null; manualSum.mat = null;
     calc();
 }
@@ -1873,105 +1635,102 @@ $("saveNewArtBtn").addEventListener("click", () => {
     msg.textContent = "Dodato u cenovnik: " + name + " — " + fmt(price) + " Din. Količinu unosiš u sekciji Okov → Novi artikli.";
 });
 
-// ---------- Pinoles: linkovi i povlačenje cena ----------
-function buildPinolesLinks() {
-    const box = $("pinolesLinks");
-    if (!box) return;
-    box.innerHTML = "";
-    Object.keys(pinolesLinks).forEach(k => { if (!hasKey(k)) delete pinolesLinks[k]; });
-    Object.keys(DEF).filter(k => k !== "Američki ormar - komplet").forEach(k => {
-        const row = document.createElement("div"); row.className = "price-edit-row";
-        row.style.gridTemplateColumns = "minmax(0,1fr) minmax(0,1.4fr)";
-        const name = document.createElement("span"); name.textContent = priceLabels[k] || k; name.style.fontSize = ".86rem";
-        const inp = document.createElement("input"); inp.type = "url"; inp.value = pinolesLinks[k] || "";
-        inp.placeholder = "https://www.pinoles.com/proizvod/…"; inp.style.cssText = "width:100%;min-width:0;box-sizing:border-box;text-align:left";
-        inp.setAttribute("aria-label", "Pinoles link: " + k);
-        inp.addEventListener("change", () => {
-            const v = inp.value.trim();
-            if (!v) { delete pinolesLinks[k]; inp.style.borderColor = ""; }
-            else if (!isPinolesUrl(v)) { inp.style.borderColor = "#d32f2f"; $("pinolesMsg").textContent = "Link mora da počinje sa https://www.pinoles.com/ — nije sačuvan."; return; }
-            else { pinolesLinks[k] = v; inp.style.borderColor = ""; }
-            save(); updatePinolesCount();
-        });
-        row.append(name, inp); box.appendChild(row);
-    });
-    updatePinolesCount();
+// ---------- Pretraga cena: kopiraj spisak -> Claude pretraži -> nalepi odgovor ----------
+function buildSearchPrompt() {
+    const rows = Object.keys(DEF).filter(k => k !== "Američki ormar - komplet")
+        .map(k => [k, priceLabels[k] || k, PRICE_SEARCH_UNITS[k] || "kom", Number(cene[k]) || 0].join(" | "));
+    return "Pretraži na internetu aktuelne maloprodajne cene (u dinarima, RSD, sa PDV-om) u srpskim internet prodavnicama za sledeće artikle nameštaja i okova. " +
+        "Za svaki artikal nađi cenu za TAČNO ISTU jedinicu mere koja je navedena (kom, par, m, patrona, komplet). Ako se artikal prodaje u pakovanju, preračunaj na jedinicu iz spiska i napiši to u napomeni. Ne izmišljaj cene: ako nisi našao pouzdanu cenu, izostavi artikal.\n\n" +
+        "Odgovor vrati kao JSON niz u jednom code bloku, u ovom formatu (polje \"key\" mora biti tačno kao u prvoj koloni spiska):\n" +
+        "[{\"key\":\"...\",\"cena\":123,\"prodavnica\":\"naziv prodavnice\",\"link\":\"https://stranica-artikla\",\"napomena\":\"opciono\"}]\n\n" +
+        "Ispod bloka kratko navedi za koje artikle nisi našao cenu i gde sumnjaš da proizvod ili jedinica ne odgovaraju.\n\n" +
+        "Spisak (key | opis | jedinica | trenutna cena u Din):\n" + rows.join("\n");
 }
-function updatePinolesCount() {
-    const n = Object.keys(pinolesLinks).length;
-    $("pinolesLinksCount").textContent = "(povezano: " + n + ")";
+$("priceSearchBtn").addEventListener("click", () => {
+    const panel = $("priceSearchSection");
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) { $("psPrompt").value = buildSearchPrompt(); panel.scrollIntoView({ behavior: "smooth", block: "start" }); }
+});
+$("psCopyBtn").addEventListener("click", async () => {
+    const t = buildSearchPrompt();
+    $("psPrompt").value = t;
+    try { await navigator.clipboard.writeText(t); $("psMsg").textContent = "Spisak je kopiran. Nalepi ga u Claude ćaskanje."; }
+    catch (e) {
+        $("psPrompt").closest("details").open = true; $("psPrompt").select();
+        $("psMsg").textContent = "Pregledač nije dozvolio automatsko kopiranje. Tekst je izabran ispod, pritisni Ctrl+C.";
+    }
+});
+function parseSearchReply(raw) {
+    let t = String(raw || "").trim();
+    const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fence) t = fence[1].trim();
+    const a = t.indexOf("["), b = t.lastIndexOf("]");
+    if (a < 0 || b < a) throw new Error("U nalepljenom tekstu nema JSON niza [ ... ].");
+    const arr = JSON.parse(t.slice(a, b + 1));
+    if (!Array.isArray(arr)) throw new Error("Odgovor nije lista.");
+    return arr;
 }
-let pinolesData = null;
-function pinolesNewPrice(it) {
-    let p = $("pinolesMode").value === "regular" ? (it.regular ?? it.price) : it.price;
-    p = Number(p);
-    if (!Number.isFinite(p) || p <= 0) return null;
-    if ($("pinolesPdv").value === "minus20") p = p / 1.2;
-    return Math.round(p);
+function toPriceNumber(v) {
+    if (typeof v === "number") return v;
+    let s = String(v ?? "").replace(/[^\d.,]/g, "");
+    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+    return Number(s);
 }
-function renderPinolesDiff() {
-    const box = $("pinolesResults"), msg = $("pinolesMsg"), apply = $("pinolesApplyBtn");
+function reviewSearchReply() {
+    const box = $("psResults"), msg = $("psMsg"), apply = $("psApplyBtn");
     box.innerHTML = ""; apply.style.display = "none";
-    if (!pinolesData || !pinolesData.items) return;
-    const rows = [], failed = []; let same = 0;
-    Object.entries(pinolesData.items).forEach(([k, it]) => {
-        if (!hasKey(k)) return;
-        const np = pinolesNewPrice(it);
-        if (np === null) { failed.push((priceLabels[k] || k) + " — " + (it.status || "nema cene")); return; }
-        const old = Number(cene[k]) || 0;
-        if (np === old) { same++; return; }
-        rows.push({ k, it, np, old, pct: old ? (np - old) / old * 100 : null });
+    let arr;
+    try { arr = parseSearchReply($("psPaste").value); } catch (e) { msg.textContent = "Ne mogu da pročitam odgovor: " + e.message; return; }
+    const byLabel = {}; Object.keys(DEF).forEach(k => { byLabel[(priceLabels[k] || k).toLowerCase()] = k; });
+    const found = new Map(); let unknown = 0, invalid = 0;
+    arr.forEach(e => {
+        if (!e || typeof e !== "object") { invalid++; return; }
+        let key = e.key;
+        if (!hasKey(key)) key = byLabel[String(e.key || e.artikal || "").toLowerCase()];
+        if (!key || !hasKey(key)) { unknown++; return; }
+        const price = Math.round(toPriceNumber(e.cena ?? e.price));
+        if (!(price > 0)) { invalid++; return; }
+        found.set(key, { price, store: String(e.prodavnica || e.store || ""), url: String(e.link || e.url || ""), note: String(e.napomena || e.note || "") });
+    });
+    const rows = []; let same = 0;
+    found.forEach((f, key) => {
+        const old = Number(cene[key]) || 0;
+        if (f.price === old) { same++; return; }
+        rows.push({ key, f, old, pct: old ? (f.price - old) / old * 100 : null });
     });
     rows.sort((a, b) => Math.abs(b.pct ?? 999) - Math.abs(a.pct ?? 999));
-    const when = pinolesData.updatedAt ? new Date(pinolesData.updatedAt).toLocaleString("sr-RS") : "nepoznato";
-    msg.textContent = "Podaci sa Pinolesa od " + when + ". Različitih cena: " + rows.length + ", istih: " + same + (failed.length ? ", bez cene: " + failed.length : "") + ".";
+    msg.textContent = "Pronađeno cena: " + found.size + ", različitih od trenutnih: " + rows.length + ", istih: " + same +
+        (unknown ? ", nepoznatih artikala: " + unknown : "") + (invalid ? ", neispravnih unosa: " + invalid : "") + ".";
     rows.forEach(r => {
         const big = r.pct !== null && Math.abs(r.pct) > 25;
-        const line = document.createElement("label");
-        line.style.cssText = "display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);font-size:.88rem";
-        const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !big; cb.dataset.key = r.k; cb.dataset.price = r.np;
-        const nm = document.createElement("span");
-        nm.textContent = (priceLabels[r.k] || r.k) + (r.it.unit ? "  [" + r.it.unit + "]" : "") + (r.it.sale ? "  (akcija)" : "") + (big ? "  ⚠ velika razlika, proveri jedinicu mere" : "");
-        const pr = document.createElement("span"); pr.style.whiteSpace = "nowrap";
-        pr.textContent = fmt(r.old) + " → " + fmt(r.np) + " Din" + (r.pct !== null ? " (" + (r.pct > 0 ? "+" : "") + r.pct.toFixed(1) + "%)" : "");
-        line.append(cb, nm, pr); box.appendChild(line);
+        const line = document.createElement("div");
+        line.style.cssText = "display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--bd);font-size:.88rem";
+        const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !big; cb.dataset.key = r.key; cb.dataset.price = r.f.price; cb.style.marginTop = "3px";
+        const info = document.createElement("div");
+        const nm = document.createElement("div"); nm.style.fontWeight = "600"; nm.textContent = priceLabels[r.key] || r.key; info.appendChild(nm);
+        const meta = document.createElement("div"); meta.className = "msg"; meta.style.margin = "2px 0 0";
+        meta.textContent = [r.f.store ? "Izvor: " + r.f.store : "Izvor: nije naveden", r.f.note, big ? "⚠ velika razlika, proveri proizvod i jedinicu mere" : ""].filter(Boolean).join(" · ");
+        info.appendChild(meta);
+        if (/^https?:\/\//i.test(r.f.url)) {
+            const a = document.createElement("a"); a.href = r.f.url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = "Otvori izvor";
+            a.style.cssText = "color:var(--oak);font-size:.82rem"; info.appendChild(a);
+        }
+        const pr = document.createElement("div"); pr.style.cssText = "white-space:nowrap;text-align:right";
+        pr.textContent = fmt(r.old) + " → " + fmt(r.f.price) + " Din" + (r.pct !== null ? " (" + (r.pct > 0 ? "+" : "") + r.pct.toFixed(1) + "%)" : "");
+        line.append(cb, info, pr); box.appendChild(line);
     });
-    if (failed.length) {
-        const d = document.createElement("details"); d.style.marginTop = "8px";
-        const sm = document.createElement("summary"); sm.textContent = "Artikli bez preuzete cene (" + failed.length + ")"; d.appendChild(sm);
-        failed.forEach(t => { const p = document.createElement("div"); p.className = "msg"; p.textContent = t; d.appendChild(p); });
-        box.appendChild(d);
-    }
     if (rows.length) apply.style.display = "";
 }
-async function loadPinolesPrices() {
-    const msg = $("pinolesMsg"), btn = $("pinolesFetchBtn");
-    btn.disabled = true; msg.textContent = "Učitavam pinoles-cene.json...";
-    try {
-        const r = await fetch("./pinoles-cene.json?v=" + Date.now(), { cache: "no-store" });
-        if (!r.ok) throw new Error("pinoles-cene.json nije dostupan (" + r.status + "). Proveri da li je GitHub zadatak „Pinoles cene“ bar jednom uspešno završen.");
-        pinolesData = await r.json();
-        renderPinolesDiff();
-    } catch (e) { msg.textContent = "Nije uspelo: " + e.message; }
-    finally { btn.disabled = false; }
-}
-$("pinolesFetchBtn").addEventListener("click", loadPinolesPrices);
-["pinolesMode", "pinolesPdv"].forEach(id => $(id).addEventListener("change", () => {
-    try { localStorage.setItem(PINOLES_OPTS_KEY, JSON.stringify({ mode: $("pinolesMode").value, pdv: $("pinolesPdv").value })); } catch (e) {}
-    renderPinolesDiff();
-}));
-try {
-    const o = JSON.parse(localStorage.getItem(PINOLES_OPTS_KEY) || "{}");
-    if (o.mode) $("pinolesMode").value = o.mode;
-    if (o.pdv) $("pinolesPdv").value = o.pdv;
-} catch (e) {}
-$("pinolesApplyBtn").addEventListener("click", () => {
-    const checked = [...$("pinolesResults").querySelectorAll("input[type=checkbox]:checked")];
-    if (!checked.length) { $("pinolesMsg").textContent = "Nijedna cena nije izabrana."; return; }
+$("psReviewBtn").addEventListener("click", reviewSearchReply);
+$("psApplyBtn").addEventListener("click", () => {
+    const checked = [...$("psResults").querySelectorAll("input[type=checkbox]:checked")];
+    if (!checked.length) { $("psMsg").textContent = "Nijedna cena nije izabrana."; return; }
     checked.forEach(cb => { cene[cb.dataset.key] = Number(cb.dataset.price); });
     manualSum.okov = null; manualSum.mat = null;
-    save(); buildCene(); populatePriceUpdateSelect(); buildNewArticles(); calc(); renderPinolesDiff();
-    $("pinolesMsg").textContent = "Primenjeno cena: " + checked.length + ". Da bi ih videli i drugi uređaji, pritisni „Sačuvaj kao podrazumevano na GitHub-u“.";
+    save(); buildCene(); buildNewArticles(); calc();
+    $("psResults").innerHTML = ""; $("psApplyBtn").style.display = "none"; $("psPaste").value = "";
+    $("psMsg").textContent = "Primenjeno cena: " + checked.length + ". Ostale cene su ostale nepromenjene.";
 });
 $("reset").onclick = () => { cene = { ...DEF }; manualSum.okov = null; manualSum.mat = null; save(); buildCene(); calc(); };
 $("addkl").onclick = () => { KL.push({ d: 400, n: 1 }); buildKl(); };
@@ -2238,12 +1997,12 @@ $("pdfBtn").onclick = stampajPDF;
 buildOkov();
 buildFin();
 buildCene();
-populatePriceUpdateSelect();
+
 buildBuiltinCsvRulesEditor();
 buildCustomRulesEditor();
 buildCustomCsvItems();
 buildNewArticles();
-buildPinolesLinks();
+
 buildKl();
 buildSpecijalno();
 buildAmerickiPlakar();
