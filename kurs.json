@@ -1,8 +1,10 @@
 {
   "source": "Narodna banka Srbije - zvanični srednji kurs",
   "currency": "EUR",
-  "eurMiddleRate": 117.6203,
-  "date": "13.11.2026",
-  "validFrom": "13.11.2026",
-  "listNumber": "217"
+  "eurMiddleRate": 117.6103,
+  "date": "16.11.2026",
+  "validFrom": "",
+  "listNumber": "",
+  "updatedAt": "2026-11-16T09:53:20Z",
+  "sourceUrl": "https://webappcenter.nbs.rs/ExchangeRateWebApp/ExchangeRate/CurrentMiddleRate"
 }
