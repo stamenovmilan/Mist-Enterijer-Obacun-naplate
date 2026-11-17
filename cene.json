@@ -1,7 +1,7 @@
 {
   "format": "mist-enterijer-cene",
   "version": 1,
-  "savedAt": "2026-11-17T20:23:27.762Z",
+  "savedAt": "2026-11-17T20:23:39.067Z",
   "cene": {
     "Klap šarka ravna": 160,
     "Klap šarka polu koleno": 125,
@@ -188,6 +188,6 @@
       "deleted": true
     }
   },
-  "okovProc": 5,
-  "procZarade": 25
+  "okovProc": 0,
+  "procZarade": 30
 }
