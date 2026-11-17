@@ -212,7 +212,7 @@
 
     <section id="ghSection" hidden>
         <h2>GitHub — čuvanje cena</h2>
-        <p class="msg">Dugme „Sačuvaj cene na GitHub“ upisuje fajl sa svim cenama, nazivima artikala i CSV pravilima u repozitorijum (svaki put nova verzija u istoriji). Token pravi na GitHub → Settings → Developer settings → Fine-grained tokens, samo za ovaj repozitorijum, sa dozvolom <b>Contents: Read and write</b>. Token se čuva samo u ovom pregledaču.</p>
+        <p class="msg">Posle prvog uspešnog podešavanja i čuvanja na GitHub, polja ispod se zaključavaju kao podrazumevana podešavanja i ne mogu se menjati u ovoj aplikaciji. Token pravi na GitHub → Settings → Developer settings → Fine-grained tokens, samo za ovaj repozitorijum, sa dozvolom <b>Contents: Read and write</b>. Token se čuva samo u ovom pregledaču.</p>
         <div class="row"><label for="ghOwner">Korisnik / organizacija</label><input id="ghOwner" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
         <div class="row"><label for="ghRepo">Repozitorijum</label><input id="ghRepo" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
         <div class="row"><label for="ghBranch">Grana (branch)</label><input id="ghBranch" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
@@ -318,6 +318,14 @@
                 <option value="m">Za mušteriju</option>
                 <option value="i">Interna (sa zaradom)</option>
             </select>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:stretch">
+            <label for="napomenaPDF">Napomena koja se štampa u oba PDF fajla</label>
+            <textarea id="napomenaPDF" spellcheck="true" style="min-height:70px;font-family:inherit;font-size:.95rem">Projekat počinje sa izradom kada se uplati novac potreban za materijal.</textarea>
+        </div>
+        <div class="row">
+            <label for="kontaktPDF">Kontakt broj u PDF-u</label>
+            <input id="kontaktPDF" type="tel" style="width:14em;text-align:left" value="+381693546820" autocomplete="tel">
         </div>
         <div class="row" style="flex-direction:column;align-items:stretch">
             <label for="komentar">Komentar (štampa se na kraju PDF-a)</label>
@@ -1491,6 +1499,7 @@ function projectSnapshot() {
         kupac: $("kupac").value, verzija: $("verzija").value,
         telefon: $("telefonKupca").value, telefonKupca: $("telefonKupca").value,
         rokIsporuke: $("rokIsporuke").value,
+        napomenaPDF: $("napomenaPDF").value, kontaktPDF: $("kontaktPDF").value,
         komentar: $("komentar").value, podsetnik: $("podsetnik").value
     };
 }
@@ -1535,6 +1544,10 @@ $("loadProjectFile").addEventListener("change", event => {
             $("kupac").value = data.kupac || "";
             $("telefonKupca").value = data.telefonKupca || data.telefon || "";
             $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
+            $("napomenaPDF").value = data.napomenaPDF || "Projekat počinje sa izradom kada se uplati novac potreban za materijal.";
+            $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
+            try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
+            try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
             $("verzija").value = data.verzija || "m";
             $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || "";
             saveCustomRules(); save();
@@ -1564,7 +1577,7 @@ $("resetProjectBtn").addEventListener("click", () => {
     lastCsvParts = null;
     customArticles.forEach(a => a.qty = 0);
     customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
-    $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); } catch (e) {}
+    $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("napomenaPDF").value = "Projekat počinje sa izradom kada se uplati novac potreban za materijal."; $("kontaktPDF").value = "+381693546820"; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); localStorage.removeItem("mist_napomena_pdf"); localStorage.removeItem("mist_kontakt_pdf"); } catch (e) {}
     buildOkov(); buildFin(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
     buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
     $("msg").textContent = "Obračun je resetovan. Cenovnik i CSV pravila su sačuvani.";
@@ -1704,6 +1717,8 @@ function tekst() {
     const ime = $("kupac").value.trim();
     const telefon = ($("telefonKupca").value || "").trim();
     const rok = ($("rokIsporuke").value || "").trim();
+    const napomenaPDF = ($("napomenaPDF").value || "").trim();
+    const kontaktPDF = ($("kontaktPDF").value || "").trim();
     const L = [];
     let okov = 0;
     const R = [];
@@ -1770,8 +1785,8 @@ function tekst() {
     if (ime) L.push("Projekat / kupac: " + ime);
     if (telefon) L.push("Telefon kupca: " + telefon);
     if (rok) L.push("Dogovoreni rok isporuke / izrade: " + rok);
-    L.push("Napomena: Projekat počinje sa izradom kada se uplati novac potreban za materijal.");
-    L.push("Kontakt: +381693546820");
+    if (napomenaPDF) L.push("Napomena: " + napomenaPDF);
+    if (kontaktPDF) L.push("Kontakt: " + kontaktPDF);
     L.push("Datum: " + new Date().toLocaleDateString("sr-RS"), "");
     L.push("OKOV, RASVETA I DODACI");
     
@@ -1795,6 +1810,8 @@ function stampajPDF() {
     const ime = $("kupac").value.trim();
     const telefon = ($("telefonKupca").value || "").trim();
     const rok = ($("rokIsporuke").value || "").trim();
+    const napomenaPDF = ($("napomenaPDF").value || "").trim();
+    const kontaktPDF = ($("kontaktPDF").value || "").trim();
     const datum = new Date().toLocaleDateString("sr-RS");
     let okov = 0; 
     const R = [];
@@ -1876,7 +1893,8 @@ function stampajPDF() {
         </div>
     </div>`;
     html += `<p><strong>Kupac / Projekat:</strong> ${ime || "Nije navedeno"}<br><strong>Telefon kupca:</strong> ${telefon || "Nije naveden"}<br><strong>Dogovoreni rok isporuke / izrade:</strong> ${rok || "Nije naveden"}<br><strong>Datum:</strong> ${datum}</p>`;
-    html += `<div class="note-box"><strong>Napomena:</strong> Projekat počinje sa izradom kada se uplati novac potreban za materijal.<br><strong>Kontakt:</strong> +381693546820</div>`;
+    const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    html += `<div class="note-box">${napomenaPDF ? "<strong>Napomena:</strong> " + esc(napomenaPDF) + "<br>" : ""}${kontaktPDF ? "<strong>Kontakt:</strong> " + esc(kontaktPDF) : ""}</div>`;
     
     if (I) {
         html += `<h3>Spisak artikala za nabavku (Okov, rasveta i dodaci)</h3>`;
@@ -1921,7 +1939,6 @@ function stampajPDF() {
         </table></div>`;
     }
     
-    const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const kom = ($("komentar").value || "").trim(), pod = ($("podsetnik").value || "").trim();
     if (kom) html += `<h3>Komentar</h3><div class="note-box">${esc(kom)}</div>`;
     if (pod) html += `<h3>Podsetnik</h3><div class="note-box">${esc(pod)}</div>`;
@@ -1971,7 +1988,7 @@ const GH_KEY = "mist_github_cfg_v1";
 function ghDefaults() {
     const host = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0] || "";
     const onPages = host.endsWith(".github.io");
-    return { owner: onPages ? host.split(".")[0] : "", repo: onPages ? (seg.endsWith(".html") ? host : (seg || host)) : "", branch: "main", path: "cene.json", token: "", auto: false, history: true };
+    return { owner: onPages ? host.split(".")[0] : "", repo: onPages ? (seg.endsWith(".html") ? host : (seg || host)) : "", branch: "main", path: "cene.json", token: "", auto: false, history: true, locked: false };
 }
 function ghLoad() {
     let c = {};
@@ -1982,9 +1999,15 @@ function ghFillForm() {
     const c = ghLoad();
     $("ghOwner").value = c.owner; $("ghRepo").value = c.repo; $("ghBranch").value = c.branch; $("ghPath").value = c.path; $("ghToken").value = c.token;
     $("ghAuto").checked = !!c.auto;
+    ["ghOwner","ghRepo","ghBranch","ghPath","ghToken","ghAuto","ghCfgSave"].forEach(id => {
+        if ($(id)) $(id).disabled = !!c.locked;
+    });
+    if (c.locked) $("ghMsg").textContent = "GitHub podešavanja su zaključana kao podrazumevana.";
 }
 function ghReadForm() {
-    return { owner: $("ghOwner").value.trim(), repo: $("ghRepo").value.trim(), branch: $("ghBranch").value.trim() || "main", path: ($("ghPath").value.trim() || "cene.json").replace(/^\/+/, ""), token: $("ghToken").value.trim(), auto: $("ghAuto").checked, history: true };
+    const current = ghLoad();
+    if (current.locked) return current;
+    return { owner: $("ghOwner").value.trim(), repo: $("ghRepo").value.trim(), branch: $("ghBranch").value.trim() || "main", path: ($("ghPath").value.trim() || "cene.json").replace(/^\/+/, ""), token: $("ghToken").value.trim(), auto: $("ghAuto").checked, history: true, locked: false };
 }
 const ghB64 = str => btoa(unescape(encodeURIComponent(str)));
 async function ghPushPrices(c) {
@@ -1993,7 +2016,8 @@ async function ghPushPrices(c) {
     const payload = {
         format: "mist-enterijer-cene", version: 1, savedAt: new Date().toISOString(),
         cene, nazivi: priceLabels, customArticles: articlesForExport(), customCsvRules, builtinCsvRules,
-        okovProc: fin.okovProc, procZarade: fin.proc
+        okovProc: fin.okovProc, procZarade: fin.proc,
+        napomenaPDF: $("napomenaPDF").value, kontaktPDF: $("kontaktPDF").value
     };
     let sha;
     const g = await fetch(api + "?ref=" + encodeURIComponent(c.branch), { headers, cache: "no-store" });
@@ -2021,6 +2045,14 @@ async function ghFetchRemotePrices(c) {
     if (payload.builtinCsvRules) builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...payload.builtinCsvRules };
     if (Number.isFinite(Number(payload.okovProc))) fin.okovProc = Number(payload.okovProc);
     if (Number.isFinite(Number(payload.procZarade))) fin.proc = Number(payload.procZarade);
+    if (typeof payload.napomenaPDF === "string") {
+        $("napomenaPDF").value = payload.napomenaPDF;
+        try { localStorage.setItem("mist_napomena_pdf", payload.napomenaPDF); } catch (e) {}
+    }
+    if (typeof payload.kontaktPDF === "string") {
+        $("kontaktPDF").value = payload.kontaktPDF;
+        try { localStorage.setItem("mist_kontakt_pdf", payload.kontaktPDF); } catch (e) {}
+    }
     saveCustomRules(); save();
     buildCene(); buildNewArticles(); buildCustomRulesEditor(); buildCustomCsvItems(); calc();
     return true;
@@ -2063,7 +2095,10 @@ async function ghSaveNow(c) {
     btn.disabled = true; m.textContent = "Šaljem cene na GitHub…";
     try {
         await ghPushPrices(c);
+        c.locked = true;
+        c.auto = true;
         localStorage.setItem(GH_KEY, JSON.stringify(c));
+        ghFillForm();
         m.textContent = "Cene su sačuvane na GitHub-u (" + c.path + ").";
         if (gm) gm.textContent = "Sačuvano: " + new Date().toLocaleTimeString("sr-RS");
     } catch (err) {
@@ -2093,9 +2128,22 @@ $("ghSaveBtn").addEventListener("click", () => {
 
 // Komentar i podsetnik pamte se lokalno
 (function () {
-    try { $("komentar").value = localStorage.getItem("mist_komentar") || ""; $("podsetnik").value = localStorage.getItem("mist_podsetnik") || ""; } catch (e) {}
+    try {
+        $("komentar").value = localStorage.getItem("mist_komentar") || "";
+        $("podsetnik").value = localStorage.getItem("mist_podsetnik") || "";
+        $("napomenaPDF").value = localStorage.getItem("mist_napomena_pdf") || "Projekat počinje sa izradom kada se uplati novac potreban za materijal.";
+        $("kontaktPDF").value = localStorage.getItem("mist_kontakt_pdf") || "+381693546820";
+    } catch (e) {}
     $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
     $("podsetnik").addEventListener("input", () => { try { localStorage.setItem("mist_podsetnik", $("podsetnik").value); } catch (e) {} });
+    $("napomenaPDF").addEventListener("input", () => {
+        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); } catch (e) {}
+        if (typeof ghSchedulePush === "function") ghSchedulePush();
+    });
+    $("kontaktPDF").addEventListener("input", () => {
+        try { localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
+        if (typeof ghSchedulePush === "function") ghSchedulePush();
+    });
 })();
 
 $("ghHistoryRefresh").addEventListener("click", () => {
@@ -2127,6 +2175,8 @@ $("ghHistoryLoad").addEventListener("click", async () => {
         $("kupac").value = data.kupac || "";
         $("telefonKupca").value = data.telefonKupca || data.telefon || "";
         $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
+        $("napomenaPDF").value = data.napomenaPDF || "Projekat počinje sa izradom kada se uplati novac potreban za materijal.";
+        $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
         $("verzija").value = data.verzija || "m";
         $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || "";
         saveCustomRules(); save();
