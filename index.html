@@ -191,6 +191,8 @@
             <button type="button" class="danger" id="resetProjectBtn">↺ Reset svih polja</button>
             <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
             <button type="button" class="alt" id="priceSearchBtn">🔎 Pretraga cena</button>
+            <button type="button" id="ghSaveBtn" title="Upisuje cene, nazive artikala i CSV pravila u cene.json na GitHub-u">☁ Sačuvaj cene na GitHub</button>
+            <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub</button>
             <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
         </div>
         <div class="top-rate">
@@ -202,6 +204,18 @@
             <p class="msg" id="nbsRateMsg">Kurs se preuzima iz zvanične kursne liste NBS.</p>
         </div>
     </div>
+
+    <section id="ghSection" hidden>
+        <h2>GitHub — čuvanje cena</h2>
+        <p class="msg">Dugme „Sačuvaj cene na GitHub“ upisuje fajl sa svim cenama, nazivima artikala i CSV pravilima u repozitorijum (svaki put nova verzija u istoriji). Token pravi na GitHub → Settings → Developer settings → Fine-grained tokens, samo za ovaj repozitorijum, sa dozvolom <b>Contents: Read and write</b>. Token se čuva samo u ovom pregledaču.</p>
+        <div class="row"><label for="ghOwner">Korisnik / organizacija</label><input id="ghOwner" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
+        <div class="row"><label for="ghRepo">Repozitorijum</label><input id="ghRepo" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
+        <div class="row"><label for="ghBranch">Grana (branch)</label><input id="ghBranch" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
+        <div class="row"><label for="ghPath">Putanja fajla</label><input id="ghPath" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
+        <div class="row"><label for="ghToken">Token</label><input id="ghToken" type="password" style="width:14em;text-align:left" autocomplete="off"></div>
+        <div class="btns"><button type="button" id="ghCfgSave">Sačuvaj podešavanja i pošalji cene</button></div>
+        <p class="msg" id="ghMsg" aria-live="polite"></p>
+    </section>
 
     <section id="csvRulesSection" hidden>
         <h2>Pravila prepoznavanja okova iz CSV krojne liste</h2>
@@ -307,6 +321,14 @@
                 <option value="m">Za mušteriju</option>
                 <option value="i">Interna (sa zaradom)</option>
             </select>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:stretch">
+            <label for="komentar">Komentar (štampa se na kraju PDF-a)</label>
+            <textarea id="komentar" spellcheck="true" style="min-height:80px;font-family:inherit;font-size:.95rem" placeholder="Npr. rok izrade, način plaćanja, napomene o materijalu…"></textarea>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:stretch">
+            <label for="podsetnik">Podsetnik (štampa se na kraju PDF-a)</label>
+            <textarea id="podsetnik" spellcheck="true" style="min-height:80px;font-family:inherit;font-size:.95rem" placeholder="Npr. proveriti mere na licu mesta, naručiti staklo…"></textarea>
         </div>
         <div class="btns">
             <button id="izvoz" disabled>Izvezi tekstualni fajl</button> 
@@ -556,7 +578,7 @@ let spec = {
     vertLajsna: 0, donjaSina: 0, gornjaSina: 0, usporivaci: 0
 };
 
-let fin = { prevoz: 0, plocasti: 0, staklo: 0, izrada: 0, plast: 0, proc: 30, okovProc: 0, kurs: 117.39 };
+let fin = { prevoz: 0, plocasti: 0, staklo: 0, metal: 0, izrada: 0, plast: 0, proc: 30, okovProc: 0, kurs: 117.39 };
 
 let manualSum = {
     okov: null,
@@ -863,14 +885,38 @@ function buildFin() {
     });
     sel.addEventListener("change", () => { fin.proc = +sel.value; calc(); });
 
+    // Zbir okova (sa uvećanjem) + padajući meni za procenat uvećanja
+    const okovWrap = document.createElement("div");
+    okovWrap.style.cssText = "display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end";
+    const okovTotal = document.createElement("b");
+    okovTotal.id = "finOkovTotal";
+    okovTotal.textContent = "0 Din";
+    const okovSel = document.createElement("select");
+    okovSel.id = "okovMarkupSel";
+    okovSel.setAttribute("aria-label", "Procenat uvećanja okova");
+    const marks = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+    const cur = Number(fin.okovProc) || 0;
+    if (!marks.includes(cur)) { marks.push(cur); marks.sort((a, b) => a - b); }
+    marks.forEach(p => {
+        const o = document.createElement("option");
+        o.value = p;
+        o.textContent = "uvećanje " + p + "%";
+        if (p === cur) o.selected = true;
+        okovSel.appendChild(o);
+    });
+    okovSel.addEventListener("change", () => { fin.okovProc = +okovSel.value; calc(); });
+    okovWrap.appendChild(okovTotal);
+    okovWrap.appendChild(okovSel);
+
     mk($("fin"), [
-        { id: "f_prevoz", l: "Prevoz", showQtyLabel: false, el: num("", fin.prevoz, v => { fin.prevoz = v; manualSum.prevoz = null; calc(); }, "1") },
-        { id: "f_plocasti", l: "Pločasti materijali sa kantom", showQtyLabel: false, el: num("", fin.plocasti, v => { fin.plocasti = v; manualSum.mat = null; calc(); }, "1") },
-        { id: "f_staklo", l: "Cena stakla i ogledala", showQtyLabel: false, el: num("", fin.staklo, v => { fin.staklo = v; manualSum.mat = null; calc(); }, "1") },
-        { id: "f_izrada", l: "Izrada projekta", showQtyLabel: false, el: num("", fin.izrada, v => { fin.izrada = v; manualSum.izrada = null; calc(); }, "1") },
-        { id: "f_plast", l: "Plastifikacija", showQtyLabel: false, el: num("", fin.plast, v => { fin.plast = v; manualSum.mat = null; calc(); }, "1") },
-        { id: "f_proc", l: "Procenat zarade", showQtyLabel: false, el: sel },
-        { id: "f_kurs", l: "Kurs evra (Din)", showQtyLabel: false, el: num("", fin.kurs, v => { fin.kurs = v; calc(); }, "0.01") }
+        { id: "f_plocasti", l: "1. Pločasti materijali sa kantom", showQtyLabel: false, el: num("", fin.plocasti, v => { fin.plocasti = v; calc(); }, "1") },
+        { id: "f_okov", l: "2. Zbir okova", showQtyLabel: false, el: okovWrap },
+        { id: "f_staklo", l: "3. Cena stakla i ogledala", showQtyLabel: false, el: num("", fin.staklo, v => { fin.staklo = v; calc(); }, "1") },
+        { id: "f_metal", l: "4. Metalne konstrukcije", showQtyLabel: false, el: num("", fin.metal, v => { fin.metal = v; calc(); }, "1") },
+        { id: "f_plast", l: "5. Plastifikacija", showQtyLabel: false, el: num("", fin.plast, v => { fin.plast = v; calc(); }, "1") },
+        { id: "f_izrada", l: "6. Izrada projekta", showQtyLabel: false, el: num("", fin.izrada, v => { fin.izrada = v; calc(); }, "1") },
+        { id: "f_prevoz", l: "7. Prevoz", showQtyLabel: false, el: num("", fin.prevoz, v => { fin.prevoz = v; calc(); }, "1") },
+        { id: "f_proc", l: "8. Procenat zarade", showQtyLabel: false, el: sel }
     ]);
 }
 
@@ -950,30 +996,32 @@ function initSumContainer() {
     if (sumInitialized) return;
     const box = $("sum");
     box.innerHTML = `
-        <div class="row"><label for="sum_inp_0">Osnovica okova pre uvećanja</label><input type="number" id="sum_inp_0" step="1" min="0" style="text-align:right;width:9em;"></div>
-        <div class="row"><label for="okovMarkupInput">Uvećanje cene okova (%)</label><input type="number" id="okovMarkupInput" step="0.5" min="0" max="500" style="text-align:right;width:9em;"></div>
-        <div class="row"><label>Iznos uvećanja</label><b id="okovMarkupAmount">0 Din</b></div>
-        <div class="row"><label>Zbir okova sa uvećanjem</label><b id="okovFinalAmount">0 Din</b></div>
-        <div class="row"><label for="sum_inp_1">Zbir materijala (osnovica za procenat)</label><input type="number" id="sum_inp_1" step="1" min="0" style="text-align:right;width:9em;"></div>
-        <div class="row"><label for="sum_inp_2" id="lbl_zarada">Zarada</label><input type="number" id="sum_inp_2" step="1" min="0" style="text-align:right;width:9em;"></div>
-        <div class="row"><label for="sum_inp_3">Prevoz</label><input type="number" id="sum_inp_3" step="1" min="0" style="text-align:right;width:9em;"></div>
-        <div class="row"><label for="sum_inp_4">Izrada projekta</label><input type="number" id="sum_inp_4" step="1" min="0" style="text-align:right;width:9em;"></div>
+        <div class="row"><label>Zbir okova sa uvećanjem</label><b id="sumOkov">0 Din</b></div>
+        <div class="row"><label>Pločasti materijali sa kantom</label><b id="sumPlocasti">0 Din</b></div>
+        <div class="row" style="align-items:flex-start"><label>Ostalo<br><small id="sumOstaloOpis" style="font-weight:400;font-size:.72rem;color:var(--mut,#6a7077);line-height:1.3;display:block;max-width:34em"></small></label><b id="sumOstalo">0 Din</b></div>
+        <div class="row"><label><b>Materijal zbirno</b></label><b id="sumMat">0 Din</b></div>
     `;
-
-    $("sum_inp_0").addEventListener("input", e => { manualSum.okov = Math.round(parseFloat(e.target.value) || 0); calc(); });
-    $("okovMarkupInput").value = fin.okovProc || 0;
-    $("okovMarkupInput").addEventListener("input", e => {
-        const value = Number(e.target.value);
-        fin.okovProc = Number.isFinite(value) ? Math.max(0, Math.min(500, value)) : 0;
-        manualSum.mat = null;
-        calc();
-    });
-    $("sum_inp_1").addEventListener("input", e => { manualSum.mat = Math.round(parseFloat(e.target.value) || 0); calc(); });
-    $("sum_inp_2").addEventListener("input", e => { manualSum.zar = Math.round(parseFloat(e.target.value) || 0); calc(); });
-    $("sum_inp_3").addEventListener("input", e => { manualSum.prevoz = Math.round(parseFloat(e.target.value) || 0); calc(); });
-    $("sum_inp_4").addEventListener("input", e => { manualSum.izrada = Math.round(parseFloat(e.target.value) || 0); calc(); });
-
+    $("sumOstaloOpis").textContent = "ostalo podrazumeva: plastifikaciju, cenu stakla i ogledala, metalne konstrukcije, prevoz, izradu projekta i iznos zarade (zarada se računa kao izabrani procenat od okova sa uvećanjem, pločastih materijala, stakla i ogledala, metalnih konstrukcija i plastifikacije)";
     sumInitialized = true;
+}
+
+// Jedinstven obračun za ekran, PDF i tekstualni izvoz. Sve vrednosti su automatske (bez ručne izmene).
+function izracunajFin(autoOkov) {
+    const okovMarkup = applyOkovMarkup(Math.round(autoOkov));
+    const okov = okovMarkup.total;                       // okov već sa uvećanjem
+    const plocasti = Math.round(fin.plocasti || 0);
+    const staklo = Math.round(fin.staklo || 0);
+    const metal = Math.round(fin.metal || 0);
+    const plast = Math.round(fin.plast || 0);
+    const prevoz = Math.round(fin.prevoz || 0);
+    const izrada = Math.round(fin.izrada || 0);
+    const osnovica = okov + plocasti + staklo + metal + plast;
+    const zar = Math.round(osnovica * (Number(fin.proc) || 0) / 100);
+    const ostalo = plast + staklo + metal + prevoz + izrada + zar;
+    const mat = okov + plocasti + ostalo;                // Materijal zbirno
+    const din = mat;
+    const eur = fin.kurs ? din / fin.kurs : 0;
+    return { okov, okovAmount: okovMarkup.amount, plocasti, staklo, metal, plast, prevoz, izrada, osnovica, zar, ostalo, mat, din, eur };
 }
 
 function applyOkovMarkup(base) {
@@ -1025,36 +1073,18 @@ function calc() {
     autoOkov += extraLines().reduce((sum, l) => sum + l.qty * l.price, 0);
 
     autoOkov = Math.round(autoOkov);
-    const okovBase = manualSum.okov !== null ? manualSum.okov : autoOkov;
-    const okovMarkup = applyOkovMarkup(okovBase);
-    const okov = okovMarkup.total;
-    
-    let autoMat = okov + fin.plocasti + fin.staklo + fin.plast;
-    autoMat = Math.round(autoMat);
-    const mat = manualSum.mat !== null ? manualSum.mat : autoMat;
-    
-    let autoZar = mat * fin.proc / 100;
-    autoZar = Math.round(autoZar);
-    const zar = manualSum.zar !== null ? manualSum.zar : autoZar;
-    
-    const prevoz = manualSum.prevoz !== null ? manualSum.prevoz : Math.round(fin.prevoz);
-    const izrada = manualSum.izrada !== null ? manualSum.izrada : Math.round(fin.izrada);
+    const T = izracunajFin(autoOkov);
 
-    const din = Math.round(mat + zar + prevoz + izrada);
-    const eur = fin.kurs ? din / fin.kurs : 0;
+    $("finOkovTotal").textContent = fmt(T.okov) + " Din";
+    const okovSel = $("okovMarkupSel");
+    if (okovSel && document.activeElement !== okovSel) okovSel.value = String(Number(fin.okovProc) || 0);
+    $("sumOkov").textContent = fmt(T.okov) + " Din";
+    $("sumPlocasti").textContent = fmt(T.plocasti) + " Din";
+    $("sumOstalo").textContent = fmt(T.ostalo) + " Din";
+    $("sumMat").textContent = fmt(T.mat) + " Din";
 
-    if (document.activeElement !== $("sum_inp_0")) $("sum_inp_0").value = okovBase;
-    if (document.activeElement !== $("okovMarkupInput")) $("okovMarkupInput").value = fin.okovProc || 0;
-    $("okovMarkupAmount").textContent = fmt(okovMarkup.amount) + " Din";
-    $("okovFinalAmount").textContent = fmt(okovMarkup.total) + " Din";
-    if (document.activeElement !== $("sum_inp_1")) $("sum_inp_1").value = mat;
-    $("lbl_zarada").textContent = "Zarada (" + fin.proc + "%)";
-    if (document.activeElement !== $("sum_inp_2")) $("sum_inp_2").value = zar;
-    if (document.activeElement !== $("sum_inp_3")) $("sum_inp_3").value = prevoz;
-    if (document.activeElement !== $("sum_inp_4")) $("sum_inp_4").value = izrada;
-
-    $("tdin").textContent = fmt(din);
-    $("teur").textContent = fmt(eur);
+    $("tdin").textContent = fmt(T.din);
+    $("teur").textContent = fmt(T.eur);
     applyLabels();
     save();
 }
@@ -1441,7 +1471,8 @@ function projectSnapshot() {
     return {
         format: "mist-enterijer-project", version: 1, savedAt: new Date().toISOString(),
         cene, priceLabels, customArticles, q, spec, fin, manualSum, KL, customCsvRules, builtinCsvRules,
-        kupac: $("kupac").value, verzija: $("verzija").value
+        kupac: $("kupac").value, verzija: $("verzija").value,
+        komentar: $("komentar").value, podsetnik: $("podsetnik").value
     };
 }
 $("saveProjectBtn").addEventListener("click", () => {
@@ -1480,6 +1511,7 @@ $("loadProjectFile").addEventListener("change", event => {
             builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...(data.builtinCsvRules || {}) };
             $("kupac").value = data.kupac || "";
             $("verzija").value = data.verzija || "m";
+            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || "";
             saveCustomRules(); save();
             buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
             buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles();calc();
@@ -1501,13 +1533,13 @@ $("resetProjectBtn").addEventListener("click", () => {
         escajgSirina:60, escajgKol:0, popUpSuko:0, americkiOrmar:0, sudoperaSirina:60, sudoperaKol:0,
         tLajsnaKol:0, kantaSirina:"40", kantaKol:0, vertLajsna:0, donjaSina:0, gornjaSina:0, usporivaci:0
     };
-    fin = { prevoz:0, plocasti:0, staklo:0, izrada:0, plast:0, proc:30, okovProc:0, kurs:fin.kurs || 117.6203 };
+    fin = { prevoz:0, plocasti:0, staklo:0, metal:0, izrada:0, plast:0, proc:30, okovProc:0, kurs:fin.kurs || 117.6203 };
     manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null };
     KL = [{ d:400, n:0 }];
     lastCsvParts = null;
     customArticles.forEach(a => a.qty = 0);
     customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
-    $("kupac").value = ""; $("verzija").value = "m"; $("csv").value = "";
+    $("kupac").value = ""; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); } catch (e) {}
     buildOkov(); buildFin(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
     buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
     $("msg").textContent = "Obračun je resetovan. Cenovnik i CSV pravila su sačuvani.";
@@ -1797,15 +1829,11 @@ function tekst() {
     dodajSpecTekst("Gornja šina 1m", spec.gornjaSina, "m");
     dodajSpecTekst("Usporivači", spec.usporivaci, "kol");
     
-    const okovMarkup = applyOkovMarkup(manualSum.okov !== null ? manualSum.okov : Math.round(okov));
-    const calcOkov = okovMarkup.total;
-    const calcMat = manualSum.mat !== null ? manualSum.mat : Math.round(calcOkov + fin.plocasti + fin.staklo + fin.plast);
-    const calcZar = manualSum.zar !== null ? manualSum.zar : Math.round(calcMat * fin.proc / 100);
-    const calcPrevoz = manualSum.prevoz !== null ? manualSum.prevoz : Math.round(fin.prevoz);
-    const calcIzrada = manualSum.izrada !== null ? manualSum.izrada : Math.round(fin.izrada);
+    const T = izracunajFin(Math.round(okov));
+    const calcOkov = T.okov, calcMat = T.osnovica, calcZar = T.zar, calcPrevoz = T.prevoz, calcIzrada = T.izrada;
 
-    const din = Math.round(calcMat + calcZar + calcPrevoz + calcIzrada);
-    const eur = fin.kurs ? din / fin.kurs : 0;
+    const din = T.din;
+    const eur = T.eur;
     
     L.push("MiSt Enterijer - Mist Enterijer - " + (I ? "INTERNI OBRAČUN" : "PONUDA"));
     if (ime) L.push("Projekat / kupac: " + ime);
@@ -1816,10 +1844,13 @@ function tekst() {
     R.forEach(r => L.push(I ? pad(r[0], 40) + pad(r[1] + " kol", 12) + "x " + pad(f(r[2]), 10) + "= " + f(r[1] * r[2]) + " Din" : "- " + r[0] + ": " + r[1]));
     
     if (I) {
-        L.push("", "Zbir okov i dodataka: " + f(calcOkov) + " Din", ...(okovMarkup.amount > 0 ? ["Uvećanje okova: " + f(okovMarkup.amount) + " Din"] : []), "Pločasti materijali sa kantom: " + f(fin.plocasti) + " Din", "Staklo i ogledala: " + f(fin.staklo) + " Din", "Plastifikacija: " + f(fin.plast) + " Din", "Zbir materijala (osnovica): " + f(calcMat) + " Din", "Zarada (" + fin.proc + "%): " + f(calcZar) + " Din", "Prevoz: " + f(calcPrevoz) + " Din", "Izrada projekta: " + f(calcIzrada) + " Din", "", "UKUPNO Din: " + f(din), "UKUPNO Eur: " + f(eur) + " (kurs " + fin.kurs + ")");
+        L.push("", "Zbir okov i dodataka: " + f(calcOkov) + " Din", "Pločasti materijali sa kantom: " + f(fin.plocasti) + " Din", "Staklo i ogledala: " + f(fin.staklo) + " Din", "Metalne konstrukcije: " + f(fin.metal) + " Din", "Plastifikacija: " + f(fin.plast) + " Din", "Zbir materijala (osnovica): " + f(calcMat) + " Din", "Zarada (" + fin.proc + "%): " + f(calcZar) + " Din", "Prevoz: " + f(calcPrevoz) + " Din", "Izrada projekta: " + f(calcIzrada) + " Din", "", "UKUPNO Din: " + f(din), "UKUPNO Eur: " + f(eur) + " (kurs " + fin.kurs + ")");
     } else {
         L.push("", "UKUPNO: " + f(din) + " Din (oko " + f(eur) + " Eur)");
     }
+    const kom = ($("komentar").value || "").trim(), pod = ($("podsetnik").value || "").trim();
+    if (kom) L.push("", "KOMENTAR:", kom);
+    if (pod) L.push("", "PODSETNIK:", pod);
     return L.join("\r\n");
 }
 
@@ -1872,15 +1903,11 @@ function stampajPDF() {
     dodajSpecPDF("Gornja šina 1m", spec.gornjaSina);
     dodajSpecPDF("Usporivači", spec.usporivaci);
 
-    const okovMarkup = applyOkovMarkup(manualSum.okov !== null ? manualSum.okov : Math.round(okov));
-    const calcOkov = okovMarkup.total;
-    const calcMat = manualSum.mat !== null ? manualSum.mat : Math.round(calcOkov + fin.plocasti + fin.staklo + fin.plast);
-    const calcZar = manualSum.zar !== null ? manualSum.zar : Math.round(calcMat * fin.proc / 100);
-    const calcPrevoz = manualSum.prevoz !== null ? manualSum.prevoz : Math.round(fin.prevoz);
-    const calcIzrada = manualSum.izrada !== null ? manualSum.izrada : Math.round(fin.izrada);
+    const T = izracunajFin(Math.round(okov));
+    const calcOkov = T.okov, calcMat = T.osnovica, calcZar = T.zar, calcPrevoz = T.prevoz, calcIzrada = T.izrada;
 
-    const din = Math.round(calcMat + calcZar + calcPrevoz + calcIzrada);
-    const eur = fin.kurs ? din / fin.kurs : 0;
+    const din = T.din;
+    const eur = T.eur;
     
     let html = `<html><head><title>MiSt Ponuda - ${ime}</title>
     <style>
@@ -1898,6 +1925,7 @@ function stampajPDF() {
         .summary-box table { margin: 0; }
         .summary-box td { border-bottom: 1px solid #ecebe7; }
         .summary-box tr:last-child td { border-bottom: none; }
+        .note-box { white-space: pre-wrap; border: 1px solid #d6d3cb; border-radius: 6px; padding: 10px 12px; background: #faf9f6; page-break-inside: avoid; }
         @media print { body { padding: 0; } }
     </style></head><body>`;
     
@@ -1925,9 +1953,9 @@ function stampajPDF() {
         html += `<h3>Finansijska rekapitulacija i obračun</h3>`;
         html += `<div class="summary-box"><table>
             <tr><td>Zbir okov i dodataka:</td><td class="right">${fmt(calcOkov)} Din</td></tr>
-            ${okovMarkup.amount > 0 ? `<tr><td>Uvećanje okova:</td><td class="right">${fmt(okovMarkup.amount)} Din</td></tr>` : ""}
             <tr><td>Pločasti materijali sa kantom:</td><td class="right">${fmt(fin.plocasti)} Din</td></tr>
             <tr><td>Staklo i ogledala:</td><td class="right">${fmt(fin.staklo)} Din</td></tr>
+            <tr><td>Metalne konstrukcije:</td><td class="right">${fmt(fin.metal)} Din</td></tr>
             <tr><td>Plastifikacija:</td><td class="right">${fmt(fin.plast)} Din</td></tr>
             <tr class="total-row"><td>Zbir materijala (osnovica za zaradu):</td><td class="right">${fmt(calcMat)} Din</td></tr>
             <tr><td>Zarada (${fin.proc}%):</td><td class="right">${fmt(calcZar)} Din</td></tr>
@@ -1940,9 +1968,9 @@ function stampajPDF() {
         html += `<h3>Informacije o finansijama i obračun</h3>`;
         html += `<div class="summary-box"><table>
             <tr><td>Zbir okov i dodataka:</td><td class="right">${fmt(calcOkov)} Din</td></tr>
-            ${okovMarkup.amount > 0 ? `<tr><td>Uvećanje okova:</td><td class="right">${fmt(okovMarkup.amount)} Din</td></tr>` : ""}
             <tr><td>Pločasti materijali sa kantom:</td><td class="right">${fmt(fin.plocasti)} Din</td></tr>
             <tr><td>Staklo i ogledala:</td><td class="right">${fmt(fin.staklo)} Din</td></tr>
+            <tr><td>Metalne konstrukcije:</td><td class="right">${fmt(fin.metal)} Din</td></tr>
             <tr><td>Plastifikacija:</td><td class="right">${fmt(fin.plast)} Din</td></tr>
             <tr class="total-row"><td>Zbir materijala (osnovica):</td><td class="right">${fmt(calcMat)} Din</td></tr>
             <tr><td>Zarada (${fin.proc}%):</td><td class="right">${fmt(calcZar)} Din</td></tr>
@@ -1953,6 +1981,10 @@ function stampajPDF() {
         </table></div>`;
     }
     
+    const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const kom = ($("komentar").value || "").trim(), pod = ($("podsetnik").value || "").trim();
+    if (kom) html += `<h3>Komentar</h3><div class="note-box">${esc(kom)}</div>`;
+    if (pod) html += `<h3>Podsetnik</h3><div class="note-box">${esc(pod)}</div>`;
     html += `</body></html>`;
     
     const win = window.open('', '_blank');
@@ -1993,6 +2025,81 @@ $("pdfBtn").onclick = stampajPDF;
     $("pdfBtn").disabled = false; 
     $("izmsg").textContent = "Izaberi verziju i pritisni dugme za izvoz.";
 })();
+
+// ===== Čuvanje cena na GitHub (GitHub REST API: Contents) =====
+const GH_KEY = "mist_github_cfg_v1";
+function ghDefaults() {
+    const host = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0] || "";
+    const onPages = host.endsWith(".github.io");
+    return { owner: onPages ? host.split(".")[0] : "", repo: onPages ? (seg.endsWith(".html") ? host : (seg || host)) : "", branch: "main", path: "cene.json", token: "" };
+}
+function ghLoad() {
+    let c = {};
+    try { c = JSON.parse(localStorage.getItem(GH_KEY) || "{}"); } catch (e) {}
+    return { ...ghDefaults(), ...c };
+}
+function ghFillForm() {
+    const c = ghLoad();
+    $("ghOwner").value = c.owner; $("ghRepo").value = c.repo; $("ghBranch").value = c.branch; $("ghPath").value = c.path; $("ghToken").value = c.token;
+}
+function ghReadForm() {
+    return { owner: $("ghOwner").value.trim(), repo: $("ghRepo").value.trim(), branch: $("ghBranch").value.trim() || "main", path: ($("ghPath").value.trim() || "cene.json").replace(/^\/+/, ""), token: $("ghToken").value.trim() };
+}
+const ghB64 = str => btoa(unescape(encodeURIComponent(str)));
+async function ghPushPrices(c) {
+    const api = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) + "/contents/" + c.path.split("/").map(encodeURIComponent).join("/");
+    const headers = { "Authorization": "Bearer " + c.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+    const payload = {
+        format: "mist-enterijer-cene", version: 1, savedAt: new Date().toISOString(),
+        cene, nazivi: priceLabels, customArticles: articlesForExport(), customCsvRules, builtinCsvRules,
+        okovProc: fin.okovProc, procZarade: fin.proc
+    };
+    let sha;
+    const g = await fetch(api + "?ref=" + encodeURIComponent(c.branch), { headers, cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    else if (g.status !== 404) throw new Error("GitHub: " + g.status + " " + ((await g.json().catch(() => ({}))).message || ""));
+    const body = { message: "Cene: izmene iz kalkulatora (" + new Date().toLocaleString("sr-RS") + ")", content: ghB64(JSON.stringify(payload, null, 2)), branch: c.branch };
+    if (sha) body.sha = sha;
+    const r = await fetch(api, { method: "PUT", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error("GitHub: " + r.status + " " + ((await r.json().catch(() => ({}))).message || ""));
+}
+async function ghSaveNow(c) {
+    const btn = $("ghSaveBtn"), m = $("msg"), gm = $("ghMsg");
+    btn.disabled = true; m.textContent = "Šaljem cene na GitHub…";
+    try {
+        await ghPushPrices(c);
+        localStorage.setItem(GH_KEY, JSON.stringify(c));
+        m.textContent = "Cene su sačuvane na GitHub-u (" + c.path + ").";
+        if (gm) gm.textContent = "Sačuvano: " + new Date().toLocaleTimeString("sr-RS");
+    } catch (err) {
+        m.textContent = "Čuvanje na GitHub nije uspelo: " + err.message;
+        if (gm) gm.textContent = "Greška: " + err.message + " — proveri token, naziv repozitorijuma i dozvolu Contents: Read and write.";
+        $("ghSection").hidden = false;
+    } finally { btn.disabled = false; }
+}
+$("ghCfgBtn").addEventListener("click", () => {
+    const sec = $("ghSection");
+    sec.hidden = !sec.hidden;
+    if (!sec.hidden) { ghFillForm(); sec.scrollIntoView({ behavior: "smooth", block: "start" }); }
+});
+$("ghCfgSave").addEventListener("click", () => {
+    const c = ghReadForm();
+    if (!c.owner || !c.repo || !c.token) { $("ghMsg").textContent = "Popuni korisnika, repozitorijum i token."; return; }
+    ghSaveNow(c);
+});
+$("ghSaveBtn").addEventListener("click", () => {
+    const c = ghLoad();
+    if (!c.owner || !c.repo || !c.token) { $("ghSection").hidden = false; ghFillForm(); $("ghMsg").textContent = "Prvo unesi GitHub podešavanja i token."; $("ghSection").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    ghSaveNow(c);
+});
+
+// Komentar i podsetnik pamte se lokalno
+(function () {
+    try { $("komentar").value = localStorage.getItem("mist_komentar") || ""; $("podsetnik").value = localStorage.getItem("mist_podsetnik") || ""; } catch (e) {}
+    $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
+    $("podsetnik").addEventListener("input", () => { try { localStorage.setItem("mist_podsetnik", $("podsetnik").value); } catch (e) {} });
+})();
+
 
 buildOkov();
 buildFin();
