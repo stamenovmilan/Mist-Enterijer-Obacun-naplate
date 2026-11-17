@@ -321,7 +321,7 @@
         </div>
         <div class="row" style="flex-direction:column;align-items:stretch">
             <label for="napomenaPDF">Napomena koja se štampa u oba PDF fajla</label>
-            <textarea id="napomenaPDF" spellcheck="true" style="min-height:70px;font-family:inherit;font-size:.95rem">Projekat počinje sa izradom kada se uplati novac potreban za materijal.</textarea>
+            <textarea id="napomenaPDF" spellcheck="true" style="min-height:70px;font-family:inherit;font-size:.95rem">Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.</textarea>
         </div>
         <div class="row">
             <label for="kontaktPDF">Kontakt broj u PDF-u</label>
@@ -583,7 +583,7 @@ let spec = {
     vertLajsna: 0, donjaSina: 0, gornjaSina: 0, usporivaci: 0
 };
 
-let fin = { prevoz: 0, plocasti: 0, staklo: 0, metal: 0, izrada: 0, plast: 0, proc: 30, okovProc: 0, kurs: 117.39, manualOkov: null };
+let fin = { prevoz: 0, plocasti: 0, staklo: 0, metal: 0, izrada: 0, plast: 0, tapacirani: 0, proc: 30, okovProc: 0, kurs: 117.39, manualOkov: null };
 
 let manualSum = {
     okov: null,
@@ -604,6 +604,7 @@ try {
         fin.proc = o.proc || fin.proc;
         fin.kurs = o.kurs || fin.kurs;
         fin.okovProc = Number.isFinite(Number(o.okovProc)) ? Number(o.okovProc) : fin.okovProc;
+        fin.tapacirani = Number.isFinite(Number(o.tapacirani)) ? Number(o.tapacirani) : fin.tapacirani;
         fin.manualOkov = Number.isFinite(Number(o.manualOkov)) && o.manualOkov !== null ? Number(o.manualOkov) : null;
         if (fin.manualOkov !== null) manualSum.okov = fin.manualOkov;
     }
@@ -636,7 +637,7 @@ function save() {
         localStorage.setItem(KEY, JSON.stringify(cene));
         localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
         fin.manualOkov = manualSum.okov;
-        localStorage.setItem(FKEY, JSON.stringify({ proc: fin.proc, okovProc: fin.okovProc, kurs: fin.kurs, manualOkov: fin.manualOkov }));
+        localStorage.setItem(FKEY, JSON.stringify({ proc: fin.proc, okovProc: fin.okovProc, tapacirani: fin.tapacirani, kurs: fin.kurs, manualOkov: fin.manualOkov }));
         localStorage.setItem(RULES_KEY, JSON.stringify(customCsvRules));
         localStorage.setItem(ARTICLES_KEY, JSON.stringify(customArticles));
         localStorage.setItem(BUILTIN_RULES_KEY, JSON.stringify(builtinCsvRules));
@@ -916,8 +917,9 @@ function buildFin() {
         { id: "f_staklo", l: "3. Cena stakla i ogledala", showQtyLabel: false, el: num("", fin.staklo, v => { fin.staklo = v; calc(); }, "1") },
         { id: "f_metal", l: "4. Metalne konstrukcije", showQtyLabel: false, el: num("", fin.metal, v => { fin.metal = v; calc(); }, "1") },
         { id: "f_plast", l: "5. Plastifikacija", showQtyLabel: false, el: num("", fin.plast, v => { fin.plast = v; calc(); }, "1") },
-        { id: "f_izrada", l: "6. Izrada projekta", showQtyLabel: false, el: num("", fin.izrada, v => { fin.izrada = v; calc(); }, "1") },
-        { id: "f_prevoz", l: "7. Prevoz", showQtyLabel: false, el: num("", fin.prevoz, v => { fin.prevoz = v; calc(); }, "1") }
+        { id: "f_tapacirani", l: "6. Tapacirani elementi", showQtyLabel: false, el: num("", fin.tapacirani, v => { fin.tapacirani = v; calc(); }, "1") },
+        { id: "f_izrada", l: "7. Izrada projekta", showQtyLabel: false, el: num("", fin.izrada, v => { fin.izrada = v; calc(); }, "1") },
+        { id: "f_prevoz", l: "8. Prevoz", showQtyLabel: false, el: num("", fin.prevoz, v => { fin.prevoz = v; calc(); }, "1") }
     ]);
 }
 
@@ -1003,7 +1005,7 @@ function initSumContainer() {
         <div class="row"><label><b>Materijal zbirno</b></label><b id="sumMat">0 Din</b></div>
         <div class="row"><label>Zarada</label><div style="display:flex;align-items:center;gap:8px"><select id="sumProcSel" aria-label="Procenat zarade"></select><b id="sumProc">0 Din</b></div></div>
     `;
-    $("sumOstaloOpis").textContent = "ostalo podrazumeva: plastifikaciju, cenu stakla i ogledala, metalne konstrukcije, prevoz i izradu projekta";
+    $("sumOstaloOpis").textContent = "ostalo podrazumeva: plastifikaciju, tapacirane elemente, cenu stakla i ogledala, metalne konstrukcije, prevoz i izradu projekta";
     const sumProcSel = $("sumProcSel");
     [20, 25, 30, 35, 40, 45, 50, 100].forEach(p => {
         const o = document.createElement("option");
@@ -1024,15 +1026,16 @@ function izracunajFin(autoOkov) {
     const staklo = Math.round(fin.staklo || 0);
     const metal = Math.round(fin.metal || 0);
     const plast = Math.round(fin.plast || 0);
+    const tapacirani = Math.round(fin.tapacirani || 0);
     const prevoz = Math.round(fin.prevoz || 0);
     const izrada = Math.round(fin.izrada || 0);
-    const osnovica = okov + plocasti + staklo + metal + plast;
+    const osnovica = okov + plocasti + staklo + metal + plast + tapacirani;
     const zar = Math.round(osnovica * (Number(fin.proc) || 0) / 100);
-    const ostalo = plast + staklo + metal + prevoz + izrada;
+    const ostalo = plast + tapacirani + staklo + metal + prevoz + izrada;
     const mat = okov + plocasti + ostalo;                // Materijal zbirno bez zarade
     const din = mat + zar;
     const eur = fin.kurs ? din / fin.kurs : 0;
-    return { okov, okovAmount: okovMarkup.amount, plocasti, staklo, metal, plast, prevoz, izrada, osnovica, zar, ostalo, mat, din, eur };
+    return { okov, okovAmount: okovMarkup.amount, plocasti, staklo, metal, plast, tapacirani, prevoz, izrada, osnovica, zar, ostalo, mat, din, eur };
 }
 
 function applyOkovMarkup(base) {
@@ -1534,7 +1537,7 @@ $("loadProjectFile").addEventListener("change", event => {
             $("kupac").value = data.kupac || "";
             $("telefonKupca").value = data.telefonKupca || data.telefon || "";
             $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
-            $("napomenaPDF").value = data.napomenaPDF || "Projekat počinje sa izradom kada se uplati novac potreban za materijal.";
+            $("napomenaPDF").value = data.napomenaPDF || "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.";
             $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
             try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
             try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
@@ -1561,13 +1564,13 @@ $("resetProjectBtn").addEventListener("click", () => {
         escajgSirina:60, escajgKol:0, popUpSuko:0, americkiOrmar:0, sudoperaSirina:60, sudoperaKol:0,
         tLajsnaKol:0, kantaSirina:"40", kantaKol:0, vertLajsna:0, donjaSina:0, gornjaSina:0, usporivaci:0
     };
-    fin = { prevoz:0, plocasti:0, staklo:0, metal:0, izrada:0, plast:0, proc:30, okovProc:0, kurs:fin.kurs || 117.6203 };
+    fin = { prevoz:0, plocasti:0, staklo:0, metal:0, izrada:0, plast:0, tapacirani:0, proc:30, okovProc:0, kurs:fin.kurs || 117.6203 };
     manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null };
     KL = [{ d:400, n:0 }];
     lastCsvParts = null;
     customArticles.forEach(a => a.qty = 0);
     customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
-    $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("napomenaPDF").value = "Projekat počinje sa izradom kada se uplati novac potreban za materijal."; $("kontaktPDF").value = "+381693546820"; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); localStorage.removeItem("mist_napomena_pdf"); localStorage.removeItem("mist_kontakt_pdf"); } catch (e) {}
+    $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("napomenaPDF").value = "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala."; $("kontaktPDF").value = "+381693546820"; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); localStorage.removeItem("mist_napomena_pdf"); localStorage.removeItem("mist_kontakt_pdf"); } catch (e) {}
     buildOkov(); buildFin(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
     buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
     $("msg").textContent = "Obračun je resetovan. Cenovnik i CSV pravila su sačuvani.";
@@ -1783,7 +1786,7 @@ function tekst() {
     R.forEach(r => L.push(I ? pad(r[0], 40) + pad(r[1] + " kol", 12) + "x " + pad(f(r[2]), 10) + "= " + f(r[1] * r[2]) + " Din" : "- " + r[0] + ": " + r[1]));
     
     if (I) {
-        L.push("", "Zbir okova: " + f(calcOkov) + " Din", "Pločasti materijali sa kantom: " + f(fin.plocasti) + " Din", "Staklo i ogledala: " + f(fin.staklo) + " Din", "Metalne konstrukcije: " + f(fin.metal) + " Din", "Plastifikacija: " + f(fin.plast) + " Din", "Zbir materijala (osnovica): " + f(calcMat) + " Din", "Zarada (" + fin.proc + "%): " + f(calcZar) + " Din", "Prevoz: " + f(calcPrevoz) + " Din", "Izrada projekta: " + f(calcIzrada) + " Din", "", "UKUPNO Din: " + f(din), "UKUPNO Eur: " + f(eur) + " (kurs " + fin.kurs + ")");
+        L.push("", "Zbir okova: " + f(calcOkov) + " Din", "Pločasti materijali sa kantom: " + f(fin.plocasti) + " Din", "Staklo i ogledala: " + f(fin.staklo) + " Din", "Metalne konstrukcije: " + f(fin.metal) + " Din", "Plastifikacija: " + f(fin.plast) + " Din", "Tapacirani elementi: " + f(fin.tapacirani) + " Din", "Zbir materijala (osnovica): " + f(calcMat) + " Din", "Zarada (" + fin.proc + "%): " + f(calcZar) + " Din", "Prevoz: " + f(calcPrevoz) + " Din", "Izrada projekta: " + f(calcIzrada) + " Din", "", "UKUPNO Din: " + f(din), "UKUPNO Eur: " + f(eur) + " (kurs " + fin.kurs + ")");
     } else {
         L.push("", "UKUPNO: " + f(din) + " Din (oko " + f(eur) + " Eur)");
     }
@@ -1900,6 +1903,7 @@ function stampajPDF() {
             <tr><td>Staklo i ogledala:</td><td class="right">${fmt(fin.staklo)} Din</td></tr>
             <tr><td>Metalne konstrukcije:</td><td class="right">${fmt(fin.metal)} Din</td></tr>
             <tr><td>Plastifikacija:</td><td class="right">${fmt(fin.plast)} Din</td></tr>
+            <tr><td>Tapacirani elementi:</td><td class="right">${fmt(fin.tapacirani)} Din</td></tr>
             <tr class="total-row"><td>Zbir materijala (osnovica za zaradu):</td><td class="right">${fmt(calcMat)} Din</td></tr>
             <tr><td>Zarada (${fin.proc}%):</td><td class="right">${fmt(calcZar)} Din</td></tr>
             <tr><td>Prevoz:</td><td class="right">${fmt(calcPrevoz)} Din</td></tr>
@@ -1914,6 +1918,7 @@ function stampajPDF() {
             <tr><td>Staklo i ogledala:</td><td class="right">${fmt(fin.staklo)} Din</td></tr>
             <tr><td>Metalne konstrukcije:</td><td class="right">${fmt(fin.metal)} Din</td></tr>
             <tr><td>Plastifikacija:</td><td class="right">${fmt(fin.plast)} Din</td></tr>
+            <tr><td>Tapacirani elementi:</td><td class="right">${fmt(fin.tapacirani)} Din</td></tr>
             <tr class="total-row"><td>Zbir materijala (osnovica):</td><td class="right">${fmt(calcMat)} Din</td></tr>
             <tr><td>Zarada (${fin.proc}%):</td><td class="right">${fmt(calcZar)} Din</td></tr>
             <tr><td>Prevoz:</td><td class="right">${fmt(calcPrevoz)} Din</td></tr>
@@ -2115,7 +2120,7 @@ $("ghSaveBtn").addEventListener("click", () => {
     try {
         $("komentar").value = localStorage.getItem("mist_komentar") || "";
         $("podsetnik").value = localStorage.getItem("mist_podsetnik") || "";
-        $("napomenaPDF").value = localStorage.getItem("mist_napomena_pdf") || "Projekat počinje sa izradom kada se uplati novac potreban za materijal.";
+        $("napomenaPDF").value = localStorage.getItem("mist_napomena_pdf") || "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.";
         $("kontaktPDF").value = localStorage.getItem("mist_kontakt_pdf") || "+381693546820";
     } catch (e) {}
     $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
@@ -2159,7 +2164,7 @@ $("ghHistoryLoad").addEventListener("click", async () => {
         $("kupac").value = data.kupac || "";
         $("telefonKupca").value = data.telefonKupca || data.telefon || "";
         $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
-        $("napomenaPDF").value = data.napomenaPDF || "Projekat počinje sa izradom kada se uplati novac potreban za materijal.";
+        $("napomenaPDF").value = data.napomenaPDF || "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.";
         $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
         $("verzija").value = data.verzija || "m";
         $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || "";
