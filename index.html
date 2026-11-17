@@ -583,7 +583,7 @@ let spec = {
     vertLajsna: 0, donjaSina: 0, gornjaSina: 0, usporivaci: 0
 };
 
-let fin = { prevoz: 0, plocasti: 0, staklo: 0, metal: 0, izrada: 0, plast: 0, proc: 30, okovProc: 0, kurs: 117.39 };
+let fin = { prevoz: 0, plocasti: 0, staklo: 0, metal: 0, izrada: 0, plast: 0, proc: 30, okovProc: 0, kurs: 117.39, manualOkov: null };
 
 let manualSum = {
     okov: null,
@@ -604,6 +604,8 @@ try {
         fin.proc = o.proc || fin.proc;
         fin.kurs = o.kurs || fin.kurs;
         fin.okovProc = Number.isFinite(Number(o.okovProc)) ? Number(o.okovProc) : fin.okovProc;
+        fin.manualOkov = Number.isFinite(Number(o.manualOkov)) && o.manualOkov !== null ? Number(o.manualOkov) : null;
+        if (fin.manualOkov !== null) manualSum.okov = fin.manualOkov;
     }
 } catch (e) {}
 // Jednokratno vraćanje cena na ugrađene (iz prvobitne verzije); cene novih artikala ostaju kako su bile.
@@ -633,7 +635,8 @@ function save() {
     try {
         localStorage.setItem(KEY, JSON.stringify(cene));
         localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
-        localStorage.setItem(FKEY, JSON.stringify({ proc: fin.proc, okovProc: fin.okovProc, kurs: fin.kurs }));
+        fin.manualOkov = manualSum.okov;
+        localStorage.setItem(FKEY, JSON.stringify({ proc: fin.proc, okovProc: fin.okovProc, kurs: fin.kurs, manualOkov: fin.manualOkov }));
         localStorage.setItem(RULES_KEY, JSON.stringify(customCsvRules));
         localStorage.setItem(ARTICLES_KEY, JSON.stringify(customArticles));
         localStorage.setItem(BUILTIN_RULES_KEY, JSON.stringify(builtinCsvRules));
@@ -881,22 +884,9 @@ function buildSpecijalno() {
 }
 
 function buildFin() {
-    const sel = document.createElement("select");
-    [20, 25, 30, 35, 40, 45, 50, 100].forEach(p => {
-        const o = document.createElement("option");
-        o.value = p;
-        o.textContent = p + "%";
-        if (p == fin.proc) o.selected = true;
-        sel.appendChild(o);
-    });
-    sel.addEventListener("change", () => { fin.proc = +sel.value; calc(); });
-
-    // Zbir okova (sa uvećanjem) + padajući meni za procenat uvećanja
+    // Zbir okova: procenat uvećanja levo, ručna cena zbira okova desno
     const okovWrap = document.createElement("div");
     okovWrap.style.cssText = "display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end";
-    const okovTotal = document.createElement("b");
-    okovTotal.id = "finOkovTotal";
-    okovTotal.textContent = "0 Din";
     const okovSel = document.createElement("select");
     okovSel.id = "okovMarkupSel";
     okovSel.setAttribute("aria-label", "Procenat uvećanja okova");
@@ -910,9 +900,15 @@ function buildFin() {
         if (p === cur) o.selected = true;
         okovSel.appendChild(o);
     });
-    okovSel.addEventListener("change", () => { fin.okovProc = +okovSel.value; calc(); });
-    okovWrap.appendChild(okovTotal);
+    okovSel.addEventListener("change", () => { fin.okovProc = +okovSel.value; manualSum.okov = null; save(); calc(); });
+    const okovInput = num("finOkovInput", manualSum.okov != null ? manualSum.okov : 0, v => {
+        manualSum.okov = Math.max(0, Math.round(v));
+        calc();
+    }, "1");
+    okovInput.style.cssText = "width:8.5em;text-align:right";
+    okovInput.setAttribute("aria-label", "Zbir okova u dinarima");
     okovWrap.appendChild(okovSel);
+    okovWrap.appendChild(okovInput);
 
     mk($("fin"), [
         { id: "f_plocasti", l: "1. Pločasti materijali sa kantom", showQtyLabel: false, el: num("", fin.plocasti, v => { fin.plocasti = v; calc(); }, "1") },
@@ -921,8 +917,7 @@ function buildFin() {
         { id: "f_metal", l: "4. Metalne konstrukcije", showQtyLabel: false, el: num("", fin.metal, v => { fin.metal = v; calc(); }, "1") },
         { id: "f_plast", l: "5. Plastifikacija", showQtyLabel: false, el: num("", fin.plast, v => { fin.plast = v; calc(); }, "1") },
         { id: "f_izrada", l: "6. Izrada projekta", showQtyLabel: false, el: num("", fin.izrada, v => { fin.izrada = v; calc(); }, "1") },
-        { id: "f_prevoz", l: "7. Prevoz", showQtyLabel: false, el: num("", fin.prevoz, v => { fin.prevoz = v; calc(); }, "1") },
-        { id: "f_proc", l: "8. Procenat zarade", showQtyLabel: false, el: sel }
+        { id: "f_prevoz", l: "7. Prevoz", showQtyLabel: false, el: num("", fin.prevoz, v => { fin.prevoz = v; calc(); }, "1") }
     ]);
 }
 
@@ -1006,15 +1001,25 @@ function initSumContainer() {
         <div class="row"><label>Pločasti materijali sa kantom</label><b id="sumPlocasti">0 Din</b></div>
         <div class="row" style="align-items:flex-start"><label>Ostalo<br><small id="sumOstaloOpis" style="font-weight:400;font-size:.72rem;color:var(--mut,#6a7077);line-height:1.3;display:block;max-width:34em"></small></label><b id="sumOstalo">0 Din</b></div>
         <div class="row"><label><b>Materijal zbirno</b></label><b id="sumMat">0 Din</b></div>
+        <div class="row"><label>Zarada</label><div style="display:flex;align-items:center;gap:8px"><select id="sumProcSel" aria-label="Procenat zarade"></select><b id="sumProc">0 Din</b></div></div>
     `;
-    $("sumOstaloOpis").textContent = "ostalo podrazumeva: plastifikaciju, cenu stakla i ogledala, metalne konstrukcije, prevoz, izradu projekta i iznos zarade (zarada se računa kao izabrani procenat od okova sa uvećanjem, pločastih materijala, stakla i ogledala, metalnih konstrukcija i plastifikacije)";
+    $("sumOstaloOpis").textContent = "ostalo podrazumeva: plastifikaciju, cenu stakla i ogledala, metalne konstrukcije, prevoz i izradu projekta";
+    const sumProcSel = $("sumProcSel");
+    [20, 25, 30, 35, 40, 45, 50, 100].forEach(p => {
+        const o = document.createElement("option");
+        o.value = p;
+        o.textContent = p + "%";
+        if (p == fin.proc) o.selected = true;
+        sumProcSel.appendChild(o);
+    });
+    sumProcSel.addEventListener("change", () => { fin.proc = +sumProcSel.value; calc(); save(); });
     sumInitialized = true;
 }
 
 // Jedinstven obračun za ekran, PDF i tekstualni izvoz. Sve vrednosti su automatske (bez ručne izmene).
 function izracunajFin(autoOkov) {
     const okovMarkup = applyOkovMarkup(Math.round(autoOkov));
-    const okov = okovMarkup.total;                       // okov već sa uvećanjem
+    const okov = manualSum.okov != null ? Math.max(0, Math.round(manualSum.okov)) : okovMarkup.total;
     const plocasti = Math.round(fin.plocasti || 0);
     const staklo = Math.round(fin.staklo || 0);
     const metal = Math.round(fin.metal || 0);
@@ -1023,9 +1028,9 @@ function izracunajFin(autoOkov) {
     const izrada = Math.round(fin.izrada || 0);
     const osnovica = okov + plocasti + staklo + metal + plast;
     const zar = Math.round(osnovica * (Number(fin.proc) || 0) / 100);
-    const ostalo = plast + staklo + metal + prevoz + izrada + zar;
-    const mat = okov + plocasti + ostalo;                // Materijal zbirno
-    const din = mat;
+    const ostalo = plast + staklo + metal + prevoz + izrada;
+    const mat = okov + plocasti + ostalo;                // Materijal zbirno bez zarade
+    const din = mat + zar;
     const eur = fin.kurs ? din / fin.kurs : 0;
     return { okov, okovAmount: okovMarkup.amount, plocasti, staklo, metal, plast, prevoz, izrada, osnovica, zar, ostalo, mat, din, eur };
 }
@@ -1081,13 +1086,17 @@ function calc() {
     autoOkov = Math.round(autoOkov);
     const T = izracunajFin(autoOkov);
 
-    $("finOkovTotal").textContent = fmt(T.okov) + " Din";
+    const okovInput = $("finOkovInput");
+    if (okovInput && document.activeElement !== okovInput) okovInput.value = String(T.okov);
     const okovSel = $("okovMarkupSel");
     if (okovSel && document.activeElement !== okovSel) okovSel.value = String(Number(fin.okovProc) || 0);
     $("sumOkov").textContent = fmt(T.okov) + " Din";
     $("sumPlocasti").textContent = fmt(T.plocasti) + " Din";
     $("sumOstalo").textContent = fmt(T.ostalo) + " Din";
     $("sumMat").textContent = fmt(T.mat) + " Din";
+    $("sumProc").textContent = fmt(T.zar) + " Din";
+    const sumProcSel = $("sumProcSel");
+    if (sumProcSel && document.activeElement !== sumProcSel) sumProcSel.value = String(Number(fin.proc) || 0);
 
     $("tdin").textContent = fmt(T.din);
     $("teur").textContent = fmt(T.eur);
