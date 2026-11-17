@@ -70,11 +70,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
             flex-shrink: 0;
         }
-        .logo-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; }
         
         h1 { font-size: 1.2rem; margin: 0 0 4px; letter-spacing: -0.01em; font-weight: 700; color: var(--tx); }
         h2 { font-size: 1.05rem; margin: 0 0 10px; font-weight: 600; }
@@ -95,7 +91,6 @@
         .price-name-input { width:100% !important; min-width:0; box-sizing:border-box; text-align:left !important; }
         .price-value-input { width:100% !important; box-sizing:border-box; }
         .price-category { margin:18px 0 5px; padding-bottom:5px; border-bottom:1px solid var(--bd); font-size:.92rem; color:var(--oak); }
-        @media(max-width:520px) { .price-edit-row { grid-template-columns:minmax(0,1fr) 7em; gap:6px; } .price-name-input { font-size:.88rem; padding:7px 6px; } }
 
         input, select, textarea, button { font: inherit; color: var(--tx); background: var(--bg); border: 1px solid var(--bd); border-radius: 6px; padding: 8px 10px; transition: border-color 0.2s, box-shadow 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--oak); outline: none; box-shadow: 0 0 0 3px rgba(185, 142, 79, 0.15); }
@@ -170,51 +165,748 @@
     <div class="header-wrap">
         <div class="brand-container">
             <div class="logo-container">
-                <img src="data:image/png;base64,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
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAACXBIWXMAAC4jAAAuIwF4pT92AAAgAElEQVR42oS99XPU+ZbHzT/x7A+7tbt3r4xhcXd3D8SFEEIIEkJwd2cYbGCwwd0d4u6ddnfXGIzce7fqOed8vh2Y3a3nqTrV9U13J0xVv+Z93kc+357jmf7FM/WLG+PTBF1PTP86OfPr5Mffpj/+Pv3L3z/+9s+Pv/5j5pe/Y/z690+//uO33/77998xfvv9v+GliZnf8C9Mf/LMxtQvU/Drn37HP/7F8/A3P/7+91///s9ff//vmV//Ab/inJxxcfFxgn5r6tPvkx9/hTfDMxDuiY+uiY/c9dQn18SM3T1lc05AmG1uq3PC4Z5m/+VOesnqmDDZ3Ca7x2z3GCwugxlDZ4Jw6M1Oo9Vtsnoo3HqzQ2d26vBVt9bo1BodGoNDa7Sr9Tal3iqnUBgdcoNDprMq9Q6l1gYvqY12ld6m0lvVBni0KbRWucYm19lkertUZ5dorBKtRayxijRWocos+DLUFpHOJtba4Hm+wiBQmIRqi0BjlZrdWueMzvVRYZ0U6+hVpXFcbuTJDBhSA0+OF2My/ahENyRU94/Lh8SaMaWZr7XxlKYxKT4/KtbC8308aR9PMshXjog1wyLNsEA9JtbBq4MCVe+YtG9MhoHvkfeOybpHJT2jkq4RcdeIqHMQo2NQ1D4o7BgStg3wW/t4rX3j7wfGu4SaIaVtQG7qHJN3jEl7RdoBibGbr/nQL3zfM/ahd2wOfNgUn9jFBAE08fEXAui36V9+n/ntH8ANowcCiPn02z9/YUFgTczg5w00wAfpnsKPmbEy9T8B+gWQ+vjbP34DgP7+T/hT8GYAAj54eASGPF8ARKzgq94ghhhALgBoEkCx2D3w6HBPsX/R6ZlxEEBGmxvoAbwMZjcDCEmyco9Ij81jtAFebr3FpePwIoAw7EAGAKQAgAw2hdEpN9gRIB0ChOggN/AjAGSFC4UGwibT2YAeqc4m0VqlWisCpLYKlJYvARKqrSKtTayxCVQmAEioNOF7tDYASOP8qHN9UtmmJDqHEF81jsv0PJl+TKr7HETJkFA1KFCOSHU8lXlcYxmTG9lLIyItYsGTACj4BrF2RKgZFmpGRTq4HuAreuCzx5B5QwoAdRNAncOAjrBzCB8xhoXtAwKgp6WX96F/vEugHVRY+2VegITaAampR6hrGRR/6OW19I3PYZ89+4CRoWkA6JcJToFQRUCEAKOpT/jRwgX9SAE/4of92/+QGfYHQcMIICZI+Dgx8wsK2O9Az3//8vs/4U8x7XESQ+7Jj/B3AB1gCP51DiCvOHkB+ujwTANAdvc0wwge4Rn2qtMzDWqECmRHgEBjOHpmGWJhdRutHgiDlTHERMipNYH8OAgjO1CiNNhBfpQmpwIVyKbSOlRau0qHDCl1FggVPGotCrVFrrPK9AiQBEILDNk4BYIAjVFxAdeiWWVSGgVKk5BkSWJ0aRwzOvcnlWNaanDBGwQoQiYUIblhTEEKpDCMyTFGQYcALJVpXG0ZV5pHpSAwWgRIrOnjgcCAzEhBpZgmAVUQQyJ1L0/aM8oA+hzwDEQ3ADQEIeoaFiFJQ6hAoEOtA3yA48MAvwuIkVt6xYaOMVkHMMdX9UuMPSJ924istR+0SjAHPjn88CY/uSc/4SOpCJAEBABA8HFOYmBSI6p+nb0m4WHMcQi6p/Ezxr8w/ZEBNEFssb858fFXkJ9fgJ6//zdgBL/uJOFxUrgYQPBPUEKknDXzOcGRDoHGADQQoDROYMg97SBoHO4ZepyGl0CWACCjBeVHb3ZhWOjR7NR7MdJ7A1KYFrKYBV4CjByQ5gAjtdmmMtlURofK6FSZXErIYjo7UyBIWKA9Cq1ZrjEpKOBCqrNK9YCOHdQFMpSYGAIOMFupmQhZhAQQMqQ2g8YgQCoDX2kAsRHqbArbpMY1AwDJjC6J1iHW2hl/gBcfQIHQUKgtPLUZtQeeV1kArBExsKIFjCBhAUCYp3hygInltRGJbhjlR9lD2QpECHWINwvQrAKhCHWPivF6SIRShAwJWvvHPwwKuoW6fpm5W6htx+dF7SOSHr6mW6DtGFO2Dkpa+gVzXMxkULhZTDLN+IU+fu5xNg1hgpuNKUpeCA3+FoSLXU8hQJOfSJym0M0Ao/AjAvQ70gMC5p78yDKXcwIkBBUI/+AMiB+6MU6cOHq4d5L74QDyooOBaoQxaXZ4IIxWlBy95f8MAoW4UQMroDcmDHqSADLb1Wa7BjFyaswuCJXJqTTaFXowOla5zizXWRAgtQkCAJJpTGIwPTr4yAka9EAMICRJoLEI1Bw6Qs0sQEaBwjAu14/LdZCn0AZZPAr7lNw6IdU7QMbExCIkOOTPyxBfaR5XmHgYRrgYl5vAFQ2L1ZjawBuJ1GBuIIX18xUjoEmyWYA08Ez3CAE0MosRXsCTXRRADyrQiPjzMwDKEInQoLBLqOuVGrv4KhAbTG3A1oisa1zdOa4GhtqG5X8AiMMIxGDqjykJHRKTFrSrXExxKY+j5w9u9yOz4QwvUBp4J/nxfwA98Ai/5fycv6a5FEZ/jckPPOOA5z/LDyQvRg/6Hpa5ONUB3wPC45pAeuxuk43LXP8nQJCqdEYmM3aww4whzFyUwtAAGUF74HmkR21xqQkghcEm11rkKDwYCgxOfiQaE0tMLBhA7OOfzWJEj/UPCgQAyXQQkKpERqcU0LFOSAxOpBDeRjkOnZAcOeN5/RCIDagL5izwPdwzOnDZcEEAycgAqUbpVbA+wxIt2O2+cUU34QLZihlnumb2mWIYQkTXktnoGBGjCAFYAm2P2NDJUwJPbf3jbfikuGNUAc9j8DVz4DOA1PC/GWJ2mHSCJGTiE2nMR0aSh8t07IJ7g9eyIA0s03m15COkQuDm4+//gEfIZUxdHGB7PdPMA9HbSMwYPQQHPU8/eqZtX3pnqMLICcGjhVTHhOigO2aV16ze/IEe9DooMygwFBrKWRR2ss9WNZVXajO86lIx+QEzBNpDaQtVh4RHoTaC9ki0ZrHG/AeAtAAQJi+CyUYMWb58gxAAgvwlN/BlOqBEDAbLMiG3TUrMbshl6H6w/gLXDNKiGoUQq0bEYIqVwyLFoEBOoRiGJxEjPV9h4qvMoElAFfjr/nEFkDQqpaQmVLNaDAEa4bJVN8lM9zDFZ4DQ/XzmCUAUqXqFqs5RSRtkN4EGHE8HANQPpdk4MATi1D4sBRECKw0xxwH/N6OZmPFiNPN/aBLzs7PXs/lukstcTIEQBQDCM42Oh0wSJjWQH7DPJD8QYMaRCdIeVBF6PwvQGAw3BV5wbLHMZXWg9ljtHosVPLLbAgy5p+yeKbMTXbORFVlgfRhAs/FHx8NC87/oQWj0FrWBhQ1eBXRUJofCYJdj8iIFYvRwYZCy5KUxAzQiLUPH4g2UIrFXk8QEFjokQEplEmINj2W8WG+XQfKyTQFDQoOdrwFnY6IaHup24GM2QHU0YHdYDIuQDECEJzdC+hPq7AK1FRw3IAUvQc4aQaFCnj4DNPoHyUGMvACh6WEpbJh+HBH3goYpzSNKc69A2T4q7QQFEunbIVsBQP3jUN5DLusYFneMSDvHFF08JQBE/68zHSKM2MUfGPrcrfEW1fQG9x+QmmFpBf4UNnUozTHIABpW/ANGrJeDaYtBg0rDEQOg2F2TVFtNckyTFDHfA+ggPTa3CUtxl8XpAYBsE9MWz5QJfI8N6HEy7TF81hvEBe3zHwGChKX+TA9W7yg8XwCkNDjAO0PmUuiY9QHfY2EKRGFQaAxStRHpoQApkmgsUshfGo4hpErN6LFRc8jKqCKAjFDDi3VYwIP2AEMig0OAxZeFULNRCwCKech0WNKzGJcZMFhPiJIUAMSHP6gD8qw8GYoQZLQxiR7lR6wBgIYlCBDzQF9KDgOIUpWY0cOqMHx1VNwv0oyprKNqK4gQVF5gn3vEuvYxBTWHxll/CGCCSq19AOs1DiDHLEB0QdcfMSa+gGY28Hkom/+HUM0w/XBiXT3DGksA0MSs/Pz6D0hq9Ke81RM+EjcsXJxH5izO5Bf0gPbY3ECPGQCyIEAm7CJOWj1TVmDIPQkMGagg51iBa7I1YI1Z+0dv/f8AiJKXYRYgK3YIyTUrMMD9WBRYtIN3NiJAGgOEVGMUq40SCqnahAEkIUwIEHgdCosYMFJZJWqOIZHKLFKYkSqjE9CRIj1OgdYK2gNyJdM7ZHonFHTMCWEoMQRKM7NE1FRERGZFaFxpgvJ+BCt5TGqsAwmvQi4DeuBxQKDsGZFS8hJ3/V9BDAkRoGEwSdI+oWpIqh+U6Lp5ULdLe0SaHokOTA8qENKDAEGFT2oEF7w5dpbCvgymQB6v9nym539nN66Lw0SFkxPPFJriKc59QzE/8yvSAxesuzNrcVB1XJPU1yF6SH4+F1nY8vkDPSYryY/FZbQ6ASDIYoCOZQIYmjK7J412t7diJ1aY/JANQoAQKZIlLK8YQE5Ofsg7z9KDLWbWS9QhNzKtWQbyQ9dycj+gQBgag0xjZCHHcgwwAphMJEiY2kRqEzIEuqK0iFUWiRoDLzQ2qd4pNbmlZo/YCPTY+FjVg6OysSoM6BEozCg/MiY8eh6U5djXgQwFWKgGhUoKFeSsUZawKK8BWwAZc9BDRA/EoFDdy5P9/wLUSSkM3tknUPZD5T8mw3p+TNot1qACjcoBoDZKYYBOC6HDYo7NOfWZIfosne5Zelj8H66Io2fWwTCAZj2NFyDwyyg/v/595tPfocJCeiZnuMxFcmXn9GZWfnBG8bk4B3qwtUPCw9EDecoJjgdds9NjguLLNQFZDBOZa8JgcxM9HCiUv7weyMy6Pg4NBBZZ4IQIINMsQGSfuUe7UmdTkPDIPwcrvgAXg8LLEAZdSzk1MkhUlNqIIRAkMYoQFwCQFCjROaRGF8iP2OgC48ynthAoE2oVoKM0ETGQjLRofSRABoICKWlIqIBAdATKAT4E2GrFkACex1eBJFIp4ygVZfR+FQIkUvejj/4jQMOUyEbFs81oagVJ+3gK8Ew9ozKuPQ0AiTTdIm3biJRJDhZihFFLLwNofA5UMfQ/PX1mzimuTUflj2uKGoOTf4CG6RDlL68LdjOMiCcyNziX8M4uZn7BcYd3OoEJkeUvovazX0YRctKQCzSJM0MTrOYy2z4DZESAHKBAYHqQIai/nB5gyOyZRBFyeL70Op8NkFeTQHU4eihYjtMyhpAbG5MfFQAEWYw6zrPBnBAokDeAG70Cg4MJ6eHCKNaaZw012iO6lurskKGkBkheID9ukd5BTWcaa0C2AtMDGUqK3IxKQVowACBSHQBCOSSCIgu1B7ISBl8ODGEIlMAKZC6hCvjD9jR7D3A2JEL4QKt6xqRcCTYq6ebKMTFNM6TY+Blh8iNHekh7qJ0oQA8k0nQJ1VC6t/YzevhohuACq3qMOTiSdEzAZ+aYtSBu1oD5XGoxNeKuvQNOJ/ZmZr5IfEQSMjHNBp8ADRt6gIl2s+HobKZzcaxwDM22BMkMkWUmdOxQmbvM5JpZGMHTmOwGK4qQ0eo22rDxY3S4SYom4VFvc5P8ODiGuCYhu6aRhdnN0cO1oV1aCKDK4ADhUXkBUhkcCsaQ1swAUrBEpmFVGAKEoTIo6ZHqMr3E64qYGZLSlEOmg4BqzikzQuZC7SH5cQrVVhyKYUBhDwlLj/RIWcGlQu1BBdKQAqkQIJQfBcqPQEH0yAggxAiUBpIXdr2VJlQgoYoII7YokYGVxtkFdRG5ntBnhlCE4CUQqr5xOVxzA40hQTtP1iXUdPLVrYMiUJ12xs3nGCeA7G6obih3MHpIfrhuENeSdnsnZTSU+MSmH39wM26u/mJmHH8RB1u/Tf3y+9RHHGgwHLH3wznoKaY0HHkTXFWP9DgmLTZSHTs2eMzesosF5C8Mq5PKdU5gcFBqJ4Y8k0aXR+/w6GwuHcPCZNeavQyZ3GSDvFYatAd+3e4xOAA7DxojI9ddpDrfrjLalViIWZkBUnhtEEthfwgV2WqtQYw6xAAyIUBanNLLjC65yS2DsHiU9imlY0oC3llvFyihmNcL4VGJfcUxKt1Rfpj2SGlMwQAiERoWoagMfqaHFGgcHwdFKrA+49ikNqDFppIe6AEgQH6GxCBgarhm0wwGDdcZ8l73ofzgGxg9rBndwZOD/HSOK1sGhbP5i9FDTog8EPZUoDymgA+V693B5w3QzPzijV8ZPZjUJr3BdGhWhDysIcn1lCdoqoWDrWmuGzQ79prFiP1bbm8r0jExY/dMg+kx0zyLC9QYl/eRanWkx0ntZqfe5NCbOFdkBEsEiQwMtYekyO6mgouahCYbkERdRBfzzmzsBW8wODxGyH1Oj87q0lgcGqtda3Nq7U640FjsarNDqbcjQHqumCcF0s+iI5+90BpkOoOES2SzDFllJpfCPgkht00o7FNq1ww8YttQDYWVnhhCengyDWv5sBiVMoy8CiTGRDZE9pmsj3wAAwRG3s8AEiqHaYIxRjXaqFRPOoTC00/6BJ4aSAKPPDsUI4C4dQ4coo3L4VWwPu0DAizRBwVtkMIAID4U84pWms9/DqKHpvG8OVaOHsQIfAm2g0Ewpombj79O4GoOokOtv4+sd+wNrvfIuHGxdqJ3LcRDI30cuE59mp2Mfg6u+4wDVPZPAJpOajojQxDuKatrEsJCj/ijG3uG1DBk/R6agBodOqMdLvBJuxvkB5wQMTSFUgQMWZhTtmmNdozZ0p1dAIKQ/pwTBhIthMbq0NocCJDNgWHFpMaVYKwcQ4C4nPUZI3TTepnWINFSItMYxGCl1WbIWXLrBANIZpuQEUMy64QY3I/CwJfr+HI9BAGk5UJOIaNchlkMchkABCqiIgOEWWlASOjwZRDwwffz5dSA5hY/2CgDJ2UETT8Cp6SiTDPAGOLoYW5aCImMk59RCXIzwG8f5HfAxaCgE1LYuAJKsBaq4an4mg300bgPxLQHS2UHZjEn2h3kAD/+j79BID0e7xYOVM4QDo+FUt7sGGQ22XHzeRpxcHtqk1yHGjOUZ9o2MW2jnqHDC9CkFyAmbICRY3LGPjFjgzezmMCwTgJYUzTqchpMrN2MSzxagwMxIjnR210GB2Jkck8CFiaHG6jS4/zLrvui8UMAMXFy6mz0Hptba8F8RykM56k4UkWAHJDIqBYzUz1v5oZi1Iz+UoeAHqmOAi7UAJAJqi3IWSg8gI7VIzE5xQaH2OgQY/IyIj0yPV+mwyCM4JnxLwIwgqSGAIkZQErmoAfRDAFMWGQNYighW41hT8jgnaFyhb23jMcRByUyri2Ey0BsHEZVGCCF7ocnx/kXWh9h2zAFjjUUGHw11PMgSC1ehj6g/IyxmMPoYQbIxs0pUVpAh0CBXDO/2CdoTYIKIlyW8JoSMzonQsHDyQlTIEpYn1zceHWG6w44ceRpZcMsDA/8IpLHPJa3P8RmqBxq+Dg1CxAy5Jlms1K2noHQoALhGqHGYNUabOh1LE4d5DgHFWg4I8PhvI7JzxcKpDa5sBwzceThM7QpptJZVHoLXkA9jyQ5VJjF2DDV8tkMacz/wwYhN5DFsMEIYQbrIze75eSXZWa3xOCQ6GwiNghTGAQyvVCmF2DoBHJKZCojDVBBlgwIkwJ4YpNUVs8zb8RNUnlSPTdMxcDJF41dsUON7SIxCg8AATmOMQQ1PwgMM9SD6K8RKdxghARHP0L08OSdoxKo2ztmgyfv4at7+ep+ib4XnBBP1sL5nvH3PWPvesZwI7EHALJB8poA6wr0IECsMQOfOnycU5/skzOYQbCV57F4y2kjeA6zw4y/6Jn9FS5mpyLMIbln4C/b4e97bZYFy6sJ+hcnyAah4LE8yIajRBjO1Sk8zEpbmPKBqFhBUVwgKly5TqN1DU6ybPCoMdq0LFuBNyJnbUARQrekQcjss/KjYgDBk0bcUmWLiEiPFoMr3WkohnMxo4Pmqawf7QVIZfwSIFAgCJQicNkGu9LsUlrcCrMHV3x0NqjkRWocwgvlepHMIJLCIzCkQ5IUBgBrdtaBUzPsIVnE2M62CFUm7ETLTNhRlBr4UkYY4SLTjXIjeu0oBrglzYhIMyxUDwIxPBkEVfhUhYHFgTqLT1IEGAlUg9RAGqROYz8CJIPoHpd38+WQtrqhnh9X9gpUvQJ1v0jbK1R1AUDe/uH7nlEuukfnWGkqaaPyh9Oh2WHCBKYSNCIOoofrxLiwEwMAWcl92zxWooGCm2ThOIx62Vzuc3BlORc2DiOu/0Q23D7bcba6zdQwnA0jzi48DCYjWB+TkxacqVYnBUJ0ACC9VW204rXBpgVWjKRGNhfmNasTrTQ8b7IzgEiBiDwDA4hq+FmAMMz4I7zH4gAdUlBjWsmZIW8xr/rCA9GADOhRGBwqi0tlcUMogB5AQW0S41gDUDAANxSMIR3okFBpkrAtItqI9Q5liSS1VaS0iBRmIRT5UgNPoh+Xcj1GMNdoqymFUVtIMYSbrGrWsB7kK3BrjNITgYK4MPeD6YwkB2SJOpBqegkMkLQLjNGoFHSoA0PcOSrtBRD5yu4xRdeYFJw1Ng/7eS3e/MUYmoOVMxgOsB30EbJEhhywJEKulrp5HvhczayVZ3IAQybLbIcGP3IgzEqCBLjQIP3jrK4AUtRQpprchjvtZmKIvd/O8MK/D+E2Ay5mJwagY0Z6SPDYMjxe641YeXl7gw6WnkhgrMws0zMOYghreK3VobPhO5Et02cRYo0fFiBOoGEqnRXQUbHej8YEJEEWw9LMhD0hJSkTl8g4BdLP1vDUSzQp9PZZepQmlxRoUJkkaggzMqQyiuQ64EYkNWAgQAYRDjGY/Fho+oFBgzCTUG4UoOroebiiikOMYeaHWDnGqjA+xbgcAIL3jImhgNdAXdY7yi0AMR0CmWHup3cMHU8/T4G7HwQQTVuxN81WEzuoBGsFKz0k6sPOkLJzWNLWh3MMVnl56fECZGM+AxWIfDQLAsjORAjKHzt9tASQifIXhsVptpJI4POY3UiNkBUkb/Ijgw8BIgcD9RRus9M+somJELwfLqykSfSMifNYLHCvmQDC+ZfJ4jbhoiqgYCeAWDvHjq1kCnTKyBYGWmYGEOiQFUotlCvKcbM2CACyY8OQjmFwPWg9LTvDo8asVJuUGguKEwBkdjKAoIyXadBEA0ByrhnNQo8/AoK4huZWEz0yEBUo5lVGAsjE5vYipVEMAMn0YhkCBAaIAQT0MGfNmWhw1uBsJDoeuh9sCw2LuE40doO4ckwxAIXYOAOCAYT70cN0coPtO0P0jIq9OoSs9OJytKxvTM6UCagCyDqHhZ3U/oHiC8r4tn4+iA2Q1MdT9EIVNixiTWe0zwBQD6OHAOoGD8QsDksxxJDVQX1F3LbB/AIpjHbUXRxAmFMwZp9h8kMEgB+nQQSpl5W6hWzpAhTOMjHtNeAEkG3CbJughIXag/pEQwmjawKnEw4Pkz3OsNP4HQ9agP5ZHGy6/sW+GPEEYGFJb9dTatMaONODnUYH1PMOTHMGO1fA0/I8GCD0QGShiB5IW2Z4BHpUABBkMXi/maUw71Ii0IPtRDM2o0GEZut5nVUFUBI9gJFcZ5MCNzixN7DGNLf7ATqkYFkMPJAWAUIDhNN75EaqptCMS7U8b2BbiMkPBmEkZB1F6jWTHR4Ylw8LVbTeiptAfVytzgEE9fms3kDmIidEnSGRpk+gZB1qrrAf5hY8IGFBRuvhQxUmg2uaf/G9E3gKJkVgokldiAMyxbS35a3LqBkDVP0RIJfR8rk1jJnLxlqRE2y/wubt4rBFQUQBngQzPjltxJoIGKKEBQABSZiqCA4HjbSg/HYTQDameW4uRYKzpj9otLmNVKtjWLkNQ3I2TG8ghdl09AiWCAJAIYBAgezkk5jFdtL7rfg2sk1qqLwgZ2lMao0RHpXeUOltrDGt0nsXonUIkEKLU1UFpz16THzgoiwujh69TaqhlUUarzIPhMMNTGQWkdIkpkSGJZhCD9oj0aFZ5uOSq4bRA8GX6PACtxOxl0iB+2IgQjTWUHEAUVcaTM+wkE3mNSAtfeO43tpD49KeYQwQHpx4kGvG0xogVFLdoFjThwUaDlB78VQQGG08MkbqJe3mgaFWQF2GXUTIX/20wjHLUP84V8YjDZbPAHkLJQ8TJHbBjllx06gv6DF91p4JLNZAaabQTgExSA8NqpAh9yTQY56YMjqYAZpk9HB+3OJFZGLKikI1hWN23Puh1R9c3nBZ3IgmMGS0A0BuBhBuaHCOh+oveDRRFWYienQMILseqno7AqQ1WBlVGm7qbtEYIXCVDIRHpQXTY1LTI8ChhNASQGYUIaUBO9FyPdTnJnLTZoXWKNfgagcIFXpwXGKEhOjAQ4a0Lk0AYYjURhExJFZBmDDQTWMHCGw1WmYEyMh6QgKpXsBNx6hDDVU6jsaUbCI27B1rUEGuxA1XPi25IhZqtgYEYLGOM5ub9oyKgKSeETwyRj1rFW4tUqOIZTQ6MiajUz64eE/9IQmO6+GPCJRQz7cMkPvBziG5HxKezx5Ij4bGyba0MKHYWGFF3Fhna2+WTf4wlvICBK9CEsRmMdDjmP4EgRAQQKgZTgwzrVvAZ08AkfbgKBTbykamQFClT+JfAIYgixm9xwKNNKaweCYBSisu/bhQgZxuCCBDZ3RSqrKxZMSV8QCQzoJYADFmG7zNiEc13MySGywArpvNYhni8N8A8OH70dwYSVqMKq1RrTPpjBa92WIwmXVGo0av18KjAZ7Xq7V6pUYvV2pVOpOGOtqgaljt6+20eE8A4aKZEXARAS5qkxcdfAQ3TX0gHXBD64sWKOb5rKqH94Cn1mO/Uaix8GnQgVMOCSQyDTWEUGa8oabKC18aoXnFEDPLPC5/fQZomGMIFUhuGFEYh2T6QYl2QKzpF6mhSu+FXAY1PE8GBRd2g4AnIXaAugXq1iHhh37ee2/ZxeJd9wiLOcyTzuoK2WEPUznFIlkAACAASURBBVCMT4+kL+UHX/D8YYnYYAQKZmbFPf4TAoaad4IA3ONzIEDkb9MiIzgTZIJyiQ40NQbsZkMImLZPT1qkZk2fSAJ+ryUlBbt1NALkmsdHsTWFofSBDUSMRgxXwkMJMNmoCeUwgWhOoW3qrQ6kxCMWK4TFh78BId+9gZ3dfZ3d/b//Q4MjY2LhQJJEr1Rqz2exyOTwuu9tuclg0NpPSopUaVXyjatyqk9j0UptR7jAp4RmddFgnG1ULB7SyUY1sXC0VqJQylVojUyilKi0oE6QwXOpQYYiU4JSNDCCRahYg1BsAC+RHpIFCHaotECQjoMNWXeX2SYnJJcLDZThjFyhAoqgJpDDy5PoxnH7oedzZIM76cH1CXAeTUmEl6h7x0oMAicEbQeYaVZpGVaYRpXGEdp+RJLFuUKLrE2lAciC6wPpAUpPoB+QmeGwflUL1jqrT/QU9XSNv4REUiCaLOF3CesfiZtuimHdmJYcNMi1knxlAX2Yxqo+QMwcuVIDS0Eh8Av6/15vstLvjYk1hltRwCGqi2SdNMU3uaXjEXh/pEG4YQrIDpSGAoJ5ChsCwuyYwhbmn9MCiHclDBTIDPXYDEGPASQXS6Z6CV1U6o0Ao6u/te/n06Y3Ll86dOLZ/x/at69auX7mybsmSpVVVtUuqK8rKy0pKllVVLq+pbqirXbeqYdv6poO7tp85fujezxc+vLg/0v1eye81K0ecer5TO2ZVD9t1ArNixCjps8gHzbJ+o7Dbqhoxivu0Y63q0feq4XcG6YBW1KeRDOuUIpVCIpNJpXK1BJIUumlKXlCC4e4YAiSQafngoGn1DB4FNNYAPyQzumRWj8o5rXLOSC1uOnFmwcVWhQlDiSHAxTE97R8SPbThOugFqI+v8Dpi3HQGdLqHOTeNg1WZntAxgQiNKswjctMgmCGUIm2fUAWuuZsv7x6XdyJAugG5sQcAGha3UveZo6dn9G3X8Juu4fd9vLZRyRw11SOoQ2aHwcykCIjBEomVzbiRY2cMfSE/BJmRnCx+zOwX7bgiiJuBOAl3sAkU1tWUp8jxsCLcgQs9Lo8Z9Gb6IxBjcHrYmVG0zxNTACIApGcA0aAUnmezVfgtDiBs7dhBn0x0VFmjM/H5/A9vXt6+fP7c4b37mlftXl23ua6ysaJ4bUVxU1VpfWnxkkWLS/MLigoLiwsXF+TmFebmLsrJzc/Ozs/OKszOKczOLsjIKszIKM7JKcnLq1i8aFVN9d4tzRdPHX398LpoqNUkGzaJe9VDbzSjH7TjbdqxFh2vzSjuBaS0vHb1WKu0/5WG16rht0n7XypG3qvGO4V9byRjvRIhjy8QS1QGKVhpVCCDWGEUSjmARLgobcKxhlwPyUtqdMpAgeyTMvuk2OQUQHWGWUw/LsXZGTFkFtA5HjI96KzZkGuQTS2E2IPuJhPDNp27iSGQH/RAULvBe8SaXiEmrJ5xRQ8P01b3mBRbiCPiDjrdjOOwIWEnKJlI28FT4ASj98vuM2oP0NOOJ52VcxTU/FBrLeAu4SMxejsuRuoZgoqghDhJQux01wsHdYRnqyGbi6ufTSQ2dvyAyZ2w9QkMPfWLGRBwQZNzl8E9YSGAIGcZQLHM1JyEP+4Gt0QAYc/QqWcLrFThgz7hQN7mTXmOCYPJIhzndbx8+uzKmYv7Nh1bV3e4cdnuhprdK5fubli6dXn11rrq7XXVG5aUNVaWrSgrrVy0uGxRYUlBYXFe/uLcnOK83JKcnMW5uYtz84ry8oGnCiAsJ7c4Oyc7JTUrMSkzPj4zPq48K2NFRen29U03Lp4dH+zQjHeqB19pht8ph96MvrulGn6vHPmA8iPolA2+0gm7JL1PJT1P4EflaKuw68nI+9vjva8VkrHxsRGRRAFJDU/2SDUCOUoOnhdTGtE7Kw0IkMGBm9FGJ9Aj1FopPWnIAKnBUOPyKx1NhGeGhcphsZKz1fTIHHQ/rfV0exWomzEE8kO7QQNCnFrg2gbX+BHSfTmEuH9IJ5rb8FQ8tpvBBnWNK9tGJKxtyBzPW8hcPaMtg4J2+Aujkk6efA6rKcA/qrQWMKS0sYUrWljs2FzYVoHP20kLyGhl6NHmMdgncA/LDkFbpBYHJSy8fwphx2ac3KiB5uFONhXXWxxoX4A8F3mUyRnzxDQqFmYrByvZjEgJAYQzL3wSanvIjFTJT1hpcVGrUfe3vXt546cHp/Zf27/p570bz29vPLdl9ZVd605tbDi+rv7o2rr9K2u211bsqqvaUlO+qnTxytKi5cWLKwsKSvJyCzMzy3Kyly0qqMjLXZyVXZiZnZ+RlZuemZ2aXp6bU56TnZeSmp+SkpOclJectCgpKTsuLiM6OiEiMi8tfVVt7Q8Hdr25e1HU+xJwkQ681Yn7NMIuzXibqOuxqPu5bOgdr/Xu8Ovr4t4X4u6nA08vvL9yQND5iN/xcKjlvmC0TySRCWUaPKEBNKhNYIDIUIMfsuExe7rXhwRMtNI0LiH7LNKMiTTjEij7Teywxzh3MJ6V90APV6YN4qCUleISDqAhBpAEvBENMbBz2EEH4LnVVaRH1DF7ZwUq2iEIIEXbiPg9cz9d5Ht6Rjh6hkUfBgVvoYzHzr3OhCWr1qzWgwN16q3w6U7ApwvuRM+WAG208oc6BJXUhNEBIjFNMQOPRuckbU049N7x+JeBKmJiDNHujo2roVC9ABQwQE4PK8gZQMAKq8LYYXXMobToY3FNOCY+2txTEpHow5P7N07sP7ut8fKu9TcPbr11eOv1A5uu7Gq+uK3xwpZVP25qOL951Y+bV51sqju6uubE2tqja5burqtcU7q4vqigbnFBWU5OVW7O6uKCmvw8wKUwI7MgIzMvLSMnNT0zJa0gLb0qJ6skPa04NaUoOTk9NjojNqY0NaUiPTU3Pi4vNjY+NCI2LDInPXPzunXP718X9L5RjbaIu5913Ds7/PqatO/VeMu9gZc/i3peKHkdsuEWrbiv78XVgReXpf0v5EOvh9/fGWl9MND6YmxkBDfwVWaoyPhSLRpqvY1KejM75AolGE9EqUqo4Yk0fLEGb8aA2OHuPS0rKkdFyjERPo7QgscAjVF7aWXMa4PEtPEjYwNUtjXGms5MgWbvyAHy0z4k4M5/9fOhgO8al0MJxtLWe7TMIzjiGBEDPe/7x191Db9oH5iD9Ohw7oOde51VZ8ElPdMEcycz8Bnr2Pqfxc1uq2N0oPPFQIDAr+AjUAWJ7DM3X5Ckp01kyl+41o53V3F40PQwhtj6qdGGdthM1goAck5gk9CCcoWpzeq00rBFLBK/vnfrwt5tp7Y0ndzUeGpz47mtay9sa/ppexNoz+mNKy5sXXVx2+ozG+pPNC49tqrmYH3l0ZVLvl9Tc2hF1faa0uayRevKFm2rKd1QWVRXkFeTl10EjiczsyAtIzs1LSslLSM5JSMpJTUhuSAlpTo7Y2VhTklKYn58XElqcmlK0pL01MWJ8cWJ8VkxMUkR0dGh4TFhEekJKWtWrLh4+lj7k2uvzu873VR2qKHk3Z3zssF3Y+3PpEMtwt7XsuEPwv43r65/3/P0Qv+b6wOvbz48ufn5+d3tD34c7WnhjY7xxSoxVGq4io+GGhel8Ti9mQcVk1A9KlKNCVUIEIgQZjrMYgLMYsCWalQoxxApRmm2OkBjVGouS2ZPYpD84FoZmOhOtvIM3AwIkKEBLnO146KqgKUwtjMPAHXyZK2DApQfLLuGW/rG6UyqBEToddfQy/aBVxxAWpMSe/MmAAglxzlhnpwBgMxTHw0kQpRNXBhQrH0BkBHocUJMGQgCncHGMpeWnacx4698eZMetscDZhmLLNZNtntwpIW/6AUIxI87JYhzCSgMnZ4ZpUo73Nd188Lp3esaD2xs3tO0ZveaFfubGg41rTi8tu6HDQ3fN9efWLsMlOaH5uWn1tWdXrf8yMrq3bWl+5eXQ+yoKV5TlF+RlbGsIGdD2aKN5YuW5GQWpqQUpaeXZmQuTkvLTU7JS0pdlJpWmZVRkZmeER9flp66qiA7Nza2NDmpMiWxMC42Py5mUXxsUWJsUWIsPJ8cGZkcHZMcFZUQGhYZHLqypvqnH462Prx8++iWV9dOSgY+SAeBnpfj7Y9GWx+OtT9R8LrGu573PP1pvP1By+1TD3/Y/OzHXQ9ObX9/51z7y4dDw6N4cyq9Dfej5Tos3VVGHuQvgZoHIVQjPSINT6zlYbLDO1ZBFhvF/qESzBClMw0dj5dzLUF2HwXqBuFmNI0+4CWiR4ToUOBaNNRcPOkXGNEZeACLGkItAwKUny5QoNE2wG5EAvLzrmfsdcfgKwRocI5Ca6bGPB56UoOPxhQDmWXK5Jk2eqBsntBZ2U0tyMfAxw8pDNPWlN4GtboH8p0OwmxHCGiPQmfy7rqTbrH79DBr5dUhahwwhuzodeAXmQIZGUDoqwBEm9k+qdObO1tafzx25NDWLScP7Nm9acMPB3c/vHL60vcHG5fVrF9Ws31F7Z6VS/esqDm0aunxxtoTjcuOrqo5vrrmSEPV/rqyPctKD9aX7a0t2VBaUJWVUZSWWpGRXpWZXpGZUZyWVpaeVpmRhnkqJnZxSnJ9QU59fnZdXsbi1KSkyKjFSYkZUZEpoaG50aHJIUFZERHVKQl1mSn12anVaYmL42KSgoPg1aSgoNCFC2tyUkrTkwCjk/t3tj64BCls4NX1zgfnBl9ckQ+/H2253//iWs/zn1/9fPzF1WPjHY97n17sfvhj250f2u6d63t9o/3Z9deP7/JFconazJfr2D2ERsWaMQHIj3oMAdKOC8EJqcESQSITqa18KMXFmmEBAsTWzYYENAXz0kMhZvcsY2zhfRTYbcgwf6H29PDleCsFgbITb8fBHbf4DNCoFHIZy19QiAE6HSPiln7+686h1+2DrzoGX3cygGjyDKEy2LVggKC6cU7qXZN6cCegEBY
-        <div>
-            <h1>MiSt Enterijer — ${I ? "INTERNI OBRAČUN" : "PONUDA"}</h1>
-            <p class="subtitle">${ime ? "Projekat / kupac: <b>" + ime + "</b> · " : ""}Datum: ${datum}</p>
+                <img id="logoImg" class="logo-img" src="" alt="Logo" style="display:none;">
+            </div>
+            <div>
+                <h1>MiSt Enterijer</h1>
+                <p class="sub">Kalkulacija i predračun materijala i okova</p>
+            </div>
         </div>
-    </div>`;
+        <div class="header-actions">
+            <label class="file-top">📂 Učitaj projekat<input type="file" id="uclajFajl" accept=".json"></label>
+            <button class="alt" id="sacuvajFajl">💾 Sačuvaj projekat</button>
+            <button class="alt" id="istorijaBtn">📚 Istorija projekata</button>
+            <button class="oak-btn" id="izvoz">📥 Preuzmi tekst</button>
+            <button class="oak-btn" id="pdfBtn">🖨️ Štampaj / PDF</button>
+            <div class="msg" id="izmsg"></div>
+        </div>
+    </div>
+
+    <section>
+        <h2>Osnovni podaci</h2>
+        <div class="row"><label>Naziv projekta / Kupac:</label><input type="text" id="kupac" placeholder="npr. Kuhinja Petrovic"></div>
+        <div class="row"><label>Tip dokumenta:</label>
+            <select id="verzija">
+                <option value="p">Ponuda za mušteriju</option>
+                <option value="i">Interni obračun</option>
+            </select>
+        </div>
+        <div class="row"><label>Dogovoreni rok izrade:</label><input type="text" id="rokIzrade" value="15-20 radnih dana" placeholder="npr. 15 radnih dana"></div>
+        <div class="row"><label>Kontakt telefon:</label><input type="text" id="kontaktTel" value="" placeholder="npr. 064/123-4567"></div>
+    </section>
+
+    <section>
+        <h2>1. Pločasti materijali i kantovanje</h2>
+        <div class="row"><label>18mm univer (m²):</label><input type="number" id="m2_18" value="0" min="0" step="0.1"></div>
+        <div class="row"><label>36mm univer (m²):</label><input type="number" id="m2_36" value="0" min="0" step="0.1"></div>
+        <div class="row"><label>Radna ploča 38mm (m²):</label><input type="number" id="m2_rp38" value="0" min="0" step="0.1"></div>
+        <div class="row"><label>Medijapan / Specijalno (m²):</label><input type="number" id="m2_med" value="0" min="0" step="0.1"></div>
+        <div class="row"><label>Kant traka ABS 0.5mm (m):</label><input type="number" id="kant_05" value="0" min="0" step="1"></div>
+        <div class="row"><label>Kant traka ABS 2mm (m):</label><input type="number" id="kant_2" value="0" min="0" step="1"></div>
+        <div class="row"><label>Lepljenje PUR lepkom:</label><select id="pur"><option value="ne">Ne</option><option value="da">Da</option></select></div>
+    </section>
+
+    <section>
+        <h2>2. Staklo, ogledala i metalne konstrukcije</h2>
+        <div class="row"><label>Staklo / ogledala (m²):</label><input type="number" id="staklo_m2" value="0" min="0" step="0.1"></div>
+        <div class="row"><label>Metalne konstrukcije (kg):</label><input type="number" id="metal_kg" value="0" min="0" step="0.5"></div>
+        <div class="row"><label>Plastifikacija metala (kg):</label><input type="number" id="plast_kg" value="0" min="0" step="0.5"></div>
+    </section>
+
+    <section>
+        <h2>3. Okov, rasveta i dodaci</h2>
+        <div id="okovLista"></div>
+    </section>
+
+    <section>
+        <h2>4. Finansijski parametri</h2>
+        <div class="row"><label>Zarada / Marža (%):</label><input type="number" id="marza" value="30" min="0" step="1"></div>
+        <div class="row"><label>Trošak prevoza (Din):</label><input type="number" id="prevoz" value="3000" min="0" step="100"></div>
+        <div class="row"><label>Izrada projekta (Din):</label><input type="number" id="izrada" value="0" min="0" step="100"></div>
+        <div class="row"><label>Kurs EUR (RSD):</label><input type="number" id="kurs" value="117.2" min="1" step="0.1"></div>
+        <div class="top-rate">
+            <div class="rate-line">
+                <label style="font-weight:500;">Zvanični srednji kurs NBS:</label>
+                <b id="nbsKursInfo">učitavanje...</b>
+                <button type="button" class="alt" id="nbsFetchBtn" style="padding:4px 10px; font-size:0.8rem;">Osveži kurs sa NBS</button>
+            </div>
+            <div class="msg" id="nbsMsg"></div>
+        </div>
+    </section>
+
+    <section class="sum">
+        <h2>Rekapitulacija obračuna</h2>
+        <div class="row"><label>Pločasti materijali + kante:</label><b id="s_plocasti">0 Din</b></div>
+        <div class="row"><label>Staklo i ogledala:</label><b id="s_staklo">0 Din</b></div>
+        <div class="row"><label>Metalne konstrukcije:</label><b id="s_metal">0 Din</b></div>
+        <div class="row"><label>Plastifikacija metala:</label><b id="s_plast">0 Din</b></div>
+        <div class="row"><label>Okova, rasveta i dodaci:</label><b id="s_okov">0 Din</b></div>
+        <div class="row"><label>Zbir materijala (osnovica):</label><b id="s_mat">0 Din</b></div>
+        <div class="row"><label>Zarada:</label><b id="s_zar">0 Din</b></div>
+        <div class="row"><label>Prevoz i projekat:</label><b id="s_prpr">0 Din</b></div>
+        <div class="tot"><span>UKUPNO:</span><span id="s_ukupan_din">0 Din (~0 €)</span></div>
+    </section>
+
+    <section>
+        <h2>Komentar i podsetnik</h2>
+        <div style="margin-bottom:10px;"><label style="display:block; font-weight:500; margin-bottom:4px;">Komentar za ponudu / interni:</label><textarea id="komentar" placeholder="Unesite napomene..."></textarea></div>
+        <div><label style="display:block; font-weight:500; margin-bottom:4px;">Podsetnik (samo za Vas):</label><textarea id="podsetnik" placeholder="Privremene beleške..."></textarea></div>
+    </section>
+
+    <section>
+        <h2>⚙ Podešavanje cena i materijala</h2>
+        <div class="btns">
+            <button type="button" class="alt" id="ghCfgBtn">⚙ GitHub sinhronizacija</button>
+        </div>
+        <div id="ghSection" class="gh-box-inline" hidden>
+            <h3 style="margin-top:0;">GitHub podešavanja cena</h3>
+            <div class="row"><label>Korisnik (Owner):</label><input type="text" id="ghOwner" value="stamenovmilan-netizen"></div>
+            <div class="row"><label>Repozitorijum (Repo):</label><input type="text" id="ghRepo" value="mist-kalkulacija"></div>
+            <div class="row"><label>Grana (Branch):</label><input type="text" id="ghBranch" value="main"></div>
+            <div class="row"><label>Putanja fajla (Path):</label><input type="text" id="ghPath" value="cene.json"></div>
+            <div class="row"><label>GitHub Token:</label><input type="password" id="ghToken" placeholder="ghp_..."></div>
+            <div class="btns">
+                <button type="button" class="oak-btn" id="ghSaveBtn">☁ Sačuvaj cene na GitHub</button>
+                <button type="button" class="alt" id="ghCfgSave">Sačuvaj podešavanja</button>
+            </div>
+            <div class="msg" id="ghMsg"></div>
+        </div>
+        <div id="ceneEditor" style="margin-top:14px;"></div>
+    </section>
+
+    <div id="historyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:var(--card); border:1px solid var(--bd); border-radius:10px; max-width:600px; width:100%; max-height:80vh; display:flex; flex-direction:column; padding:20px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h2 style="margin:0;">Istorija sačuvanih projekata</h2>
+                <button type="button" class="alt" id="closeHistory" style="padding:4px 10px;">Zatvori</button>
+            </div>
+            <div id="historyList" style="overflow-y:auto; flex:1; padding-right:5px;"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n || 0).toLocaleString("sr-RS");
+
+const DEF = {
+    univer18: 1800,
+    univer36: 3600,
+    rp38: 3500,
+    medijapan: 4200,
+    kant05: 60,
+    kant2: 150,
+    purLepljenje: 300,
+    stakloM2: 4500,
+    metalKg: 350,
+    plastKg: 200,
     
-    html += `<h3>Okov, rasveta i dodaci</h3><table><thead><tr><th>Naziv artikla</th><th class="right">Količina</th>`;
-    if (I) html += `<th class="right">Jed. cena</th><th class="right">Ukupno</th>`;
-    html += `</tr></thead><tbody>`;
+    // Okov i dodaci
+    klapSarka: 180,
+    klapSarkaUgradna: 220,
+    klapSarka155: 450,
+    klapSarkaMini: 200,
+    klapSarkaStaklo: 350,
+    klizniSistemGornji: 4500,
+    klizniSistemPodni: 2500,
+    ugradniAluProfil: 1200,
+    rucicaAlu: 350,
+    rucicaStandard: 250,
+    uskocnaKvaka: 800,
+    klizacStandard: 350,
+    klizacUsporivac: 950,
+    tandemboxKomplet: 3500,
+    podizacGasni: 450,
+    podizacAventos: 8500,
+    nogaStocnaMetalna: 600,
+    nogaKuhinjskaPVC: 150,
+    tipl: 8,
+    sraf4x16: 2,
+    sraf4x40: 3,
+    konfirmatSraf: 5,
+    kablovskiProlaz: 250,
+    ledTrakaMetar: 600,
+    ledNapajanje: 1800,
+    silikonBeli: 600
+};
+
+const PRICE_LABELS = {
+    univer18: "18mm univer (m²)",
+    univer36: "36mm univer (m²)",
+    rp38: "Radna ploča 38mm (m²)",
+    medijapan: "Medijapan / Specijalno (m²)",
+    kant05: "Kant traka ABS 0.5mm (m)",
+    kant2: "Kant traka ABS 2mm (m)",
+    purLepljenje: "Lepljenje PUR lepkom (m)",
+    stakloM2: "Staklo / ogledala (m²)",
+    metalKg: "Metalne konstrukcije (kg)",
+    plastKg: "Plastifikacija metala (kg)",
     
-    if (!R.length) html += `<tr><td colspan="${I?4:2}">(Nema dodatih stavki)</td></tr>`;
-    R.forEach(r => {
-        html += `<tr><td>${r[0]}</td><td class="right">${r[1]}</td>`;
-        if (I) html += `<td class="right">${fmt(r[2])} Din</td><td class="right">${fmt(r[1] * r[2])} Din</td>`;
-        html += `</tr>`;
+    klapSarka: "Klap šarka ravna",
+    klapSarkaUgradna: "Klap šarka ugradna (polukolenasta)",
+    klapSarka155: "Klap šarka 155° / 170° širokougaona",
+    klapSarkaMini: "Klap šarka mini (fi 26mm)",
+    klapSarkaStaklo: "Klap šarka za staklena vrata",
+    klizniSistemGornji: "Klizni sistem za garderober (garnitura)",
+    klizniSistemPodni: "Klizni sistem podni klizni",
+    ugradniAluProfil: "Ugradni ALU profil za LED (metar)",
+    rucicaAlu: "Ručica ALU profil (komad / metar)",
+    rucicaStandard: "Ručica standardna nameštaj",
+    uskocnaKvaka: "Uskočna brava / kvaka",
+    klizacStandard: "Klizač fioke standardni (set)",
+    klizacUsporivac: "Klizač fioke sa usporivačem (set)",
+    tandemboxKomplet: "Tandembox / metalna fioka komplet",
+    podizacGasni: "Podizač gasni (amortizer vrata)",
+    podizacAventos: "Podizač Blum Aventos (komplet)",
+    nogaStocnaMetalna: "Noga stočna metalna podesiva",
+    nogaKuhinjskaPVC: "Noga kuhinjska PVC podesiva sa klipom",
+    tipl: "Tipl Double Power 8 × 65 mm (produženi)",
+    sraf4x16: "Šraf 4 x 16 mm (komad)",
+    sraf4x40: "Šraf 4 x 40 mm (komad)",
+    konfirmatSraf: "Konfirmat šraf za spajanje korpusa",
+    kablovskiProlaz: "Kablovski propust (izdvojeni)",
+    ledTrakaMetar: "LED traka profesionalna (metar)",
+    ledNapajanje: "LED napajanje / drajver",
+    silikonBeli: "Silikon sanitarni / akrilni"
+};
+
+let cene = { ...DEF };
+let priceLabels = { ...PRICE_LABELS };
+let customArticles = [];
+
+function registerArticles(arr) {
+    if (!Array.isArray(arr)) return;
+    arr.forEach(item => {
+        if (!item || !item.key) return;
+        const key = item.key;
+        if (item.name) priceLabels[key] = item.name;
+        if (typeof item.price === "number") cene[key] = item.price;
+        else if (!(key in cene) && key in DEF) cene[key] = DEF[key];
     });
-    html += `</tbody></table>`;
+}
+function articlesForExport() {
+    return Object.keys(cene).map(k => ({ key: k, name: priceLabels[k] || k, price: cene[k] }));
+}
+
+const OKOV_KEYS = [
+    "klapSarka", "klapSarkaUgradna", "klapSarka155", "klapSarkaMini", "klapSarkaStaklo",
+    "klizniSistemGornji", "klizniSistemPodni", "ugradniAluProfil", "rucicaAlu", "rucicaStandard",
+    "uskocnaKvaka", "klizacStandard", "klizacUsporivac", "tandemboxKomplet", "podizacGasni",
+    "podizacAventos", "nogaStocnaMetalna", "nogaKuhinjskaPVC", "tipl", "sraf4x16", "sraf4x40",
+    "konfirmatSraf", "kablovskiProlaz", "ledTrakaMetar", "ledNapajanje", "silikonBeli"
+];
+
+function buildOkov() {
+    const wrap = $("okovLista");
+    wrap.innerHTML = "";
+    OKOV_KEYS.forEach(k => {
+        const row = document.createElement("div");
+        row.className = "row";
+        const label = document.createElement("label");
+        label.htmlFor = "okv_" + k;
+        label.textContent = (priceLabels[k] || k) + ":";
+        const input = document.createElement("input");
+        input.type = "number";
+        input.id = "okv_" + k;
+        input.value = "0";
+        input.min = "0";
+        input.step = "1";
+        input.addEventListener("input", calc);
+        row.appendChild(label);
+        row.appendChild(input);
+        wrap.appendChild(row);
+    });
+}
+
+function buildFin() {
+    ["m2_18", "m2_36", "m2_rp38", "m2_med", "kant_05", "kant_2", "pur", "staklo_m2", "metal_kg", "plast_kg",
+     "marza", "prevoz", "izrada", "kurs", "kupac", "verzija", "rokIzrade", "kontaktTel"].forEach(id => {
+        const el = $(id);
+        if (el) el.addEventListener("input", calc);
+    });
+    const vEl = $("verzija");
+    if (vEl) vEl.addEventListener("change", calc);
+}
+
+function buildCene() {
+    const ed = $("ceneEditor");
+    if (!ed) return;
+    ed.innerHTML = '<h3 style="margin-bottom:8px;">Katalog cena i materijala</h3>';
+    
+    const categories = [
+        { name: "Pločasti materijali i kantovanje", keys: ["univer18", "univer36", "rp38", "medijapan", "kant05", "kant2", "purLepljenje"] },
+        { name: "Staklo i metal", keys: ["stakloM2", "metalKg", "plastKg"] },
+        { name: "Šarke i klizači", keys: ["klapSarka", "klapSarkaUgradna", "klapSarka155", "klapSarkaMini", "klapSarkaStaklo", "klizacStandard", "klizacUsporivac", "tandemboxKomplet"] },
+        { name: "Sistemi i podizači", keys: ["klizniSistemGornji", "klizniSistemPodni", "ugradniAluProfil", "podizacGasni", "podizacAventos"] },
+        { name: "Ručice, nogice i ostalo", keys: ["rucicaAlu", "rucicaStandard", "uskocnaKvaka", "nogaStocnaMetalna", "nogaKuhinjskaPVC", "tipl", "sraf4x16", "sraf4x40", "konfirmatSraf", "kablovskiProlaz", "ledTrakaMetar", "ledNapajanje", "silikonBeli"] }
+    ];
+
+    categories.forEach(cat => {
+        const catDiv = document.createElement("div");
+        catDiv.className = "price-category";
+        catDiv.textContent = cat.name;
+        ed.appendChild(catDiv);
+        
+        cat.keys.forEach(k => {
+            if (!(k in cene)) return;
+            const r = document.createElement("div");
+            r.className = "price-edit-row";
+            
+            const nameInput = document.createElement("input");
+            nameInput.type = "text";
+            nameInput.className = "price-name-input";
+            nameInput.value = priceLabels[k] || k;
+            nameInput.addEventListener("input", () => {
+                priceLabels[k] = nameInput.value;
+                const lbl = $("okv_" + k);
+                if (lbl && lbl.previousElementSibling) lbl.previousElementSibling.textContent = nameInput.value + ":";
+            });
+
+            const valInput = document.createElement("input");
+            valInput.type = "number";
+            valInput.className = "price-value-input";
+            valInput.value = cene[k];
+            valInput.min = "0";
+            valInput.step = "1";
+            valInput.addEventListener("input", () => {
+                cene[k] = parseFloat(valInput.value) || 0;
+                calc();
+            });
+
+            r.appendChild(nameInput);
+            r.appendChild(valInput);
+            ed.appendChild(r);
+        });
+    });
+}
+
+let manualSum = { okov: null, mat: null };
+
+function calc() {
+    const m2_18 = parseFloat($("m2_18").value) || 0;
+    const m2_36 = parseFloat($("m2_36").value) || 0;
+    const m2_rp38 = parseFloat($("m2_rp38").value) || 0;
+    const m2_med = parseFloat($("m2_med").value) || 0;
+    const kant_05 = parseFloat($("kant_05").value) || 0;
+    const kant_2 = parseFloat($("kant_2").value) || 0;
+    const pur = $("pur").value === "da";
+
+    const staklo_m2 = parseFloat($("staklo_m2").value) || 0;
+    const metal_kg = parseFloat($("metal_kg").value) || 0;
+    const plast_kg = parseFloat($("plast_kg").value) || 0;
+
+    let calcOkov = 0;
+    OKOV_KEYS.forEach(k => {
+        const val = parseFloat($("okv_" + k).value) || 0;
+        calcOkov += val * (cene[k] || 0);
+    });
+
+    const plocasti = m2_18 * cene.univer18 + m2_36 * cene.univer36 + m2_rp38 * cene.rp38 + m2_med * cene.medijapan +
+                     kant_05 * cene.kant05 + kant_2 * cene.kant2 + (pur ? (kant_05 + kant_2) * cene.purLepljenje : 0);
+    const staklo = staklo_m2 * cene.stakloM2;
+    const metal = metal_kg * cene.metalKg;
+    const plast = plast_kg * cene.plastKg;
+
+    const calcMat = plocasti + staklo + metal + plast + calcOkov;
+    const marza = parseFloat($("marza").value) || 0;
+    const calcZar = calcMat * (marza / 100);
+    const calcPrevoz = parseFloat($("prevoz").value) || 0;
+    const calcIzrada = parseFloat($("izrada").value) || 0;
+
+    const ukupnoDin = calcMat + calcZar + calcPrevoz + calcIzrada;
+    const kurs = parseFloat($("kurs").value) || 117.2;
+    const ukupnoEur = kurs > 0 ? ukupnoDin / kurs : 0;
+
+    $("s_plocasti").textContent = fmt(plocasti) + " Din";
+    $("s_staklo").textContent = fmt(staklo) + " Din";
+    $("s_metal").textContent = fmt(metal) + " Din";
+    $("s_plast").textContent = fmt(plast) + " Din";
+    $("s_okov").textContent = fmt(calcOkov) + " Din";
+    $("s_mat").textContent = fmt(calcMat) + " Din";
+    $("s_zar").textContent = fmt(calcZar) + " Din";
+    $("s_prpr").textContent = fmt(calcPrevoz + calcIzrada) + " Din";
+    $("s_ukupan_din").textContent = fmt(ukupnoDin) + " Din (~" + fmt(ukupnoEur) + " €)";
+}
+
+async function refreshNbsRate() {
+    const info = $("nbsKursInfo"), msg = $("nbsMsg");
+    info.textContent = "učitavanje...";
+    try {
+        const res = await fetch("https://nbs.rs/kurs/API/kursnaLista?vrsta=srb", { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const eurItem = data.find(x => x.oznakaValute === "EUR");
+        if (eurItem && eurItem.srednjiKurs) {
+            const val = parseFloat(eurItem.srednjiKurs);
+            if (!isNaN(val)) {
+                $("kurs").value = val.toFixed(2);
+                calc();
+                info.textContent = val.toFixed(2) + " RSD";
+                msg.textContent = "Uspešno preuzet zvanični srednji kurs sa NBS.";
+                return;
+            }
+        }
+        throw new Error("EUR nije pronađen");
+    } catch (e) {
+        info.textContent = "greška";
+        msg.textContent = "Nije uspelo preuzimanje sa NBS. Koristi se ručni kurs.";
+    }
+}
+$("nbsFetchBtn").addEventListener("click", refreshNbsRate);
+
+// State save / load
+function get projektState() {
+    const o = {
+        kupac: $("kupac").value,
+        verzija: $("verzija").value,
+        rokIzrade: $("rokIzrade").value,
+        kontaktTel: $("kontaktTel").value,
+        m2_18: $("m2_18").value,
+        m2_36: $("m2_36").value,
+        m2_rp38: $("m2_rp38").value,
+        m2_med: $("m2_med").value,
+        kant_05: $("kant_05").value,
+        kant_2: $("kant_2").value,
+        pur: $("pur").value,
+        staklo_m2: $("staklo_m2").value,
+        metal_kg: $("metal_kg").value,
+        plast_kg: $("plast_kg").value,
+        marza: $("marza").value,
+        prevoz: $("prevoz").value,
+        izrada: $("izrada").value,
+        kurs: $("kurs").value,
+        komentar: $("komentar").value,
+        podsetnik: $("podsetnik").value,
+        okovi: {},
+        cene, priceLabels,
+        updatedAt: new Date().toISOString()
+    };
+    OKOV_KEYS.forEach(k => { o.okovi[k] = $("okv_" + k).value; });
+    return o;
+}
+
+function loadState(o) {
+    if (!o) return;
+    if (o.kupac !== undefined) $("kupac").value = o.kupac;
+    if (o.verzija !== undefined) $("verzija").value = o.verzija;
+    if (o.rokIzrade !== undefined) $("rokIzrade").value = o.rokIzrade;
+    if (o.kontaktTel !== undefined) $("kontaktTel").value = o.kontaktTel;
+    if (o.m2_18 !== undefined) $("m2_18").value = o.m2_18;
+    if (o.m2_36 !== undefined) $("m2_36").value = o.m2_36;
+    if (o.m2_rp38 !== undefined) $("m2_rp38").value = o.m2_rp38;
+    if (o.m2_med !== undefined) $("m2_med").value = o.m2_med;
+    if (o.kant_05 !== undefined) $("kant_05").value = o.kant_05;
+    if (o.kant_2 !== undefined) $("kant_2").value = o.kant_2;
+    if (o.pur !== undefined) $("pur").value = o.pur;
+    if (o.staklo_m2 !== undefined) $("staklo_m2").value = o.staklo_m2;
+    if (o.metal_kg !== undefined) $("metal_kg").value = o.metal_kg;
+    if (o.plast_kg !== undefined) $("plast_kg").value = o.plast_kg;
+    if (o.marza !== undefined) $("marza").value = o.marza;
+    if (o.prevoz !== undefined) $("prevoz").value = o.prevoz;
+    if (o.izrada !== undefined) $("izrada").value = o.izrada;
+    if (o.kurs !== undefined) $("kurs").value = o.kurs;
+    if (o.komentar !== undefined) $("komentar").value = o.komentar;
+    if (o.podsetnik !== undefined) $("podsetnik").value = o.podsetnik;
+    
+    if (o.okovi) {
+        OKOV_KEYS.forEach(k => {
+            if (o.okovi[k] !== undefined && $("okv_" + k)) $("okv_" + k).value = o.okovi[k];
+        });
+    }
+    if (o.cene) {
+        Object.keys(o.cene).forEach(k => { if (k in cene) cene[k] = o.cene[k]; });
+    }
+    if (o.nazivi || o.priceLabels) {
+        const nl = o.nazivi || o.priceLabels;
+        Object.keys(nl).forEach(k => { priceLabels[k] = nl[k]; });
+    }
+    buildOkov(); buildCene(); calc();
+}
+
+// GitHub History storage
+function saveToGitHubHistory(state) {
+    let history = [];
+    try {
+        const s = localStorage.getItem("mist_history");
+        if (s) history = JSON.parse(s);
+    } catch(e) {}
+    const id = "proj_" + Date.now();
+    const name = (state.kupac || "Nepoznat projekat") + " (" + new Date().toLocaleDateString("sr-RS") + ")";
+    history.unshift({ id, name, date: state.updatedAt, data: state });
+    if (history.length > 30) history = history.slice(0, 30);
+    try {
+        localStorage.setItem("mist_history", JSON.stringify(history));
+    } catch(e) { alert("Greška pri čuvanju u lokalnu istoriju: " + e.message); }
+}
+
+$("sacuvajFajl").addEventListener("click", () => {
+    const state = projektState;
+    saveToGitHubHistory(state);
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const b = ($("kupac").value || "projekat").trim().replace(/[^A-Za-z0-9_-]+/g, "_");
+    a.href = url;
+    a.download = "MiSt-Projekat-" + b + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    $("izmsg").textContent = "Projekat je sačuvan i dodat u istoriju.";
+});
+
+$("uclajFajl").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+        try {
+            const data = JSON.parse(evt.target.result);
+            loadState(data);
+            $("izmsg").textContent = "Projekat je uspešno učitan.";
+        } catch(err) {
+            alert("Greška pri čitanju JSON fajla: " + err.message);
+        }
+    };
+    reader.readAsText(file);
+});
+
+$("istorijaBtn").addEventListener("click", () => {
+    const listEl = $("historyList");
+    listEl.innerHTML = "";
+    let history = [];
+    try {
+        const s = localStorage.getItem("mist_history");
+        if (s) history = JSON.parse(s);
+    } catch(e) {}
+    
+    if (!history.length) {
+        listEl.innerHTML = "<p>Nema sačuvanih projekata u istoriji.</p>";
+    } else {
+        history.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "history-item";
+            row.innerHTML = `<div><strong>${item.name}</strong><div class="history-meta">${new Date(item.date).toLocaleString("sr-RS")}</div></div>` +
+                            `<div style="display:flex; gap:6px;"><button type="button" class="oak-btn" style="padding:4px 10px; font-size:0.8rem;">Učitaj</button>` +
+                            `<button type="button" class="danger" style="padding:4px 8px; font-size:0.8rem;">Briši</button></div>`;
+            row.querySelector(".oak-btn").onclick = () => {
+                loadState(item.data);
+                $("historyModal").style.display = "none";
+                $("izmsg").textContent = "Učitan projekat iz istorije.";
+            };
+            row.querySelector(".danger").onclick = () => {
+                history = history.filter(x => x.id !== item.id);
+                localStorage.setItem("mist_history", JSON.stringify(history));
+                row.remove();
+            };
+            listEl.appendChild(row);
+        });
+    }
+    $("historyModal").style.display = "flex";
+});
+
+$("closeHistory").addEventListener("click", () => {
+    $("historyModal").style.display = "none";
+});
+
+// Tekstualni izvoz
+function tekst() {
+    const I = $("verzija").value === "i";
+    const kupac = $("kupac").value.trim();
+    const datum = new Date().toLocaleDateString("sr-RS");
+    const rok = $("rokIzrade").value.trim();
+    const tel = $("kontaktTel").value.trim();
+    
+    let t = `========================================\n`;
+    t += `MiSt Enterijer — ${I ? "INTERNI OBRAČUN" : "PONUDA"}\n`;
+    t += `========================================\n`;
+    if (kupac) t += `Kupac / Projekat: ${kupac}\n`;
+    t += `Datum: ${datum}\n`;
+    t += `Dogovoreni rok izrade: ${rok}\n`;
+    if (tel) t += `Kontakt telefon: ${tel}\n`;
+    t += `----------------------------------------\n\n`;
+    
+    t += `STAVKE OKOVA I DODATAKA:\n`;
+    let R = [];
+    OKOV_KEYS.forEach(k => {
+        const q = parseFloat($("okv_" + k).value) || 0;
+        if (q > 0) R.push([priceLabels[k] || k, q, cene[k] || 0]);
+    });
+    if (!R.length) t += `  (Nema dodatih stavki)\n`;
+    R.forEach(r => {
+        t += `• ${r[0]}: ${r[1]} kom`;
+        if (I) t += ` x ${fmt(r[2])} Din = ${fmt(r[1] * r[2])} Din`;
+        t += `\n`;
+    });
+    t += `\n`;
+    
+    const m2_18 = parseFloat($("m2_18").value) || 0;
+    const m2_36 = parseFloat($("m2_36").value) || 0;
+    const m2_rp38 = parseFloat($("m2_rp38").value) || 0;
+    const m2_med = parseFloat($("m2_med").value) || 0;
+    const kant_05 = parseFloat($("kant_05").value) || 0;
+    const kant_2 = parseFloat($("kant_2").value) || 0;
+    const pur = $("pur").value === "da";
+    const staklo_m2 = parseFloat($("staklo_m2").value) || 0;
+    const metal_kg = parseFloat($("metal_kg").value) || 0;
+    const plast_kg = parseFloat($("plast_kg").value) || 0;
+    
+    let calcOkov = 0;
+    R.forEach(r => { calcOkov += r[1] * r[2]; });
+    const plocasti = m2_18 * cene.univer18 + m2_36 * cene.univer36 + m2_rp38 * cene.rp38 + m2_med * cene.medijapan +
+                     kant_05 * cene.kant05 + kant_2 * cene.kant2 + (pur ? (kant_05 + kant_2) * cene.purLepljenje : 0);
+    const staklo = staklo_m2 * cene.stakloM2;
+    const metal = metal_kg * cene.metalKg;
+    const plast = plast_kg * cene.plastKg;
+    const calcMat = plocasti + staklo + metal + plast + calcOkov;
+    const marza = parseFloat($("marza").value) || 0;
+    const calcZar = calcMat * (marza / 100);
+    const calcPrevoz = parseFloat($("prevoz").value) || 0;
+    const calcIzrada = parseFloat($("izrada").value) || 0;
+    const din = calcMat + calcZar + calcPrevoz + calcIzrada;
+    const kurs = parseFloat($("kurs").value) || 117.2;
+    const eur = kurs > 0 ? din / kurs : 0;
     
     if (I) {
-        html += `<h3>Finansijska rekapitulacija</h3><div class="summary-box"><table><tbody>
-            <tr><td>Zbir okov i dodataka:</td><td class="right"><b>${fmt(calcOkov)} Din</b></td></tr>
-            <tr><td>Pločasti materijali sa kantom:</td><td class="right"><b>${fmt(fin.plocasti)} Din</b></td></tr>
-            <tr><td>Staklo i ogledala:</td><td class="right"><b>${fmt(fin.staklo)} Din</b></td></tr>
-            <tr><td>Metalne konstrukcije:</td><td class="right"><b>${fmt(fin.metal)} Din</b></td></tr>
-            <tr><td>Plastifikacija:</td><td class="right"><b>${fmt(fin.plast)} Din</b></td></tr>
-            <tr><td>Zbir materijala (osnovica):</td><td class="right"><b>${fmt(calcMat)} Din</b></td></tr>
-            <tr><td>Zarada (${fin.proc}%):</td><td class="right"><b>${fmt(calcZar)} Din</b></td></tr>
-            <tr><td>Prevoz:</td><td class="right"><b>${fmt(calcPrevoz)} Din</b></td></tr>
-            <tr><td>Izrada projekta:</td><td class="right"><b>${fmt(calcIzrada)} Din</b></td></tr>
-            <tr class="total-row"><td>UKUPNO DIN:</td><td class="right">${fmt(din)} Din</td></tr>
-            <tr class="total-row"><td>UKUPNO EUR (kurs ${fin.kurs}):</td><td class="right">${fmt(eur)} Eur</td></tr>
-        </tbody></table></div>`;
+        t += `FINANSIJSKA REKAPITULACIJA:\n`;
+        t += `• Zbir okov i dodataka: ${fmt(calcOkov)} Din\n`;
+        t += `• Pločasti materijali sa kantom: ${fmt(plocasti)} Din\n`;
+        t += `• Staklo i ogledala: ${fmt(staklo)} Din\n`;
+        t += `• Metalne konstrukcije: ${fmt(metal)} Din\n`;
+        t += `• Plastifikacija: ${fmt(plast)} Din\n`;
+        t += `• Zbir materijala (osnovica): ${fmt(calcMat)} Din\n`;
+        t += `• Zarada (${marza}%): ${fmt(calcZar)} Din\n`;
+        t += `• Prevoz: ${fmt(calcPrevoz)} Din\n`;
+        t += `• Izrada projekta: ${fmt(calcIzrada)} Din\n`;
+        t += `----------------------------------------\n`;
+        t += `UKUPNO: ${fmt(din)} Din (~${fmt(eur)} €)\n`;
     } else {
-        html += `<div class="summary-box"><table><tbody>
-            <tr class="total-row"><td>UKUPNA CENA PROJEKTA:</td><td class="right">${fmt(din)} Din (oko ${fmt(eur)} Eur)</td></tr>
-        </tbody></table></div>`;
+        t += `UKUPNA CENA PROJEKTA: ${fmt(din)} Din (~${fmt(eur)} €)\n`;
     }
-    const escHtml = s => String(s || "").replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
-    const kom = ($("komentar").value || "").trim(), pod = ($("podsetnik").value || "").trim();
-    if (kom) html += `<h3>Komentar</h3><div class="note-box">${escHtml(kom)}</div>`;
-    if (pod) html += `<h3>Podsetnik</h3><div class="note-box">${escHtml(pod)}</div>`;
-    html += `</body></html>`;
     
+    const kom = ($("komentar").value || "").trim();
+    const pod = ($("podsetnik").value || "").trim();
+    if (kom) t += `\nKomentar:\n${kom}\n`;
+    if (pod) t += `\nPodsetnik:\n${pod}\n`;
+    return t;
+}
+
+// Štampanje PDF-a
+function stampajPDF() {
+    const I = $("verzija").value === "i";
+    const kupac = $("kupac").value.trim();
+    const datum = new Date().toLocaleDateString("sr-RS");
+    const rok = $("rokIzrade").value.trim() || "15-20 radnih dana";
+    const tel = $("kontaktTel").value.trim();
+
+    let R = [];
+    OKOV_KEYS.forEach(k => {
+        const q = parseFloat($("okv_" + k).value) || 0;
+        if (q > 0) R.push([priceLabels[k] || k, q, cene[k] || 0]);
+    });
+
+    let calcOkov = 0;
+    R.forEach(r => { calcOkov += r[1] * r[2]; });
+
+    const m2_18 = parseFloat($("m2_18").value) || 0;
+    const m2_36 = parseFloat($("m2_36").value) || 0;
+    const m2_rp38 = parseFloat($("m2_rp38").value) || 0;
+    const m2_med = parseFloat($("m2_med").value) || 0;
+    const kant_05 = parseFloat($("kant_05").value) || 0;
+    const kant_2 = parseFloat($("kant_2").value) || 0;
+    const pur = $("pur").value === "da";
+    const staklo_m2 = parseFloat($("staklo_m2").value) || 0;
+    const metal_kg = parseFloat($("metal_kg").value) || 0;
+    const plast_kg = parseFloat($("plast_kg").value) || 0;
+
+    const plocasti = m2_18 * cene.univer18 + m2_36 * cene.univer36 + m2_rp38 * cene.rp38 + m2_med * cene.medijapan +
+                     kant_05 * cene.kant05 + kant_2 * cene.kant2 + (pur ? (kant_05 + kant_2) * cene.purLepljenje : 0);
+    const staklo = staklo_m2 * cene.stakloM2;
+    const metal = metal_kg * cene.metalKg;
+    const plast = plast_kg * cene.plastKg;
+    const calcMat = plocasti + staklo + metal + plast + calcOkov;
+    const marza = parseFloat($("marza").value) || 0;
+    const calcZar = calcMat * (marza / 100);
+    const calcPrevoz = parseFloat($("prevoz").value) || 0;
+    const calcIzrada = parseFloat($("izrada").value) || 0;
+    const din = calcMat + calcZar + calcPrevoz + calcIzrada;
+    const kurs = parseFloat($("kurs").value) || 117.2;
+    const eur = kurs > 0 ? din / kurs : 0;
+
+    const okovRezimeStr = R.map(r => `${r[0]} (${r[1]} kom)`).join(", ");
+
+    let html = `<!doctype html><html lang="sr"><head><meta charset="utf-8">`;
+    html += `<title>MiSt Enterijer - ${I ? "Interni obračun" : "Ponuda"}</title>`;
+    html += `<style>`;
+    html += `body { font-family: sans-serif; color: #212529; padding: 20px; line-height: 1.5; font-size: 14px; }`;
+    html += `h1 { font-size: 1.3rem; margin-bottom: 5px; }`;
+    html += `h2 { font-size: 1.1rem; margin-top: 20px; border-bottom: 2px solid #2b2f33; padding-bottom: 4px; }`;
+    html += `.sub { color: #6c757d; margin-bottom: 20px; font-size: 0.9rem; }`;
+    html += `table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; }`;
+    html += `th, td { border: 1px solid #dee2e6; padding: 8px 10px; text-align: left; }`;
+    html += `th { background: #f8f9fa; font-weight: 600; }`;
+    html += `.right { text-align: right; }`;
+    html += `.summary-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 15px; margin-top: 15px; }`;
+    html += `.total-row { font-weight: bold; font-size: 1.1rem; background: #e9ecef; }`;
+    html += `.note-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 6px; margin-top: 15px; }`;
+    html += `.footer-notes { margin-top: 30px; font-size: 0.9rem; border-top: 1px solid #dee2e6; padding-top: 15px; }`;
+    html += `</style></head><body>`;
+
+    html += `<h1>MiSt Enterijer — ${I ? "INTERNI OBRAČUN" : "PONUDA"}</h1>`;
+    html += `<div class="sub">${kupac ? "Projekat / kupac: <b>" + kupac + "</b> · " : ""}Datum: ${datum}</div>`;
+
+    html += `<h2>Okov, rasveta i dodaci</h2>`;
+    html += `<table><thead><tr><th>Naziv artikla</th><th class="right">Količina</th>`;
+    if (I) html += `<th class="right">Jed. cena</th><th class="right">Ukupno</th>`;
+    html += `</tr></thead><tbody>`;
+
+    if (!R.length) {
+        html += `<tr><td colspan="${I?4:2}">(Nema dodatih stavki)</td></tr>`;
+    } else {
+        R.forEach(r => {
+            html += `<tr><td>${r[0]}</td><td class="right">${r[1]}</td>`;
+            if (I) html += `<td class="right">${fmt(r[2])} Din</td><td class="right">${fmt(r[1] * r[2])} Din</td>`;
+            html += `</tr>`;
+        });
+    }
+    html += `</tbody></table>`;
+
+    if (I) {
+        html += `<h2>Finansijska rekapitulacija</h2>`;
+        html += `<div class="summary-box"><table><tbody>`;
+        html += `<tr><td>Zbir okov i dodataka: <small style="color:#6c757d; display:block;">(${okovRezimeStr || "nema"})</small></td><td class="right"><b>${fmt(calcOkov)} Din</b></td></tr>`;
+        html += `<tr><td>Pločasti materijali sa kantom:</td><td class="right"><b>${fmt(plocasti)} Din</b></td></tr>`;
+        html += `<tr><td>Staklo i ogledala:</td><td class="right"><b>${fmt(staklo)} Din</b></td></tr>`;
+        html += `<tr><td>Metalne konstrukcije:</td><td class="right"><b>${fmt(metal)} Din</b></td></tr>`;
+        html += `<tr><td>Plastifikacija:</td><td class="right"><b>${fmt(plast)} Din</b></td></tr>`;
+        html += `<tr><td>Zbir materijala (osnovica):</td><td class="right"><b>${fmt(calcMat)} Din</b></td></tr>`;
+        html += `<tr><td>Zarada (${marza}%):</td><td class="right"><b>${fmt(calcZar)} Din</b></td></tr>`;
+        html += `<tr><td>Prevoz:</td><td class="right"><b>${fmt(calcPrevoz)} Din</b></td></tr>`;
+        html += `<tr><td>Izrada projekta:</td><td class="right"><b>${fmt(calcIzrada)} Din</b></td></tr>`;
+        html += `<tr class="total-row"><td>UKUPNO DIN:</td><td class="right">${fmt(din)} Din</td></tr>`;
+        html += `<tr class="total-row"><td>UKUPNO EUR (kurs ${kurs}):</td><td class="right">${fmt(eur)} Eur</td></tr>`;
+        html += `</tbody></table></div>`;
+    } else {
+        html += `<div class="summary-box"><table><tbody>`;
+        html += `<tr class="total-row"><td>UKUPNA CENA PROJEKTA:</td><td class="right">${fmt(din)} Din (oko ${fmt(eur)} Eur)</td></tr>`;
+        html += `</tbody></table></div>`;
+    }
+
+    const escHtml = s => String(s || "").replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
+    const kom = ($("komentar").value || "").trim();
+    const pod = ($("podsetnik").value || "").trim();
+
+    if (kom) html += `<h2>Komentar</h2><div class="note-box">${escHtml(kom)}</div>`;
+    if (I && pod) html += `<h2>Podsetnik</h2><div class="note-box">${escHtml(pod)}</div>`;
+
+    html += `<div class="footer-notes">`;
+    html += `<p><b>Dogovoreni rok izrade:</b> ${escHtml(rok)}</p>`;
+    html += `<p><b>Napomena:</b> Projekat počinje sa izradom kada se uplati novac potreban za materijal.</p>`;
+    if (tel) html += `<p><b>Kontakt telefon:</b> ${escHtml(tel)}</p>`;
+    html += `</div>`;
+
+    html += `</body></html>`;
+
     const win = window.open('', '_blank');
     if (!win) { alert("Molimo dozvolite iskačuće prozore (pop-ups) za štampanje PDF-a."); return; }
     win.document.write(html);
@@ -223,7 +915,7 @@
     setTimeout(() => { win.print(); }, 500);
 }
 
-// ---------- GitHub: učitavanje cena pri otvaranju i čuvanje iz aplikacije ----------
+// ---------- GitHub cene sinhronizacija ----------
 const GH_KEY = "mist_github_cfg_v1";
 let ghCfg = { owner: "stamenovmilan-netizen", repo: "mist-kalkulacija", branch: "main", path: "cene.json", token: "" };
 try { const s = localStorage.getItem(GH_KEY); if (s) ghCfg = { ...ghCfg, ...JSON.parse(s) }; } catch (e) {}
@@ -243,6 +935,7 @@ function readGhForm() {
     ghCfg.token = $("ghToken").value.trim();
     saveGhCfg();
 }
+
 function applyPricePayload(o) {
     if (!o || typeof o !== "object") return false;
     let changed = false;
@@ -255,16 +948,12 @@ function applyPricePayload(o) {
         if (k in DEF) { cene[k] = Math.round(parseFloat(importedPrices[k]) || 0); changed = true; }
     });
     if (o.nazivi && typeof o.nazivi === "object") {
-        priceLabels = { ...PRICE_LABELS, ...o.nazivi, "Tipl": o.nazivi["Tipl"] || "Tipl Double Power 8 × 65 mm (produženi)" };
-        changed = true;
-    }
-    if (Array.isArray(o.customCsvRules)) { customCsvRules = normalizeRules(o.customCsvRules); changed = true; }
-    if (o.builtinCsvRules && typeof o.builtinCsvRules === "object") {
-        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...o.builtinCsvRules };
+        priceLabels = { ...PRICE_LABELS, ...o.nazivi };
         changed = true;
     }
     return changed;
 }
+
 async function loadPricesFromGitHub() {
     const path = (ghCfg.path || "cene.json").replace(/^\/+/, "");
     try {
@@ -272,25 +961,24 @@ async function loadPricesFromGitHub() {
         if (!res.ok) return;
         const o = await res.json();
         if (!applyPricePayload(o)) return;
-        manualSum.okov = null; manualSum.mat = null;
-        save(); saveCustomRules();
-        buildCene(); buildNewArticles(); buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); calc();
-        if (o.updatedAt) $("msg").textContent = "Cene učitane sa GitHub-a (" + new Date(o.updatedAt).toLocaleDateString("sr-RS") + ").";
+        save(); buildCene(); buildOkov(); calc();
+        if (o.updatedAt) $("izmsg").textContent = "Cene učitane sa GitHub-a (" + new Date(o.updatedAt).toLocaleDateString("sr-RS") + ").";
     } catch (e) {}
 }
+
 const b64utf8 = s => btoa(unescape(encodeURIComponent(s)));
 async function savePricesToGitHub() {
     readGhForm();
-    const gm = $("ghMsg"), tm = $("msg"), btn = $("ghSaveBtn");
+    const gm = $("ghMsg"), tm = $("izmsg"), btn = $("ghSaveBtn");
     if (!ghCfg.owner || !ghCfg.repo || !ghCfg.path || !ghCfg.token) {
         $("ghSection").hidden = false; fillGhForm();
-        gm.textContent = "Upiši GitHub korisnika, repozitorijum i token (Contents: Read and write), pa pritisni dugme ispod.";
+        gm.textContent = "Upiši GitHub korisnika, repozitorijum i token.";
         $("ghSection").scrollIntoView({ behavior: "smooth", block: "start" });
         return;
     }
     const payload = {
         format: "mist-enterijer-prices", version: 1, updatedAt: new Date().toISOString(),
-        cene, nazivi: priceLabels, customArticles: articlesForExport(), customCsvRules, builtinCsvRules
+        cene, nazivi: priceLabels, customArticles: articlesForExport()
     };
     const content = b64utf8(JSON.stringify(payload, null, 2) + "\n");
     const api = "https://api.github.com/repos/" + encodeURIComponent(ghCfg.owner) + "/" + encodeURIComponent(ghCfg.repo) +
@@ -310,49 +998,19 @@ async function savePricesToGitHub() {
             const err = await putRes.json().catch(() => ({}));
             throw new Error(err.message || ("HTTP " + putRes.status));
         }
-        const ok = "Cene su sačuvane na GitHub (" + ghCfg.path + "). Nova verzija je aktivna na svim uređajima za oko 30 sekundi.";
+        const ok = "Cene su sačuvane na GitHub (" + ghCfg.path + ").";
         gm.textContent = tm.textContent = ok;
     } catch (e) {
         gm.textContent = tm.textContent = "Čuvanje na GitHub nije uspelo: " + e.message;
     } finally { if (btn) btn.disabled = false; }
 }
+
 $("ghCfgBtn").addEventListener("click", () => {
     const p = $("ghSection"); p.hidden = !p.hidden;
     if (!p.hidden) { fillGhForm(); p.scrollIntoView({ behavior: "smooth", block: "start" }); }
 });
 $("ghSaveBtn").addEventListener("click", savePricesToGitHub);
 $("ghCfgSave").addEventListener("click", savePricesToGitHub);
-
-function tekstSafe() { try { return tekst(); } catch (e) { return "Greška pri generisanju izvoza: " + e.message; } }
-function initExport() {
-    $("izvoz").disabled = false;
-    $("pdfBtn").disabled = false;
-    $("izmsg").textContent = "Izvoz je spreman.";
-    
-    $("izvoz").onclick = () => {
-        try {
-            const content = tekst();
-            const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            const b = $("kupac").value.trim().replace(/[^A-Za-z0-9_-]+/g, "_");
-            a.href = url;
-            a.download = "MiSt-" + ($("verzija").value == "i" ? "interni" : "ponuda") + (b ? "-" + b : "") + ".txt";
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            $("izmsg").textContent = "Tekstualni fajl je preuzet.";
-        } catch (err) {
-            $("izmsg").textContent = "Greška pri izvozu: " + err.message;
-        }
-    };
-
-    $("pdfBtn").onclick = () => {
-        try { stampajPDF(); }
-        catch (err) { $("izmsg").textContent = "Greška pri otvaranju PDF-a: " + err.message; }
-    };
-}
 
 function initNotes() {
     ["komentar", "podsetnik"].forEach(id => {
@@ -361,12 +1019,19 @@ function initNotes() {
         el.addEventListener("input", () => { try { localStorage.setItem("mist_" + id, el.value); } catch (e) {} });
     });
 }
+
+function save() {
+    try { localStorage.setItem("mist_state", JSON.stringify(projektState)); } catch(e){}
+}
+
 function init() {
-    buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
-    buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles();
+    buildOkov(); buildFin(); buildCene();
     initNotes();
+    try {
+        const saved = localStorage.getItem("mist_state");
+        if (saved) loadState(JSON.parse(saved));
+    } catch(e) {}
     calc();
-    initExport();
     refreshNbsRate();
     loadPricesFromGitHub();
 }
