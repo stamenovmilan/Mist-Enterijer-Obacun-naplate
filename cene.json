@@ -1,7 +1,7 @@
 {
   "format": "mist-enterijer-cene",
   "version": 1,
-  "savedAt": "2026-11-17T20:19:58.736Z",
+  "savedAt": "2026-11-17T20:23:15.488Z",
   "cene": {
     "Klap šarka ravna": 160,
     "Klap šarka polu koleno": 125,
@@ -59,37 +59,40 @@
     "Vertikalna lajsna za vrata 2,7m": 1500,
     "Donja šina 1m": 800,
     "Gornja šina 1m": 800,
-    "Usporivači": 1200
+    "Usporivači": 1200,
+    "Noga za sto alu Fi60/720mm": 1100,
+    "Civiluk sa tri nosaca": 400,
+    "Podla lajsna za hodnik": 400
   },
   "nazivi": {
-    "Klap šarka ravna": "Šarka za nameštaj ravna - GTV sa usporivačem",
-    "Klap šarka polu koleno": "Šarka za nameštaj polukoleno - GTV sa usporivačem",
-    "Klap šarka koleno": "Šarka za nameštaj koleno - GTV sa usporivačem",
-    "Klap šarka slepi ugao": "Šarka za slepi ugao - GTV sa usporivačem",
-    "Klap šarka žaba": "Šarka žaba - GTV sa usporivačem",
-    "Šraf 4x1": "Šraf za ivericu 4×10 mm (proveriti dimenziju)",
-    "Šraf 4x16": "Šraf za ivericu 4×16 mm",
-    "Šraf 4x18": "Šraf za ivericu 4×18 mm",
-    "Šraf 4x30": "Šraf za ivericu 4×30 mm",
-    "Šraf 4x50": "Šraf za ivericu 4×50 mm",
-    "Šraf 5x80": "Šraf za ivericu 5×80 mm",
-    "Šraf za ručicu": "Šraf za ručicu za nameštaj",
-    "Tipl": "Tipl Duble Power",
-    "Nosač viseći": "Nosač za viseći kuhinjski element",
-    "Ručica": "Ručica za nameštaj (model/razmak rupa definisati)",
-    "Klizač 200 mm (po paru)": "Teleskopski klizač 200 mm - GTV sa usporivačem (par)",
-    "Klizač 250 mm (po paru)": "Teleskopski klizač 250 mm - GTV sa usporivačem (par)",
-    "Klizač 300 mm (po paru)": "Teleskopski klizač 300 mm - GTV sa usporivačem (par)",
-    "Klizač 350 mm (po paru)": "Teleskopski klizač 350 mm - GTV sa usporivačem (par)",
-    "Klizač 400 mm (po paru)": "Teleskopski klizač 400 mm - GTV sa usporivačem (par)",
-    "Klizač 450 mm (po paru)": "Teleskopski klizač 450 mm - GTV sa usporivačem (par)",
-    "Klizač 500 mm (po paru)": "Teleskopski klizač 500 mm - GTV sa usporivačem (par)",
-    "Pinovi za police": "Pinovi za police sa providnom plastikom",
+    "Klap šarka ravna": "Nameštajska šarka ravna 110° sa usporivačem (soft close)",
+    "Klap šarka polu koleno": "Nameštajska šarka polukoleno 110° sa usporivačem (soft close)",
+    "Klap šarka koleno": "Nameštajska šarka koleno 110° sa usporivačem (soft close)",
+    "Klap šarka slepi ugao": "Nameštajska šarka za slepi ugao sa usporivačem",
+    "Klap šarka žaba": "Nameštajska šarka žaba sa oprugom",
+    "Šraf 4x1": "Šraf za ivericu 4×10 mm, pocinkovan",
+    "Šraf 4x16": "Šraf za ivericu 4×16 mm, pocinkovan",
+    "Šraf 4x18": "Šraf za ivericu 4×18 mm, pocinkovan",
+    "Šraf 4x30": "Šraf za ivericu 4×30 mm, pocinkovan",
+    "Šraf 4x50": "Šraf za ivericu 4×50 mm, pocinkovan",
+    "Šraf 5x80": "Šraf za ivericu 5×80 mm, pocinkovan",
+    "Šraf za ručicu": "Spojni šraf za nameštaj i ručicu, proveriti dužinu",
+    "Tipl": "Tipl Double Power 8 × 65 mm (produženi)",
+    "Nosač viseći": "Metalni zidni nosač za viseći kuhinjski element",
+    "Ručica": "Nameštajska ručica za kuhinjski element, proveriti model i razmak rupa",
+    "Klizač 200 mm (po paru)": "Teleskopski kuglični klizač za fioku 200 mm, par",
+    "Klizač 250 mm (po paru)": "Teleskopski kuglični klizač za fioku 250 mm, par",
+    "Klizač 300 mm (po paru)": "Teleskopski kuglični klizač za fioku 300 mm, par",
+    "Klizač 350 mm (po paru)": "Teleskopski kuglični klizač za fioku 350 mm, par",
+    "Klizač 400 mm (po paru)": "Teleskopski kuglični klizač za fioku 400 mm, par",
+    "Klizač 450 mm (po paru)": "Teleskopski kuglični klizač za fioku 450 mm, par",
+    "Klizač 500 mm (po paru)": "Teleskopski kuglični klizač za fioku 500 mm, par",
+    "Pinovi za police": "Nosači za police, metalni pinovi sa plastičnom kapicom",
     "Silikon sanitarni": "Sanitarni silikon protiv buđi, patrona 280–300 ml",
-    "Nogica PVC 100mm": "PVC nogica 100 mm",
-    "Nogica PVC 50mm": "PVC nogica 50 mm",
+    "Nogica PVC 100mm": "PVC podesiva nogica za kuhinjski element 100 mm",
+    "Nogica PVC 50mm": "PVC podesiva nogica za kuhinjski element 50 mm",
     "LED traka (po m)": "LED traka 12 V, cena po metru (navesti boju i snagu W/m)",
-    "LED profil (po m)": "LED profil ugaoni ili ugradni (po metru)",
+    "LED profil (po m)": "Aluminijumski LED profil za nameštaj, cena po metru",
     "LED napajanje 12V": "LED napajanje 12 V, proveriti snagu u W",
     "Daljinska kontrola LED": "LED kontroler sa daljinskim upravljačem za 12 V traku",
     "Kabal 220V 3x1.5 (po m)": "Električni kabl 3×1,5 mm², cena po metru",
@@ -102,26 +105,45 @@
     "Dekorativne nogice": "Dekorativna metalna nogica za nameštaj, proveriti visinu i model",
     "Nogica štelujuća 10mm": "Podesiva nivelaciona nogica za nameštaj, M10",
     "Dvonavojna matica": "Dvonavojna matica za nameštaj, proveriti dimenziju navoja",
-    "Push sistem za vrata": "Push sistem za vrata sa kućištem",
-    "Žičana korpa za korpus": "Žičana korpa za korpus (po veličinama)",
-    "Vinkla": "Vinkla sa 4 rupe",
-    "Ugaona lajsna za radnu ploču 4m": "Ugaona lajsna za radnu ploču 4 m - aluminijumska kocka",
-    "Crevo za aspirator": "Crevo za aspirator (po prečnicima/veličinama)",
+    "Push sistem za vrata": "Push-to-open mehanizam za nameštajska vrata sa magnetom",
+    "Žičana korpa za korpus": "Žičana izvlačna korpa za kuhinjski element, proveriti širinu korpusa",
+    "Vinkla": "Metalni ugaoni spojnik za nameštaj sa rupama za šrafove",
+    "Ugaona lajsna za radnu ploču 4m": "Aluminijumska ugaona zidna lajsna za kuhinjsku radnu ploču, 4 m",
+    "Crevo za aspirator": "Fleksibilno aluminijumsko crevo za kuhinjski aspirator, proveriti prečnik",
     "Garderoberna šipka (po m)": "Ovalna garderobna šipka za ormar, cena po metru",
-    "Nosač garderoberne šipke": "Nosač garderobne šipke",
-    "Šnale za coklu": "Šnale za coklu za PVC nogicu",
+    "Nosač garderoberne šipke": "Nosač za ovalnu garderobnu šipku u ormaru",
+    "Šnale za coklu": "Plastična kopča za pričvršćivanje kuhinjske PVC cokle",
     "Dodatak za escajg": "Plastični organizator za escajg za kuhinjsku fioku, proveriti širinu",
-    "Pop up šuko utičnica": "Pop-up šuko utičnica - vertikalna",
+    "Pop up šuko utičnica": "Ugradna izvlačna pop-up Šuko utičnica za kuhinjsku radnu ploču",
     "Američki ormar - komplet": "Komplet okova za klizna vrata američkog plakara",
     "Sudopera": "Kuhinjska sudopera, proveriti dimenzije, materijal i broj korita",
     "T lajsna za radnu ploču": "T-spojna lajsna za kuhinjsku radnu ploču",
-    "Kanta za đubre": "Klasična kanta za otpatke",
-    "Vertikalna lajsna za vrata 2,7m": "Vertikalna lajsna za vrata američkog plakara 2,7 m",
-    "Donja šina 1m": "Donja šina za američki plakar",
-    "Gornja šina 1m": "Gornja šina za američki plakar",
-    "Usporivači": "Usporivači za američki plakar"
+    "Kanta za đubre": "Ugradna kanta za otpatke za kuhinjski element, proveriti zapreminu",
+    "Vertikalna lajsna za vrata 2,7m": "Vertikalni aluminijumski profil za klizna vrata plakara, dužina 2,7 m",
+    "Donja šina 1m": "Donja aluminijumska šina za klizna vrata plakara, cena po metru",
+    "Gornja šina 1m": "Gornja aluminijumska šina za klizna vrata plakara, cena po metru",
+    "Usporivači": "Usporivač za klizna vrata američkog plakara",
+    "Noga za sto alu Fi60/720mm": "Noga za sto alu Fi60/720mm",
+    "Civiluk sa tri nosaca": "Civiluk sa tri nosaca",
+    "Podla lajsna za hodnik": "Podla lajsna za hodnik"
   },
-  "customArticles": [],
+  "customArticles": [
+    {
+      "key": "Noga za sto alu Fi60/720mm",
+      "name": "Noga za sto alu Fi60/720mm",
+      "price": 1100
+    },
+    {
+      "key": "Civiluk sa tri nosaca",
+      "name": "Civiluk sa tri nosaca",
+      "price": 400
+    },
+    {
+      "key": "Podla lajsna za hodnik",
+      "name": "Podla lajsna za hodnik",
+      "price": 400
+    }
+  ],
   "customCsvRules": [],
   "builtinCsvRules": {
     "side": {
@@ -144,23 +166,28 @@
     },
     "shelf": {
       "keyword": "polica",
-      "pins": 4
+      "pins": 4,
+      "deleted": true
     },
     "sink": {
-      "keyword": "sudoper"
+      "keyword": "sudoper",
+      "deleted": true
     },
     "bottom": {
       "keyword": "dno donji",
-      "legs": 4
+      "legs": 4,
+      "deleted": true
     },
     "wallBottom": {
       "keyword": "dno viseci",
-      "factor": 2
+      "factor": 2,
+      "deleted": true
     },
     "aspirator": {
-      "keyword": "aspirator"
+      "keyword": "aspirator",
+      "deleted": true
     }
   },
-  "okovProc": 0,
+  "okovProc": 5,
   "procZarade": 25
 }
