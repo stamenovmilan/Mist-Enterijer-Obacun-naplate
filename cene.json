@@ -1,7 +1,7 @@
 {
   "format": "mist-enterijer-cene",
   "version": 1,
-  "savedAt": "2026-11-17T23:59:56.978Z",
+  "savedAt": "2026-11-18T00:00:01.947Z",
   "cene": {
     "Klap šarka ravna": 160,
     "Klap šarka polu koleno": 125,
@@ -190,6 +190,6 @@
   },
   "okovProc": 0,
   "procZarade": 30,
-  "napomenaPDF": "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.\nKompletnu kominikaciju vezano za projekat kao i izmene definisati u ",
+  "napomenaPDF": "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.\nKompletnu kominikaciju vezano za projekat kao i izmene definisati u Viber po",
   "kontaktPDF": "+381693546820"
 }
