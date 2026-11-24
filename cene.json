@@ -1,7 +1,7 @@
 {
   "format": "mist-enterijer-cene",
   "version": 1,
-  "savedAt": "2026-11-24T13:25:29.083Z",
+  "savedAt": "2026-11-24T13:25:40.181Z",
   "cene": {
     "Klap šarka ravna": 160,
     "Klap šarka polu koleno": 125,
@@ -166,7 +166,7 @@
     },
     {
       "key": "Podla lajsna za hodnik",
-      "name": "Poda lajsna za hodnik",
+      "name": "Podna lajsna za hodnik",
       "price": 400
     },
     {
