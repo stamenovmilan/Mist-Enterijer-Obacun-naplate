@@ -1,7 +1,7 @@
 {
   "format": "mist-enterijer-cene",
   "version": 1,
-  "savedAt": "2026-11-24T13:27:37.263Z",
+  "savedAt": "2026-11-24T13:27:48.478Z",
   "cene": {
     "Klap šarka ravna": 160,
     "Klap šarka polu koleno": 125,
@@ -149,7 +149,7 @@
     "Usporivači": "Usporivač za klizna vrata američkog plakara",
     "Noga za sto alu Fi60/720mm": "Noga za sto alu Fi60/720mm",
     "Civiluk sa tri nosaca": "Civiluk sa tri nosaca",
-    "Podla lajsna za hodnik": "Podna lajsna za hodnik",
+    "Podla lajsna za hodnik": "Podla lajsna za hodnik",
     "FX Čiviluk P24022": "FX Čiviluk P24022",
     "Aspirator PIO 650 2MIX": "Aspirator PIO 650 2MIX"
   },
@@ -166,7 +166,7 @@
     },
     {
       "key": "Podla lajsna za hodnik",
-      "name": "Podna lajsna za hodnik",
+      "name": "Podla lajsna za hodnik",
       "price": 400
     },
     {
@@ -224,8 +224,8 @@
       "deleted": true
     }
   },
-  "okovProc": 0,
-  "procZarade": 30,
+  "okovProc": 5,
+  "procZarade": 25,
   "napomenaPDF": "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.",
   "kontaktPDF": "+381693546820"
 }
