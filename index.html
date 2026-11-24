@@ -338,6 +338,7 @@
         <div class="btns">
             <button id="izvoz" disabled>Izvezi tekstualni fajl</button> 
             <button id="pdfBtn" disabled class="alt">Izvezi kao PDF</button>
+            <button id="trebovanjePdfBtn" disabled class="alt">Štampaj trebovanje (PDF)</button>
         </div>
         <p class="msg" id="izmsg">Priprema izvoza...</p>
     </section>
@@ -350,6 +351,10 @@ const ST = [
     ["skoleno", "Klap šarka koleno", "Klap šarka koleno"],
     ["sslepi", "Klap šarka slepi ugao", "Klap šarka slepi ugao"],
     ["szaba", "Klap šarka žaba", "Klap šarka žaba"],
+    ["s165", "Šarka slide za ugao 165° hidraulična GTV", "Šarka slide za ugao 165° hidraulična GTV"],
+    ["pvcKonektor", "PVC ugaoni konektor", "PVC ugaoni konektor"],
+    ["coklaH100", "PVC cokla H100, 4 m", "PVC cokla H100, 4 m"],
+    ["crevoF100", "Crevo za aspirator F100", "Crevo za aspirator F100"],
     ["s164", "Šraf 4x16", "Šraf 4x16"],
     ["s418", "Šraf 4x18", "Šraf 4x18"],
     ["s430", "Šraf 4x30", "Šraf 4x30"],
@@ -357,6 +362,7 @@ const ST = [
     ["s680", "Šraf 5x80", "Šraf 5x80"],
     ["srucica", "Šraf za ručicu", "Šraf za ručicu"],
     ["tipl", "Tipl", "Tipl"],
+    ["tipl1080", "DuoPower tipla 10×80", "DuoPower tipla 10×80"],
     ["nosaci", "Nosač viseći", "Nosač viseći"],
     ["rucice", "Ručica", "Ručica"],
     ["pinovi", "Pinovi za police", "Pinovi za police"],
@@ -365,25 +371,29 @@ const ST = [
 ];
 
 const DEF = {
-    "Klap šarka ravna": 160, "Klap šarka polu koleno": 125, "Klap šarka koleno": 137, 
-    "Klap šarka slepi ugao": 171, "Klap šarka žaba": 403, "Šraf 4x1": 1, 
-    "Šraf 4x16": 1, "Šraf 4x18": 1, "Šraf 4x30": 2, "Šraf 4x50": 3, "Šraf 5x80": 7, 
-    "Šraf za ručicu": 8, "Tipl": 17, "Nosač viseći": 63, "Ručica": 575, 
-    "Klizač 200 mm (po paru)": 919, "Klizač 250 mm (po paru)": 976, 
-    "Klizač 300 mm (po paru)": 1034, "Klizač 350 mm (po paru)": 1091, 
-    "Klizač 400 mm (po paru)": 1149, "Klizač 450 mm (po paru)": 1206, 
-    "Klizač 500 mm (po paru)": 1264, "Pinovi za police": 6, 
-    "Silikon sanitarni": 920, "Nogica PVC 100mm": 58,
-    "LED traka (po m)": 350, "LED profil (po m)": 450, "LED napajanje 12V": 1800,
-    "Daljinska kontrola LED": 1200, "Kabal 220V 3x1.5 (po m)": 120, "Kabal za LED 2x0.35 (po m)": 50,
-    "Duplex traka": 300, "Alu traka": 400, "Spojnice": 50, "Streč folija": 600,
-    "Amortizer": 450, "Dekorativne nogice": 350, "Nogica štelujuća 10mm": 150,
+    "Klap šarka ravna": 99, "Klap šarka polu koleno": 105, "Klap šarka koleno": 119, 
+    "Klap šarka slepi ugao": 190, "Klap šarka žaba": 403, "Šarka slide za ugao 165° hidraulična GTV": 390, "PVC ugaoni konektor": 8, "PVC cokla H100, 4 m": 1650, "Šraf 4x1": 1, 
+    "Šraf 4x16": 0.8, "Šraf 4x18": 0.9, "Šraf 4x30": 1.3, "Šraf 4x50": 1.75, "Šraf 5x80": 5.2, 
+    "Šraf za ručicu": 2.8, "Tipl": 32, "DuoPower tipla 10×80": 62, "Nosač viseći": 42, "Ručica": 575, 
+    "Klizač 200 mm (po paru)": 919, "Klizač 250 mm (po paru)": 660, 
+    "Klizač 300 mm (po paru)": 670, "Klizač 350 mm (po paru)": 690, 
+    "Klizač 400 mm (po paru)": 760, "Klizač 450 mm (po paru)": 790, 
+    "Klizač 500 mm (po paru)": 790, "Pinovi za police": 4.5, 
+    "Silikon sanitarni": 650, "Nogica PVC 100mm": 29,
+    "LED traka (po m)": 210, "LED profil (po m)": 396.67, "LED napajanje 12V": 1410,
+    "Daljinska kontrola LED": 1160, "Kabal 220V 3x1.5 (po m)": 130, "Kabal za LED 2x0.35 (po m)": 50,
+    "Duplex traka": 240, "Alu traka": 320, "Spojnice": 11, "Streč folija": 1820,
+    "Amortizer": 170, "Dekorativne nogice": 350, "Nogica štelujuća 10mm": 150,
     "Dvonavojna matica": 30, "Push sistem za vrata": 350, "Žičana korpa za korpus": 2800,
-    "Vinkla": 40, "Ugaona lajsna za radnu ploču 4m": 1800, "Crevo za aspirator": 1500,
-    "Garderoberna šipka (po m)": 600, "Nosač garderoberne šipke": 150, "Šnale za coklu": 80,
-    "Dodatak za escajg": 1200, "Pop up šuko utičnica": 3500, "Američki ormar - komplet": 4500,
-    "Sudopera": 8500, "T lajsna za radnu ploču": 950, "Kanta za đubre": 2500,
-    "Vertikalna lajsna za vrata 2,7m": 1500, "Donja šina 1m": 800, "Gornja šina 1m": 800, "Usporivači": 1200,
+    "Vinkla": 40, "Ugaona lajsna za radnu ploču 4m": 1920, "Crevo za aspirator": 480, "Crevo za aspirator F100": 860,
+    "Garderoberna šipka (po m)": 190, "Nosač garderoberne šipke": 25, "Šnale za coklu": 11,
+    "Dodatak za escajg": 1200,
+    "Dodatak za escajg K300": 470, "Dodatak za escajg K350": 420,
+    "Dodatak za escajg K400": 490, "Dodatak za escajg K450": 560,
+    "Dodatak za escajg K500": 610, "Dodatak za escajg K600": 640,
+    "Pop up šuko utičnica": 5970, "Američki ormar - komplet": 990,
+    "Sudopera": 8500, "T lajsna za radnu ploču": 390.01, "Kanta za đubre": 5980,
+    "Vertikalna lajsna za vrata 2,7m": 1290, "Donja šina 1m": 330, "Gornja šina 1m": 790, "Usporivači": 780,
 };
 
 const PRICE_LABELS = {
@@ -392,6 +402,10 @@ const PRICE_LABELS = {
     "Klap šarka koleno": "Nameštajska šarka koleno 110° sa usporivačem (soft close)",
     "Klap šarka slepi ugao": "Nameštajska šarka za slepi ugao sa usporivačem",
     "Klap šarka žaba": "Nameštajska šarka žaba sa oprugom",
+    "Šarka slide za ugao 165° hidraulična GTV": "Šarka slide za ugao 165° hidraulična GTV",
+    "PVC ugaoni konektor": "PVC ugaoni konektor",
+    "PVC cokla H100, 4 m": "PVC cokla H100, 4 m",
+    "Crevo za aspirator F100": "Crevo za aspirator F100",
     "Šraf 4x1": "Šraf za ivericu 4×10 mm, pocinkovan",
     "Šraf 4x16": "Šraf za ivericu 4×16 mm, pocinkovan",
     "Šraf 4x18": "Šraf za ivericu 4×18 mm, pocinkovan",
@@ -400,6 +414,11 @@ const PRICE_LABELS = {
     "Šraf 5x80": "Šraf za ivericu 5×80 mm, pocinkovan",
     "Šraf za ručicu": "Spojni šraf za nameštaj i ručicu, proveriti dužinu",
     "Tipl": "Tipl Double Power 8 × 65 mm (produženi)",
+    "DuoPower tipla 10×80": "DuoPower tipla 10×80 mm",
+    "Pinovi za police": "Fah nosač police F5 (metal/plastika)",
+    "Šnale za coklu": "Držač cokle",
+    "Daljinska kontrola LED": "LED dimer DC12–24 V",
+    "Spojnice": "Spojnica M6×30",
     "Nosač viseći": "Metalni zidni nosač za viseći kuhinjski element",
     "Ručica": "Nameštajska ručica za kuhinjski element, proveriti model i razmak rupa",
     "Klizač 200 mm (po paru)": "Teleskopski kuglični klizač za fioku 200 mm, par",
@@ -409,19 +428,18 @@ const PRICE_LABELS = {
     "Klizač 400 mm (po paru)": "Teleskopski kuglični klizač za fioku 400 mm, par",
     "Klizač 450 mm (po paru)": "Teleskopski kuglični klizač za fioku 450 mm, par",
     "Klizač 500 mm (po paru)": "Teleskopski kuglični klizač za fioku 500 mm, par",
-    "Pinovi za police": "Nosači za police, metalni pinovi sa plastičnom kapicom",
     "Silikon sanitarni": "Sanitarni silikon protiv buđi, patrona 280–300 ml",
     "Nogica PVC 100mm": "PVC podesiva nogica za kuhinjski element 100 mm",
     "Nogica PVC 50mm": "PVC podesiva nogica za kuhinjski element 50 mm",
     "LED traka (po m)": "LED traka 12 V, cena po metru (navesti boju i snagu W/m)",
     "LED profil (po m)": "Aluminijumski LED profil za nameštaj, cena po metru",
     "LED napajanje 12V": "LED napajanje 12 V, proveriti snagu u W",
-    "Daljinska kontrola LED": "LED kontroler sa daljinskim upravljačem za 12 V traku",
+    "Daljinska kontrola LED": "LED dimer DC12–24 V",
     "Kabal 220V 3x1.5 (po m)": "Električni kabl 3×1,5 mm², cena po metru",
     "Kabal za LED 2x0.35 (po m)": "Dvožilni kabl 2×0,35 mm² za LED rasvetu, cena po metru",
     "Duplex traka": "Duplex obostrano lepljiva montažna traka, rola",
     "Alu traka": "Samolepljiva aluminijumska traka, rola",
-    "Spojnice": "Spojnice za nameštaj, metalne spojnice",
+    "Spojnice": "Spojnica M6×30",
     "Streč folija": "Streč folija za pakovanje, ručna rolna",
     "Amortizer": "Gasni amortizer za podizna vrata nameštaja, proveriti silu i dužinu",
     "Dekorativne nogice": "Dekorativna metalna nogica za nameštaj, proveriti visinu i model",
@@ -430,14 +448,20 @@ const PRICE_LABELS = {
     "Push sistem za vrata": "Push-to-open mehanizam za nameštajska vrata sa magnetom",
     "Žičana korpa za korpus": "Žičana izvlačna korpa za kuhinjski element, proveriti širinu korpusa",
     "Vinkla": "Metalni ugaoni spojnik za nameštaj sa rupama za šrafove",
-    "Ugaona lajsna za radnu ploču 4m": "Aluminijumska ugaona zidna lajsna za kuhinjsku radnu ploču, 4 m",
-    "Crevo za aspirator": "Fleksibilno aluminijumsko crevo za kuhinjski aspirator, proveriti prečnik",
+    "Ugaona lajsna za radnu ploču 4m": "Al diht lajsna mala kocka crna, 4 m",
+    "Crevo za aspirator": "Crevo za aspirator F120, 1,5 m",
     "Garderoberna šipka (po m)": "Ovalna garderobna šipka za ormar, cena po metru",
     "Nosač garderoberne šipke": "Nosač za ovalnu garderobnu šipku u ormaru",
-    "Šnale za coklu": "Plastična kopča za pričvršćivanje kuhinjske PVC cokle",
+    "Šnale za coklu": "Držač cokle",
     "Dodatak za escajg": "Plastični organizator za escajg za kuhinjsku fioku, proveriti širinu",
-    "Pop up šuko utičnica": "Ugradna izvlačna pop-up Šuko utičnica za kuhinjsku radnu ploču",
-    "Američki ormar - komplet": "Komplet okova za klizna vrata američkog plakara",
+    "Dodatak za escajg K300": "Kutija za escajg K300",
+    "Dodatak za escajg K350": "Kutija za escajg K350",
+    "Dodatak za escajg K400": "Kutija za escajg EL K400",
+    "Dodatak za escajg K450": "Kutija za escajg K450",
+    "Dodatak za escajg K500": "Kutija za escajg K500",
+    "Dodatak za escajg K600": "Kutija za escajg K600",
+    "Pop up šuko utičnica": "AEPB Soft ugradna električna konzola, 2 utičnice + USB (crna/bela)",
+    "Američki ormar - komplet": "Mehanizam za klizna vrata – Klizači",
     "Sudopera": "Kuhinjska sudopera, proveriti dimenzije, materijal i broj korita",
     "T lajsna za radnu ploču": "T-spojna lajsna za kuhinjsku radnu ploču",
     "Kanta za đubre": "Ugradna kanta za otpatke za kuhinjski element, proveriti zapreminu",
@@ -448,6 +472,14 @@ const PRICE_LABELS = {
 };
 // Novi artikli koje korisnik dodaje u cenovnik (ostaju u cenovniku, pravilima i sekciji Okov).
 const ARTICLES_KEY = "mist_custom_articles_v1";
+const ESCAJG_VARIANTS = [
+    { width: 300, key: "Dodatak za escajg K300" },
+    { width: 350, key: "Dodatak za escajg K350" },
+    { width: 400, key: "Dodatak za escajg K400" },
+    { width: 450, key: "Dodatak za escajg K450" },
+    { width: 500, key: "Dodatak za escajg K500" },
+    { width: 600, key: "Dodatak za escajg K600" }
+];
 let customArticles = [];
 function registerArticles(list) {
     if (!Array.isArray(list)) return;
@@ -466,6 +498,10 @@ function registerArticles(list) {
     });
 }
 try { registerArticles(JSON.parse(localStorage.getItem(ARTICLES_KEY) || "[]")); } catch (e) {}
+registerArticles([
+    { key: "FX Čiviluk P24022", name: "FX Čiviluk P24022", price: 190 },
+    { key: "Aspirator PIO 650 2MIX", name: "Aspirator PIO 650 2MIX", price: 11970 }
+]);
 const isArticle = k => customArticles.some(a => a.key === k);
 function articlesForExport() {
     return customArticles.map(a => ({ key: a.key, name: (priceLabels[a.key] || a.name), price: Number(cene[a.key]) || 0 }));
@@ -563,7 +599,7 @@ function applyLabels() {
         if (el.textContent !== t) el.textContent = t;
     });
     document.querySelectorAll("[data-pricekey]").forEach(el => {
-        const t = fmt(Number(cene[el.dataset.pricekey]) || 0) + " Din/kom";
+        const t = fmtCena(Number(cene[el.dataset.pricekey]) || 0) + " Din/kom";
         if (el.textContent !== t) el.textContent = t;
     });
 }
@@ -578,7 +614,7 @@ let spec = {
     dekNogiceVisina: 50, dekNogiceKol: 0, stelNogice: 0, matice: 0, push: 0,
     zicaSirina: "30", zicaKol: 0, vinklaTip: "2", vinklaKol: 0,
     ugaonaLajsnaTable: 0, crevoAspiratorPrecnik: "120", crevoAspiratorKol: 0, gardSipkaM: 0, gardNosac: 0,
-    escajgSirina: 60, escajgKol: 0, popUpSuko: 0, americkiOrmar: 0,
+    escajgSirina: 350, escajgKol: 0, popUpSuko: 0, americkiOrmar: 0,
     sudoperaSirina: 60, sudoperaKol: 0, tLajsnaKol: 0, kantaSirina: "40", kantaKol: 0,
     vertLajsna: 0, donjaSina: 0, gornjaSina: 0, usporivaci: 0
 };
@@ -619,6 +655,166 @@ try {
         localStorage.setItem("mist_prices_restored_v2", "1");
     }
 } catch (e) {}
+// Apply invoice prices as new defaults without overwriting user-edited prices.
+try {
+    const updateKey = "mist_invoice_prices_20261124_v1";
+    if (!localStorage.getItem(updateKey)) {
+        const previous = {
+            "Klap šarka ravna": 160, "Klap šarka polu koleno": 125, "Klap šarka koleno": 137,
+            "Klap šarka slepi ugao": 171, "Šraf 4x16": 1, "Šraf 4x18": 1, "Šraf 4x30": 2,
+            "Šraf 4x50": 3, "Šraf 5x80": 7, "Šraf za ručicu": 8, "Tipl": 17, "Nosač viseći": 63,
+            "Klizač 250 mm (po paru)": 976, "Klizač 300 mm (po paru)": 1034,
+            "Klizač 350 mm (po paru)": 1091, "Klizač 400 mm (po paru)": 1149,
+            "Klizač 450 mm (po paru)": 1206, "Klizač 500 mm (po paru)": 1264,
+            "Silikon sanitarni": 920, "Nogica PVC 100mm": 58, "Streč folija": 600,
+            "Amortizer": 450, "LED traka (po m)": 350, "LED profil (po m)": 450,
+            "LED napajanje 12V": 1800, "Kabal 220V 3x1.5 (po m)": 120, "Duplex traka": 300,
+            "Alu traka": 400, "Garderoberna šipka (po m)": 600, "Nosač garderoberne šipke": 150,
+            "T lajsna za radnu ploču": 950, "Kanta za đubre": 2500,
+            "Vertikalna lajsna za vrata 2,7m": 1500, "Donja šina 1m": 800,
+            "Gornja šina 1m": 800, "Usporivači": 1200
+        };
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        Object.keys(previous).forEach(key => {
+            if (Number(stored[key]) === previous[key]) stored[key] = DEF[key];
+        });
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v2";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Pinovi za police"]) === 6) stored["Pinovi za police"] = DEF["Pinovi za police"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Pinovi za police"] === "Pinovi za police") {
+            priceLabels["Pinovi za police"] = PRICE_LABELS["Pinovi za police"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v3";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Šnale za coklu"]) === 80) stored["Šnale za coklu"] = DEF["Šnale za coklu"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Šnale za coklu"] === "Šnale za coklu") {
+            priceLabels["Šnale za coklu"] = PRICE_LABELS["Šnale za coklu"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v4";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Daljinska kontrola LED"]) === 1200) stored["Daljinska kontrola LED"] = DEF["Daljinska kontrola LED"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Daljinska kontrola LED"] === "Daljinska kontrola LED") {
+            priceLabels["Daljinska kontrola LED"] = PRICE_LABELS["Daljinska kontrola LED"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v5";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Spojnice"]) === 50) stored["Spojnice"] = DEF["Spojnice"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Spojnice"] === "Spojnice") {
+            priceLabels["Spojnice"] = PRICE_LABELS["Spojnice"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v6";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Ugaona lajsna za radnu ploču 4m"]) === 1800) stored["Ugaona lajsna za radnu ploču 4m"] = DEF["Ugaona lajsna za radnu ploču 4m"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Ugaona lajsna za radnu ploču 4m"] === "Aluminijumska ugaona zidna lajsna za kuhinjsku radnu ploču, 4 m") {
+            priceLabels["Ugaona lajsna za radnu ploču 4m"] = PRICE_LABELS["Ugaona lajsna za radnu ploču 4m"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v7";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Crevo za aspirator"]) === 1500) stored["Crevo za aspirator"] = DEF["Crevo za aspirator"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Crevo za aspirator"] === "Crevo za aspirator") {
+            priceLabels["Crevo za aspirator"] = PRICE_LABELS["Crevo za aspirator"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v8";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Dodatak za escajg"]) === 1200) stored["Dodatak za escajg"] = DEF["Dodatak za escajg"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v9";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Dodatak za escajg"]) === 420) stored["Dodatak za escajg"] = DEF["Dodatak za escajg"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v10";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Pop up šuko utičnica"]) === 3500) stored["Pop up šuko utičnica"] = DEF["Pop up šuko utičnica"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Pop up šuko utičnica"] === "Ugradna izvlačna pop-up Šuko utičnica za kuhinjsku radnu ploču") {
+            priceLabels["Pop up šuko utičnica"] = PRICE_LABELS["Pop up šuko utičnica"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
+try {
+    const updateKey = "mist_invoice_prices_20261124_v11";
+    if (!localStorage.getItem(updateKey)) {
+        const stored = JSON.parse(localStorage.getItem(KEY) || "{}");
+        if (Number(stored["Američki ormar - komplet"]) === 4500) stored["Američki ormar - komplet"] = DEF["Američki ormar - komplet"];
+        cene = { ...DEF, ...stored };
+        localStorage.setItem(KEY, JSON.stringify(cene));
+        if (priceLabels["Američki ormar - komplet"] === "Komplet okova za klizna vrata američkog plakara") {
+            priceLabels["Američki ormar - komplet"] = PRICE_LABELS["Američki ormar - komplet"];
+            localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels));
+        }
+        localStorage.setItem(updateKey, "1");
+    }
+} catch (e) {}
 // Migracija starog naziva u svim postojećim lokalnim cenovnicima.
 if (priceLabels["Tipl"] === "Plastični tipl za spajanje pločastog nameštaja" || !priceLabels["Tipl"]) {
     priceLabels["Tipl"] = "Tipl Double Power 8 × 65 mm (produženi)";
@@ -631,6 +827,25 @@ const LEN = [200, 250, 300, 350, 400, 450, 500];
 
 const $ = id => document.getElementById(id);
 const fmt = n => Math.round(n).toLocaleString("sr-RS");
+const fmtCena = n => Number(n).toLocaleString("sr-RS", { maximumFractionDigits: 2 });
+const getEscajgVariant = () => ESCAJG_VARIANTS.find(v => v.width === Number(spec.escajgSirina)) || ESCAJG_VARIANTS[0];
+function normalizeEscajgWidth(value) {
+    let width = Number(value) || 350;
+    if (width <= 100) width *= 10;
+    return ESCAJG_VARIANTS.some(v => v.width === width) ? width : 350;
+}
+function updateEscajgPriceDisplay() {
+    const select = $("s_escSirina");
+    const price = $("c_escPrice");
+    if (!select || !price) return;
+    ESCAJG_VARIANTS.forEach(v => {
+        const option = select.querySelector(`option[value="${v.width}"]`);
+        if (option) option.textContent = (priceLabels[v.key] || v.key) + " — " + fmtCena(cene[v.key] || 0) + " Din";
+    });
+    const variant = getEscajgVariant();
+    select.value = String(variant.width);
+    price.textContent = fmtCena(cene[variant.key] || 0) + " Din/kom";
+}
 
 function save() {
     try {
@@ -796,10 +1011,12 @@ function buildSpecijalno() {
         <div class="spec-row"><span class="spec-name" data-pkey="Nosač garderoberne šipke" data-def="Nosač garderoberne šipke">Nosač garderoberne šipke</span><div class="spec-controls" id="c_gardNosac"></div></div>
         <div class="spec-row"><span class="spec-name" data-pkey="Šnale za coklu" data-def="Šnale za coklu">Šnale za coklu</span><div class="spec-controls" id="c_snaleKol"></div></div>
         <div class="spec-row">
-            <span class="spec-name" data-pkey="Dodatak za escajg" data-def="Dodatak za escajg">Dodatak za escajg</span>
+            <span class="spec-name">Kutija za escajg</span>
             <div class="spec-controls">
-                <input type="number" id="s_escSirina" value="${spec.escajgSirina}" min="0" placeholder="širina fioke" style="width:100px">
-                <span>mm</span>
+                <select id="s_escSirina" aria-label="Izaberite meru kutije za escajg">
+                    ${ESCAJG_VARIANTS.map(v => `<option value="${v.width}">${priceLabels[v.key] || v.key}</option>`).join("")}
+                </select>
+                <span id="c_escPrice"></span>
                 <span id="c_escKol"></span>
             </div>
         </div>
@@ -878,9 +1095,10 @@ function buildSpecijalno() {
     $("s_zicaSirina").value = spec.zicaSirina; $("s_zicaSirina").onchange = e => { spec.zicaSirina = e.target.value; save(); };
     $("s_vinklaTip").value = spec.vinklaTip; $("s_vinklaTip").onchange = e => { spec.vinklaTip = e.target.value; save(); };
     $("s_crevoPrecnik").value = spec.crevoAspiratorPrecnik; $("s_crevoPrecnik").onchange = e => { spec.crevoAspiratorPrecnik = e.target.value; save(); };
-    $("s_escSirina").onchange = e => { spec.escajgSirina = parseFloat(e.target.value) || 0; save(); };
+    $("s_escSirina").onchange = e => { spec.escajgSirina = normalizeEscajgWidth(e.target.value); updateEscajgPriceDisplay(); calc(); save(); };
     $("s_sudSirina").onchange = e => { spec.sudoperaSirina = parseFloat(e.target.value) || 0; save(); };
     $("s_kantaSirina").onchange = e => { spec.kantaSirina = parseFloat(e.target.value) || 0; save(); };
+    updateEscajgPriceDisplay();
     applyLabels();
 }
 
@@ -924,19 +1142,20 @@ function buildFin() {
 }
 
 const PRICE_GROUPS = [
-        ["Šarke za nameštaj", ["Klap šarka ravna", "Klap šarka polu koleno", "Klap šarka koleno", "Klap šarka slepi ugao", "Klap šarka žaba"]],
+        ["Šarke za nameštaj", ["Klap šarka ravna", "Klap šarka polu koleno", "Klap šarka koleno", "Klap šarka slepi ugao", "Klap šarka žaba", "Šarka slide za ugao 165° hidraulična GTV"]],
+        ["Konektori", ["PVC ugaoni konektor"]],
         ["Klizači za fioke", ["Klizač 200 mm (po paru)", "Klizač 250 mm (po paru)", "Klizač 300 mm (po paru)", "Klizač 350 mm (po paru)", "Klizač 400 mm (po paru)", "Klizač 450 mm (po paru)", "Klizač 500 mm (po paru)"]],
-        ["Šrafovi i spojni materijal", ["Šraf 4x1", "Šraf 4x16", "Šraf 4x18", "Šraf 4x30", "Šraf 4x50", "Šraf 5x80", "Šraf za ručicu", "Tipl", "Dvonavojna matica", "Vinkla", "Spojnice"]],
+        ["Šrafovi i spojni materijal", ["Šraf 4x1", "Šraf 4x16", "Šraf 4x18", "Šraf 4x30", "Šraf 4x50", "Šraf 5x80", "Šraf za ručicu", "Tipl", "DuoPower tipla 10×80", "Dvonavojna matica", "Vinkla", "Spojnice"]],
         ["Nosači, ručice i okov za montažu", ["Nosač viseći", "Ručica", "Pinovi za police", "Montažni čiviluk ugradni za šrafljenje", "Push sistem za vrata"]],
-        ["Nogice i cokle", ["Nogica PVC 100mm", "Nogica PVC 50mm", "Šnale za coklu", "Dekorativne nogice", "Nogica štelujuća 10mm"]],
+        ["Nogice i cokle", ["Nogica PVC 100mm", "Nogica PVC 50mm", "PVC cokla H100, 4 m", "Šnale za coklu", "Dekorativne nogice", "Nogica štelujuća 10mm"]],
         ["Garderobni program", ["Garderoberna šipka (po m)", "Nosač garderoberne šipke"]],
-        ["Kuhinjski okov i oprema", ["Žičana korpa za korpus", "Dodatak za escajg", "Kanta za đubre", "Sudopera"]],
+        ["Kuhinjski okov i oprema", ["Žičana korpa za korpus", ...ESCAJG_VARIANTS.map(v => v.key), "Kanta za đubre", "Sudopera"]],
         ["Radne ploče i završne lajsne", ["Ugaona lajsna za radnu ploču 4m", "T lajsna za radnu ploču"]],
         ["Američki plakar", ["Vertikalna lajsna za vrata 2,7m", "Donja šina 1m", "Gornja šina 1m", "Usporivači"]],
         ["LED rasveta", ["LED traka (po m)", "LED profil (po m)", "LED napajanje 12V", "Daljinska kontrola LED"]],
         ["Električni materijal", ["Kabal 220V 3x1.5 (po m)", "Kabal za LED 2x0.35 (po m)", "Pop up šuko utičnica"]],
         ["Trake i pakovanje", ["Duplex traka", "Alu traka", "Streč folija"]],
-        ["Aspiracija i ventilacija", ["Crevo za aspirator"]],
+        ["Aspiracija i ventilacija", ["Crevo za aspirator", "Crevo za aspirator F100"]],
         ["Potrošni materijal", ["Silikon sanitarni", "Amortizer"]]
     ];
 
@@ -945,7 +1164,7 @@ function buildCene() {
     box.innerHTML = "";
     const groups = PRICE_GROUPS;
     // Ova stavka se više ne prikazuje kao zaseban artikal u cenovniku.
-    const hiddenItems = new Set(["Američki ormar - komplet"]);
+    const hiddenItems = new Set(["Američki ormar - komplet", "Dodatak za escajg"]);
     const seen = new Set(hiddenItems);
     groups.forEach(([heading, keys]) => {
         const existing = keys.filter(k => Object.prototype.hasOwnProperty.call(DEF, k) && !seen.has(k));
@@ -960,6 +1179,7 @@ function buildCene() {
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => {
                 cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc();
             }, "1");
+            price.step = "0.01"; price.value = String(cene[k]);
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             row.appendChild(name); row.appendChild(price); box.appendChild(row);
         });
@@ -973,6 +1193,7 @@ function buildCene() {
             name.setAttribute("aria-label", "Naziv artikla: " + k);
             name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
+            price.step = "0.01"; price.value = String(cene[k]);
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             row.appendChild(name); row.appendChild(price); box.appendChild(row);
         });
@@ -986,6 +1207,7 @@ function buildCene() {
             name.setAttribute("aria-label", "Naziv artikla: " + k);
             name.addEventListener("input", () => { priceLabels[k] = name.value.trim() || k; save(); applyLabels(); });
             const price = num("c_" + Object.keys(DEF).indexOf(k), cene[k], v => { cene[k] = v; manualSum.okov = null; manualSum.mat = null; save(); calc(); }, "1");
+            price.step = "0.01"; price.value = String(cene[k]);
             price.className = "price-value-input"; price.setAttribute("aria-label", "Cena za " + (priceLabels[k] || k) + " u dinarima");
             const del = removeBtn("Obriši artikal iz cenovnika", () => removeArticle(k));
             row.append(name, price, del); box.appendChild(row);
@@ -1045,6 +1267,7 @@ function applyOkovMarkup(base) {
 
 function calc() {
     initSumContainer();
+    updateEscajgPriceDisplay();
 
     let autoOkov = 0;
     ST.forEach(s => autoOkov += (q[s[0]] || 0) * (cene[s[2]] || 0));
@@ -1073,7 +1296,8 @@ function calc() {
     autoOkov += spec.gardNosac * cene["Nosač garderoberne šipke"];
     const snaleKom = spec.snaleRucno !== undefined ? spec.snaleRucno : Math.ceil((q["nogice"] || 0) / 2);
     autoOkov += snaleKom * cene["Šnale za coklu"];
-    autoOkov += spec.escajgKol * cene["Dodatak za escajg"];
+    const escajg = getEscajgVariant();
+    autoOkov += spec.escajgKol * (cene[escajg.key] || 0);
     autoOkov += spec.popUpSuko * cene["Pop up šuko utičnica"];
     autoOkov += spec.americkiOrmar * cene["Američki ormar - komplet"];
     autoOkov += spec.sudoperaKol * cene["Sudopera"];
@@ -1529,6 +1753,7 @@ $("loadProjectFile").addEventListener("change", event => {
             Object.assign(q, data.q || {});
             ST.forEach(item => { if (!(item[0] in q)) q[item[0]] = 0; });
             spec = { ...spec, ...(data.spec || {}) };
+            spec.escajgSirina = normalizeEscajgWidth(spec.escajgSirina);
             fin = { ...fin, ...(data.fin || {}) };
             manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
             KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
@@ -1561,7 +1786,7 @@ $("resetProjectBtn").addEventListener("click", () => {
         amortizerSnaga:"60", amortizerDuzina:"kraci", amortizerKol:0, dekNogiceVisina:50, dekNogiceKol:0,
         stelNogice:0, matice:0, push:0, zicaSirina:"30", zicaKol:0, vinklaTip:"2", vinklaKol:0,
         ugaonaLajsnaTable:0, crevoAspiratorPrecnik:"120", crevoAspiratorKol:0, gardSipkaM:0, gardNosac:0,
-        escajgSirina:60, escajgKol:0, popUpSuko:0, americkiOrmar:0, sudoperaSirina:60, sudoperaKol:0,
+        escajgSirina:350, escajgKol:0, popUpSuko:0, americkiOrmar:0, sudoperaSirina:60, sudoperaKol:0,
         tLajsnaKol:0, kantaSirina:"40", kantaKol:0, vertLajsna:0, donjaSina:0, gornjaSina:0, usporivaci:0
     };
     fin = { prevoz:0, plocasti:0, staklo:0, metal:0, izrada:0, plast:0, tapacirani:0, proc:30, okovProc:0, kurs:fin.kurs || 117.6203 };
@@ -1672,7 +1897,7 @@ function buildNewArticles() {
         const qty = document.createElement("input"); qty.type = "number"; qty.min = "0"; qty.step = "0.1"; qty.value = Number(a.qty) || 0;
         qty.title = "Količina"; qty.setAttribute("aria-label", "Količina: " + labelFor(a.key));
         qty.addEventListener("input", () => { a.qty = Number(qty.value) || 0; manualSum.okov = null; manualSum.mat = null; save(); calc(); });
-        const price = ruleEl("span", "", fmt(Number(cene[a.key]) || 0) + " Din/kom"); price.dataset.pricekey = a.key;
+        const price = ruleEl("span", "", fmtCena(Number(cene[a.key]) || 0) + " Din/kom"); price.dataset.pricekey = a.key;
         row.append(name, qty, price, removeBtn("Obriši artikal iz cenovnika", () => removeArticle(a.key)));
         box.appendChild(row);
     });
@@ -1703,6 +1928,113 @@ $("addkl").onclick = () => { KL.push({ d: 400, n: 1 }); buildKl(); };
 
 let DL = null;
 const pad = (s, n) => { s = String(s); return s.length >= n ? s : s + " ".repeat(n - s.length); };
+
+function stavkeTrebovanja() {
+    const rows = [];
+    const add = (name, qty, price, unit) => {
+        qty = Number(qty) || 0;
+        if (qty <= 0) return;
+        price = Number(price) || 0;
+        rows.push({ name, qty, unit: unit || "kom", price, total: qty * price });
+    };
+
+    ST.forEach(s => add(priceLabels[s[2]] || s[1], q[s[0]], cene[s[2]], PRICE_SEARCH_UNITS[s[2]] || "kom"));
+    KL.forEach(k => {
+        const key = "Klizač " + k.d + " mm (po paru)";
+        add(priceLabels[key] || ("Klizač " + k.d + " mm (po paru)"), k.n, cene[key], "par");
+    });
+    extraLines().forEach(line => add(line.name, line.qty, line.price, PRICE_SEARCH_UNITS[line.key] || "kom"));
+
+    [
+        ["LED traka (po m)", spec.ledM, "m"],
+        ["LED profil (po m)", spec.ledProfM, "m"],
+        ["LED napajanje 12V", spec.ledNapajanjeKol, "kom"],
+        ["Daljinska kontrola LED", spec.ledDaljinski, "kom"],
+        ["Kabal 220V 3x1.5 (po m)", spec.kabal220m, "m"],
+        ["Kabal za LED 2x0.35 (po m)", spec.kabalLedm, "m"],
+        ["Duplex traka", spec.duplex, "kom"],
+        ["Alu traka", spec.aluTraka, "kom"],
+        ["Spojnice", spec.spojnice, "kom"],
+        ["Streč folija", spec.strecFolija, "kom"],
+        ["Amortizer", spec.amortizerKol, "kom"],
+        ["Dekorativne nogice", spec.dekNogiceKol, "kom"],
+        ["Nogica štelujuća 10mm", spec.stelNogice, "kom"],
+        ["Dvonavojna matica", spec.maticK || spec.matice || 0, "kom"],
+        ["Push sistem za vrata", spec.push, "kom"],
+        ["Žičana korpa za korpus", spec.zicaKol, "kom"],
+        ["Vinkla", spec.vinklaKol, "kom"],
+        ["Ugaona lajsna za radnu ploču 4m", spec.ugaonaLajsnaTable, "tabla"],
+        ["Crevo za aspirator", spec.crevoAspiratorKol, "kom"],
+        ["Garderoberna šipka (po m)", spec.gardSipkaM, "m"],
+        ["Nosač garderoberne šipke", spec.gardNosac, "kom"],
+        ["Šnale za coklu", spec.snaleRucno !== undefined ? spec.snaleRucno : Math.ceil((q.nogice || 0) / 2), "kom"],
+        ["Pop up šuko utičnica", spec.popUpSuko, "kom"],
+        ["Sudopera", spec.sudoperaKol, "kom"],
+        ["T lajsna za radnu ploču", spec.tLajsnaKol, "kom"],
+        ["Kanta za đubre", spec.kantaKol, "kom"],
+        ["Američki ormar - komplet", spec.americkiOrmar, "garn"],
+        ["Vertikalna lajsna za vrata 2,7m", spec.vertLajsna, "kom"],
+        ["Donja šina 1m", spec.donjaSina, "m"],
+        ["Gornja šina 1m", spec.gornjaSina, "m"],
+        ["Usporivači", spec.usporivaci, "kom"]
+    ].forEach(([key, qty, unit]) => add(priceLabels[key] || key, qty, cene[key], unit));
+    const escajg = getEscajgVariant();
+    add(priceLabels[escajg.key] || escajg.key, spec.escajgKol, cene[escajg.key], "kom");
+
+    return rows;
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[ch]);
+}
+
+function stampajTrebovanjePDF() {
+    const rows = stavkeTrebovanja();
+    const ime = $("kupac").value.trim();
+    const telefon = ($("telefonKupca").value || "").trim();
+    const rok = ($("rokIsporuke").value || "").trim();
+    const total = rows.reduce((sum, row) => sum + row.total, 0);
+    const tableRows = rows.map((row, i) => `<tr>
+        <td>${i + 1}</td><td>${escapeHtml(row.name)}</td>
+        <td class="num">${fmt(row.qty)} ${escapeHtml(row.unit)}</td>
+        <td class="num">${fmtCena(row.price)} Din</td><td class="num">${fmtCena(row.total)} Din</td>
+    </tr>`).join("");
+    const html = `<!doctype html><html lang="sr"><head><meta charset="utf-8">
+        <title>Trebovanje materijala${ime ? " - " + escapeHtml(ime) : ""}</title>
+        <style>
+            @page { size: A4 portrait; margin: 15mm; }
+            body { font-family: Arial, sans-serif; color: #222; font-size: 10pt; }
+            h1 { margin: 0 0 6mm; font-size: 18pt; }
+            .meta { margin: 2mm 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8mm; }
+            th, td { border: 1px solid #999; padding: 6px; }
+            th { background: #eee; text-align: left; }
+            .num { text-align: right; white-space: nowrap; }
+            tfoot td { font-weight: bold; background: #eee; }
+            @media print { tr { page-break-inside: avoid; } }
+        </style></head><body>
+        <h1>Trebovanje materijala</h1>
+        ${ime ? `<p class="meta"><b>Projekat / kupac:</b> ${escapeHtml(ime)}</p>` : ""}
+        ${telefon ? `<p class="meta"><b>Telefon:</b> ${escapeHtml(telefon)}</p>` : ""}
+        ${rok ? `<p class="meta"><b>Rok isporuke:</b> ${escapeHtml(rok)}</p>` : ""}
+        <p class="meta"><b>Datum:</b> ${escapeHtml(new Date().toLocaleDateString("sr-RS"))}</p>
+        <table><thead><tr><th>Rb.</th><th>Stavka</th><th class="num">Količina</th><th class="num">Cena po jedinici</th><th class="num">Ukupno</th></tr></thead>
+        <tbody>${tableRows || `<tr><td colspan="5">Nema unetih količina za trebovanje.</td></tr>`}</tbody>
+        <tfoot><tr><td colspan="4" class="num">UKUPNO</td><td class="num">${fmtCena(total)} Din</td></tr></tfoot></table>
+        </body></html>`;
+    const win = window.open("", "_blank");
+    if (!win) {
+        $("izmsg").textContent = "Pregledač je blokirao prozor za štampu. Dozvoli iskačuće prozore za ovu aplikaciju.";
+        return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
+}
 
 function tekst() {
     const f = fmt;
@@ -1756,7 +2088,12 @@ function tekst() {
     dodajSpecTekst("Nosač garderoberne šipke", spec.gardNosac, "kol");
     const snaleKom = spec.snaleRucno !== undefined ? spec.snaleRucno : Math.ceil((q["nogice"] || 0) / 2);
     dodajSpecTekst("Šnale za coklu", snaleKom, "kol");
-    dodajSpecTekst("Dodatak za escajg", spec.escajgKol, "kol");
+    const escajg = getEscajgVariant();
+    if (spec.escajgKol > 0) {
+        const c = cene[escajg.key] || 0;
+        okov += spec.escajgKol * c;
+        R.push([(priceLabels[escajg.key] || escajg.key) + " (kom)", spec.escajgKol, c]);
+    }
     dodajSpecTekst("Pop up šuko utičnica", spec.popUpSuko, "kol");
     dodajSpecTekst("Sudopera", spec.sudoperaKol, "kol");
     dodajSpecTekst("T lajsna za radnu ploču", spec.tLajsnaKol, "kol");
@@ -1783,7 +2120,7 @@ function tekst() {
     L.push("OKOV, RASVETA I DODACI");
     
     if (!R.length) L.push("(nema stavki)");
-    R.forEach(r => L.push(I ? pad(r[0], 40) + pad(r[1] + " kol", 12) + "x " + pad(f(r[2]), 10) + "= " + f(r[1] * r[2]) + " Din" : "- " + r[0] + ": " + r[1]));
+    R.forEach(r => L.push(I ? pad(r[0], 40) + pad(r[1] + " kol", 12) + "x " + pad(fmtCena(r[2]), 10) + "= " + fmtCena(r[1] * r[2]) + " Din" : "- " + r[0] + ": " + r[1]));
     
     if (I) {
         L.push("", "Zbir okova: " + f(calcOkov) + " Din", "Pločasti materijali sa kantom: " + f(fin.plocasti) + " Din", "Staklo i ogledala: " + f(fin.staklo) + " Din", "Metalne konstrukcije: " + f(fin.metal) + " Din", "Plastifikacija: " + f(fin.plast) + " Din", "Tapacirani elementi: " + f(fin.tapacirani) + " Din", "Zbir materijala (osnovica): " + f(calcMat) + " Din", "Zarada (" + fin.proc + "%): " + f(calcZar) + " Din", "Prevoz: " + f(calcPrevoz) + " Din", "Izrada projekta: " + f(calcIzrada) + " Din", "", "UKUPNO Din: " + f(din), "UKUPNO Eur: " + f(eur) + " (kurs " + fin.kurs + ")");
@@ -1838,7 +2175,7 @@ function stampajPDF() {
     dodajSpecPDF("Nosač garderoberne šipke", spec.gardNosac);
     const snaleKom = spec.snaleRucno !== undefined ? spec.snaleRucno : Math.ceil((q["nogice"] || 0) / 2);
     dodajSpecPDF("Šnale za coklu", snaleKom);
-    dodajSpecPDF("Dodatak za escajg", spec.escajgKol);
+    dodajSpecPDF(getEscajgVariant().key, spec.escajgKol);
     dodajSpecPDF("Pop up šuko utičnica", spec.popUpSuko);
     dodajSpecPDF("Sudopera", spec.sudoperaKol);
     dodajSpecPDF("T lajsna za radnu ploču", spec.tLajsnaKol);
@@ -1892,7 +2229,7 @@ function stampajPDF() {
         } else {
             html += `<table><tr><th>Stavka</th><th class="right">Količina</th><th class="right">Cena po kom.</th><th class="right">Ukupno</th></tr>`;
             R.forEach(r => {
-                html += `<tr><td>${r[0]}</td><td class="right">${r[1]}</td><td class="right">${fmt(r[2])} Din</td><td class="right">${fmt(r[1] * r[2])} Din</td></tr>`;
+                html += `<tr><td>${r[0]}</td><td class="right">${r[1]}</td><td class="right">${fmtCena(r[2])} Din</td><td class="right">${fmtCena(r[1] * r[2])} Din</td></tr>`;
             });
             html += `</table>`;
         }
@@ -1962,6 +2299,7 @@ $("izvoz").onclick = async () => {
 };
 
 $("pdfBtn").onclick = stampajPDF;
+$("trebovanjePdfBtn").onclick = stampajTrebovanjePDF;
 
 (async () => {
     try {
@@ -1969,6 +2307,7 @@ $("pdfBtn").onclick = stampajPDF;
     } catch (e) {}
     $("izvoz").disabled = false; 
     $("pdfBtn").disabled = false; 
+    $("trebovanjePdfBtn").disabled = false;
     $("izmsg").textContent = "Izaberi verziju i pritisni dugme za izvoz.";
 })();
 
@@ -2156,6 +2495,7 @@ $("ghHistoryLoad").addEventListener("click", async () => {
         Object.keys(q).forEach(k => delete q[k]); Object.assign(q, data.q || {});
         ST.forEach(item => { if (!(item[0] in q)) q[item[0]] = 0; });
         spec = { ...spec, ...(data.spec || {}) };
+        spec.escajgSirina = normalizeEscajgWidth(spec.escajgSirina);
         fin = { ...fin, ...(data.fin || {}) };
         manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
         KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
