@@ -206,7 +206,7 @@
             <button type="button" id="ghHeaderSave" title="Sačuvaj cene, nazive, artikle, pravila i napomenu na GitHub (cene.json)">💾 Sačuvaj</button>
             <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub</button>
             <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
-            <div class="msg" id="appVersion" style="font-size: 0.7rem; opacity:.75">Verzija aplikacije: 2026-11-25 · v9 (šarke GTV, klizač 500)</div>
+            <div class="msg" id="appVersion" style="font-size: 0.7rem; opacity:.75">Verzija aplikacije: 2026-11-25 · v10 (PDF na 1 A4, trebovanje sa komentarom)</div>
         </div>
         <div class="top-rate">
             <div class="rate-line">
@@ -1937,6 +1937,8 @@ function stampajTrebovanjePDF() {
     const telefon = ($("telefonKupca").value || "").trim();
     const rok = ($("rokIsporuke").value || "").trim();
     const total = rows.reduce((sum, row) => sum + row.total, 0);
+    const komentar = ($("komentar").value || "").trim();
+    const podsetnik = ($("podsetnik").value || "").trim();
     const tableRows = rows.map((row, i) => `<tr>
         <td>${i + 1}</td><td>${escapeHtml(row.name)}</td>
         <td class="num">${fmt(row.qty)} ${escapeHtml(row.unit)}</td>
@@ -1954,6 +1956,8 @@ function stampajTrebovanjePDF() {
             th { background: #eee; text-align: left; }
             .num { text-align: right; white-space: nowrap; }
             tfoot td { font-weight: bold; background: #eee; }
+            .note { margin: 4mm 0 0; padding: 3mm 4mm; border: 1px solid #999; background: #f7f7f7; white-space: pre-wrap; page-break-inside: avoid; }
+            .note b { display: block; margin-bottom: 1mm; }
             @media print { tr { page-break-inside: avoid; } }
         </style></head><body>
         <h1>Trebovanje materijala</h1>
@@ -1961,6 +1965,8 @@ function stampajTrebovanjePDF() {
         ${telefon ? `<p class="meta"><b>Telefon:</b> ${escapeHtml(telefon)}</p>` : ""}
         ${rok ? `<p class="meta"><b>Rok isporuke:</b> ${escapeHtml(rok)}</p>` : ""}
         <p class="meta"><b>Datum:</b> ${escapeHtml(new Date().toLocaleDateString("sr-RS"))}</p>
+        ${komentar ? `<div class="note"><b>Komentar</b>${escapeHtml(komentar)}</div>` : ""}
+        ${podsetnik ? `<div class="note"><b>Podsetnik</b>${escapeHtml(podsetnik)}</div>` : ""}
         <table><thead><tr><th>Rb.</th><th>Stavka</th><th class="num">Količina</th><th class="num">Cena po jedinici</th><th class="num">Ukupno</th></tr></thead>
         <tbody>${tableRows || `<tr><td colspan="5">Nema unetih količina za trebovanje.</td></tr>`}</tbody>
         <tfoot><tr><td colspan="4" class="num">UKUPNO</td><td class="num">${fmtCena(total)} Din</td></tr></tfoot></table>
@@ -2868,26 +2874,4 @@ fin.tapacirani = 0; fin.manualOkov = null; manualSum.okov = null; manualSum.mat 
 
 buildOkov();
 buildFin();
-buildCene();
-
-buildBuiltinCsvRulesEditor();
-buildCustomRulesEditor();
-buildCustomCsvItems();
-buildNewArticles();
-
-buildKl();
-buildSpecijalno();
-buildAmerickiPlakar();
-buildElementi();
-calc();
-refreshNbsRate();
-// Zajednički cene.json se učitava na svakom računaru (posle toga se sve ponovo iscrta).
-loadSharedPrices().finally(() => {
-    const gs = ghLoad();
-    if (gs.owner && gs.repo && gs.token) ghRefreshProjectHistory(gs).catch(() => {});
-});
-
-/* Service worker not required in single-file version */
-</script>
-</body>
-</html>
+b
