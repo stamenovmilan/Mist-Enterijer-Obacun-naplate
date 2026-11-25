@@ -2879,4 +2879,275 @@ async function ghPushPrices(c) {
     setPriceSrc("Cene: sačuvane na GitHub-u " + new Date().toLocaleString("sr-RS") + ". Ostali uređaji ih vide za 1–2 minuta.");
 }
 function ghDecodeB64(value) {
-    return decodeURIComponent(Array.prototype.map.
+    return decodeURIComponent(Array.prototype.map.call(atob(value.replace(/\n/g, "")), ch => "%" + ("00" + ch.charCodeAt(0).toString(16)).slice(-2)).join(""));
+}
+async function ghFetchRemotePayload(c) {
+    const r = await fetch(ghApi(c, c.path) + "?ref=" + encodeURIComponent(c.branch), { headers: ghHeaders(c), cache: "no-store" });
+    if (!r.ok) throw new Error("GitHub " + r.status);
+    return JSON.parse(ghDecodeB64((await r.json()).content));
+}
+
+// Primena sadržaja cene.json na aplikaciju.
+function applyPricePayload(payload) {
+    if (!payload || typeof payload !== "object") return false;
+    if (Array.isArray(payload.customArticles)) registerArticles(payload.customArticles);
+    if (payload.cene && typeof payload.cene === "object") {
+        const nc = { ...DEF };
+        Object.keys(DEF).forEach(k => {
+            const raw = payload.cene[k];
+            const v = Number(raw);
+            if (raw !== undefined && raw !== null && raw !== "" && Number.isFinite(v) && v >= 0) nc[k] = v;
+        });
+        cene = nc;
+    }
+    if (payload.nazivi && typeof payload.nazivi === "object") {
+        priceLabels = { ...PRICE_LABELS };
+        Object.keys(payload.nazivi).forEach(k => {
+            if (typeof payload.nazivi[k] === "string" && payload.nazivi[k].trim()) priceLabels[k] = payload.nazivi[k].trim();
+        });
+        fixLabelNotes();
+    }
+    if (Array.isArray(payload.customCsvRules)) {
+        const nr = normalizeRules(payload.customCsvRules);
+        // količine iz trenutno učitanog CSV-a ostaju
+        customCsvRules = nr;
+        applyCustomRules();
+    }
+    if (payload.builtinCsvRules && typeof payload.builtinCsvRules === "object" && !Array.isArray(payload.builtinCsvRules)) {
+        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...payload.builtinCsvRules };
+    }
+    if (Number.isFinite(Number(payload.okovProc))) fin.okovProc = Number(payload.okovProc);
+    if (Number.isFinite(Number(payload.procZarade)) && Number(payload.procZarade) > 0) fin.proc = Number(payload.procZarade);
+    if (typeof payload.napomenaPDF === "string") {
+        $("napomenaPDF").value = fixNapomena(payload.napomenaPDF, payload.napomenaVersion);
+        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_napomena_ver", String(NAPOMENA_VER)); } catch (e) {}
+    }
+    const kontakt = typeof payload.kontaktPDF === "string" ? payload.kontaktPDF : (typeof payload.telefon === "string" ? payload.telefon : "");
+    if (kontakt.trim()) {
+        $("kontaktPDF").value = kontakt;
+        try { localStorage.setItem("mist_kontakt_pdf", kontakt); } catch (e) {}
+    }
+    return true;
+}
+function setPriceSrc(text) {
+    const el = $("priceSrcMsg");
+    if (el) el.textContent = text;
+}
+function refreshAfterPriceLoad() {
+    manualSum.okov = null; manualSum.mat = null;
+    buildFin(); buildCene(); buildNewArticles();
+    buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems();
+    buildSpecijalno(); buildAmerickiPlakar();
+    if (typeof buildElementi === "function") buildElementi();
+    calc();
+}
+
+async function loadSharedPrices() {
+    const c = ghLoad();
+    let pushedAt = "";
+    try { pushedAt = localStorage.getItem(PUSHED_AT_KEY) || ""; } catch (e) {}
+    let payload = null, src = "";
+    setPriceSrc("Cene: učitavam cene.json...");
+    // 1) Računar sa tokenom: direktno sa GitHub-a (bez čekanja na objavu GitHub Pages).
+    if (c.owner && c.repo && c.token) {
+        try { payload = await ghFetchRemotePayload(c); src = "GitHub-a"; } catch (e) { payload = null; }
+    }
+    // 2) Računar bez tokena: direktno sa GitHub-a (javni repozitorijum, odmah poslednja verzija).
+    if (!payload && c.owner && c.repo) {
+        try { payload = await ghFetchRemotePayload({ ...c, token: "" }); src = "GitHub-a"; } catch (e) { payload = null; }
+    }
+    // 3) Rezerva: cene.json koji stoji pored index.html (GitHub Pages).
+    if (!payload) {
+        try {
+            const r = await fetch("./" + String(c.path || "cene.json").replace(/^\/+/, "") + "?v=" + Date.now(), { cache: "no-store" });
+            if (r.ok) { payload = await r.json(); src = "cene.json"; }
+        } catch (e) { payload = null; }
+    }
+    const remoteAt = payload ? String(payload.savedAt || payload.updatedAt || "") : "";
+    let stale = false;
+    if (payload && pushedAt && remoteAt && remoteAt < pushedAt) { payload = null; stale = true; }
+
+    if (payload && applyPricePayload(payload)) {
+        setPriceSrc("Cene: učitane iz " + src + (remoteAt ? " (sačuvane " + new Date(remoteAt).toLocaleString("sr-RS") + ")" : "") + ".");
+    } else if (stale) {
+        setPriceSrc("Cene: prikazane su cene koje si upravo sačuvao na ovom uređaju. GitHub Pages još objavljuje novi cene.json (1–2 min).");
+    } else if (location.protocol === "file:") {
+        setPriceSrc("Cene: fajl je otvoren sa diska, pa cene.json nije dostupan. Koriste se cene sačuvane na ovom uređaju. Otvori aplikaciju preko GitHub Pages linka.");
+    } else {
+        setPriceSrc("Cene: cene.json nije pronađen. Koriste se cene sačuvane na ovom uređaju.");
+    }
+    ghLastSig = priceSig();
+    // cene.json sa starom napomenom: na računaru sa automatskim čuvanjem odmah upiši novu napomenu.
+    if (payload && Number(payload.napomenaVersion || 0) < NAPOMENA_VER) ghLastSig = null;
+    pricesReady = true;
+    try { localStorage.setItem(KEY, JSON.stringify(cene)); localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels)); } catch (e) {}
+    refreshAfterPriceLoad();
+}
+
+// Automatsko slanje: samo kad se cene/nazivi/pravila stvarno promene.
+function ghSchedulePush() {
+    if (!pricesReady) return;
+    const c = ghLoad();
+    if (!c.auto || !c.owner || !c.repo || !c.token) return;
+    if (priceSig() === ghLastSig) return;
+    clearTimeout(ghPushTimer);
+    ghPushTimer = setTimeout(async () => {
+        if (priceSig() === ghLastSig) return;
+        if (ghPushing) { ghSchedulePush(); return; }
+        ghPushing = true;
+        try {
+            await ghPushPrices(ghLoad());
+            if ($("ghMsg")) $("ghMsg").textContent = "Cene automatski ažurirane na GitHub-u (" + new Date().toLocaleTimeString("sr-RS") + ").";
+        } catch (err) {
+            if ($("ghMsg")) $("ghMsg").textContent = "Automatsko ažuriranje cena nije uspelo: " + err.message;
+            setPriceSrc("Cene: automatsko čuvanje na GitHub nije uspelo — " + err.message);
+        } finally { ghPushing = false; }
+    }, 1500);
+}
+async function ghPushProject(c, data) {
+    const stamp = new Date().toISOString().replace(/[:.]/g,"-");
+    const name = (data.kupac || data.telefonKupca || "projekat").replace(/[^A-Za-z0-9_-]+/g, "_").slice(0,80) || "projekat";
+    const path = "projektna-historija/" + stamp + "-" + name + ".json";
+    const body = { message: "Istorija projekta: " + (data.kupac || name), content: ghB64(JSON.stringify(data, null, 2)), branch: c.branch };
+    const r = await fetch(ghApi(c, path), { method: "PUT", headers: { ...ghHeaders(c), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error("GitHub: " + r.status + " " + ((await r.json().catch(() => ({}))).message || ""));
+    return path;
+}
+async function ghRefreshProjectHistory(c) {
+    if (!c.owner || !c.repo) return;
+    const r = await fetch(ghApi(c, "projektna-historija") + "?ref=" + encodeURIComponent(c.branch), { headers: ghHeaders(c), cache: "no-store" });
+    const list = $("ghHistoryList"), msg = $("ghHistoryMsg");
+    if (!r.ok) { list.innerHTML = '<option value="">Nema sačuvanih projekata</option>'; msg.textContent = r.status === 404 ? "Mapa istorije još ne postoji." : "Istorija nije dostupna: " + r.status; return; }
+    const files = (await r.json()).filter(x => x.type === "file" && x.name.endsWith(".json")).sort((a,b) => b.name.localeCompare(a.name));
+    list.innerHTML = files.length ? files.map(f => `<option value="${f.path.replace(/"/g,"&quot;")}">${escapeHtml(f.name)}</option>`).join("") : '<option value="">Nema sačuvanih projekata</option>';
+    msg.textContent = files.length ? "Pronađeno projekata: " + files.length + "." : "Nema sačuvanih projekata.";
+}
+async function ghSaveNow(c) {
+    const btn = $("ghSaveBtn"), cfgBtn = $("ghHeaderSave"), m = $("msg"), gm = $("ghMsg");
+    btn.disabled = true; if (cfgBtn) { cfgBtn.disabled = true; cfgBtn.textContent = "💾 Čuvam…"; }
+    m.textContent = "Šaljem izmene na GitHub…";
+    clearTimeout(ghPushTimer);
+    try {
+        ghPushing = true;
+        await ghPushPrices(c);
+        localStorage.setItem(GH_KEY, JSON.stringify(c));
+        m.textContent = "Sve izmene su sačuvane na GitHub-u (" + c.path + "). Ostali uređaji ih dobijaju pri sledećem otvaranju.";
+        if (gm) gm.textContent = "Sačuvano: " + new Date().toLocaleTimeString("sr-RS");
+        ghRefreshProjectHistory(c).catch(() => {});
+    } catch (err) {
+        m.textContent = "Čuvanje na GitHub nije uspelo: " + err.message;
+        if (gm) gm.textContent = "Greška: " + err.message + " — proveri token, naziv repozitorijuma i dozvolu Contents: Read and write.";
+        $("ghSection").hidden = false;
+    } finally { ghPushing = false; btn.disabled = false; if (cfgBtn) { cfgBtn.disabled = false; cfgBtn.textContent = "💾 Sačuvaj"; } }
+}
+$("ghCfgBtn").addEventListener("click", () => {
+    const sec = $("ghSection");
+    sec.hidden = !sec.hidden;
+    if (!sec.hidden) { ghFillForm(); sec.scrollIntoView({ behavior: "smooth", block: "start" }); }
+});
+function ghSaveClick() {
+    // Ako je panel otvoren, uzmi ono što je upisano u polja.
+    const c = $("ghSection").hidden ? ghLoad() : ghReadForm();
+    if (!c.owner || !c.repo || !c.token) { $("ghSection").hidden = false; ghFillForm(); $("ghMsg").textContent = "Prvo unesi GitHub podešavanja i token."; $("ghSection").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    localStorage.setItem(GH_KEY, JSON.stringify(c));
+    ghSaveNow(c);
+}
+$("ghSaveBtn").addEventListener("click", ghSaveClick);
+$("ghHeaderSave").addEventListener("click", ghSaveClick);
+
+// Komentar i podsetnik pamte se lokalno
+(function () {
+    try {
+        $("komentar").value = localStorage.getItem("mist_komentar") || "";
+        $("podsetnik").value = localStorage.getItem("mist_podsetnik") || "";
+        $("napomenaPDF").value = fixNapomena(localStorage.getItem("mist_napomena_pdf"), localStorage.getItem("mist_napomena_ver"));
+        localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_napomena_ver", String(NAPOMENA_VER));
+        $("kontaktPDF").value = localStorage.getItem("mist_kontakt_pdf") || "+381693546820";
+    } catch (e) {}
+    $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
+    $("podsetnik").addEventListener("input", () => { try { localStorage.setItem("mist_podsetnik", $("podsetnik").value); } catch (e) {} });
+    $("napomenaPDF").addEventListener("input", () => {
+        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); } catch (e) {}
+        if (typeof ghSchedulePush === "function") ghSchedulePush();
+    });
+    $("kontaktPDF").addEventListener("input", () => {
+        try { localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
+        if (typeof ghSchedulePush === "function") ghSchedulePush();
+    });
+})();
+
+$("ghHistoryRefresh").addEventListener("click", () => {
+    const c = ghLoad();
+    if (!c.owner || !c.repo) { $("ghHistoryMsg").textContent = "Prvo unesi GitHub podešavanja."; return; }
+    ghRefreshProjectHistory(c);
+});
+$("ghHistoryLoad").addEventListener("click", async () => {
+    const c = ghLoad(), path = $("ghHistoryList").value;
+    if (!path) { $("ghHistoryMsg").textContent = "Izaberi projekat iz istorije."; return; }
+    try {
+        const headers = c.token ? { "Authorization": "Bearer " + c.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } : { "Accept": "application/vnd.github+json" };
+        const api = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) + "/contents/" + path.split("/").map(encodeURIComponent).join("/");
+        const r = await fetch(api + "?ref=" + encodeURIComponent(c.branch), { headers, cache: "no-store" });
+        if (!r.ok) throw new Error("GitHub " + r.status);
+        const data = JSON.parse(ghDecodeB64((await r.json()).content));
+        if (!data || data.format !== "mist-enterijer-project") throw new Error("Izabrani fajl nije MiSt projekat.");
+        registerArticles(data.customArticles);
+        // Cene i nazivi se NE preuzimaju iz projekta (izvor je cene.json); dopunjuju se samo artikli kojih nema.
+            Object.keys(DEF).forEach(k => { if (!(k in cene)) { const v = Number(data.cene && data.cene[k]); cene[k] = Number.isFinite(v) && data.cene[k] !== undefined ? v : DEF[k]; } });
+        Object.keys(data.priceLabels || {}).forEach(k => { if (!(k in priceLabels)) priceLabels[k] = data.priceLabels[k]; }); fixLabelNotes();
+        Object.keys(q).forEach(k => delete q[k]); Object.assign(q, data.q || {});
+        ST.forEach(item => { if (!(item[0] in q)) q[item[0]] = 0; });
+        spec = { ...spec, ...(data.spec || {}) };
+        spec.escajgSirina = normalizeEscajgWidth(spec.escajgSirina); if (spec.maticK && !spec.matice) spec.matice = spec.maticK; delete spec.maticK;
+        fin = { ...fin, ...(data.fin || {}) };
+        manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
+        KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
+        customCsvRules = normalizeRules(data.customCsvRules); lastCsvParts = null;
+        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...(data.builtinCsvRules || {}) };
+        $("kupac").value = data.kupac || "";
+        $("telefonKupca").value = data.telefonKupca || data.telefon || "";
+        $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
+        $("napomenaPDF").value = fixNapomena(data.napomenaPDF, data.napomenaVersion);
+        $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
+        $("verzija").value = data.verzija || "m";
+        $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; syncFolds(); elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(normalizujElement); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
+        saveCustomRules(); save();
+        buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
+        buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
+        $("ghHistoryMsg").textContent = "Projekat je uspešno učitan iz GitHub istorije.";
+        $("msg").textContent = "Projekat iz GitHub istorije je učitan.";
+    } catch (err) { $("ghHistoryMsg").textContent = "Učitavanje projekta nije uspelo: " + err.message; }
+});
+
+
+// Pri svakom pokretanju sve količine i iznosi projekta su prazni (cene i podešavanja ostaju).
+customArticles.forEach(a => a.qty = 0);
+customCsvRules.forEach(r => { r.matches = 0; r.items.forEach(i => i.qty = 0); r.newItems.forEach(i => i.qty = 0); });
+fin.tapacirani = 0; fin.manualOkov = null; manualSum.okov = null; manualSum.mat = null;
+
+buildOkov();
+buildFin();
+buildCene();
+
+buildBuiltinCsvRulesEditor();
+buildCustomRulesEditor();
+buildCustomCsvItems();
+buildNewArticles();
+
+buildKl();
+buildSpecijalno();
+buildAmerickiPlakar();
+buildElementi();
+calc();
+refreshNbsRate();
+// Zajednički cene.json se učitava na svakom računaru (posle toga se sve ponovo iscrta).
+syncFolds();
+loadSharedPrices().finally(() => {
+    const gs = ghLoad();
+    if (gs.owner && gs.repo && gs.token) ghRefreshProjectHistory(gs).catch(() => {});
+});
+
+/* Service worker not required in single-file version */
+</script>
+</body>
+</html>
