@@ -183,6 +183,158 @@
             .brand-container { flex-direction: column; }
             .file-top { width: 100%; justify-content: center; box-sizing: border-box; }
         }
+
+        /* ================= NOVI DIZAJN: tamna tema, pozadina u dezenu tamnog drveta ================= */
+        :root, :root:not([data-theme="light"]) {
+            --bg: rgba(0, 0, 0, 0.28);
+            --card: rgba(26, 22, 19, 0.88);
+            --tx: #f1ebe3;
+            --mu: #b8ab99;
+            --bd: rgba(255, 236, 210, 0.10);
+            --oak: #d2a964;
+            --ink: #d2a964;
+            --on: #1b1510;
+            --tot: #d2a964;
+            --totx: #1b1510;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            color-scheme: dark;
+        }
+        html, body {
+            background-color: #2b1d13;
+            background-image:
+                repeating-linear-gradient(91deg, rgba(0,0,0,0.16) 0 2px, transparent 2px 7px),
+                repeating-linear-gradient(89deg, rgba(255,210,150,0.045) 0 1px, transparent 1px 19px),
+                repeating-linear-gradient(90.5deg, rgba(0,0,0,0.10) 0 9px, transparent 9px 41px),
+                linear-gradient(90deg, #3b2818 0%, #2a1b11 18%, #3a2718 37%, #24170f 58%, #3d2919 79%, #2b1c12 100%);
+            background-attachment: fixed;
+            color: var(--tx);
+        }
+        main { max-width: 920px; padding: 20px 16px 110px; }
+        section, .header-wrap {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        section { padding: 18px 22px; margin-bottom: 14px; }
+        h1 { color: var(--tx); font-weight: 600; letter-spacing: 0; }
+        h2, details > summary { color: var(--oak); }
+        h2 { font-size: 1.05rem; letter-spacing: .01em; }
+        details > summary { font-size: 1.02rem; padding: 2px 0; }
+        .sub, .msg { color: var(--mu); }
+        .logo-container { background: #fff; border-color: rgba(210,169,100,.45); }
+        input, select, textarea { background: rgba(0,0,0,0.30); border-color: rgba(255,236,210,0.14); color: var(--tx); border-radius: 8px; }
+        input:focus, select:focus, textarea:focus { border-color: var(--oak); box-shadow: 0 0 0 3px rgba(210,169,100,0.22); }
+        button { border-radius: 8px; }
+        button.alt, .file-top { background: rgba(255,255,255,0.04); color: var(--tx); border: 1px solid rgba(255,236,210,0.16); }
+        button.alt:hover, .file-top:hover { background: rgba(210,169,100,0.12); border-color: rgba(210,169,100,0.5); }
+        .file-top { border-style: solid; }
+        .row, .spec-row, .price-edit-row, .rule-row, .custom-item-row, .elem-spec-row { border-color: var(--bd); }
+        .rule-card { background: rgba(0,0,0,0.22); border-color: var(--bd); border-radius: 10px; }
+        .tot { border-radius: 10px; }
+        .price-category { color: var(--oak); }
+
+        /* Zaglavlje: glavna dugmad + meni ⋯ Više */
+        .header-actions { align-items: center; }
+        .more-menu { position: relative; }
+        .more-menu > summary { list-style: none; cursor: pointer; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,236,210,0.16); background: rgba(255,255,255,0.04); color: var(--tx); font-weight: 600; font-size: .84rem; white-space: nowrap; }
+        .more-menu > summary::-webkit-details-marker { display: none; }
+        .more-menu[open] > summary { border-color: var(--oak); }
+        .more-pop { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; min-width: 230px; display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 12px; background: #1e1915; border: 1px solid rgba(255,236,210,0.14); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+        .more-pop button { width: 100%; text-align: left; justify-content: flex-start; }
+
+        /* Traka na dnu */
+        #bottomBar {
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+            max-width: 920px; margin: 0 auto 10px; padding: 10px 16px;
+            width: calc(100% - 32px); box-sizing: border-box;
+            background: rgba(20, 16, 13, 0.94); border: 1px solid rgba(210,169,100,0.35); border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .bb-total { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        .bb-label { font-size: .75rem; letter-spacing: .08em; color: var(--mu); font-weight: 600; }
+        .bb-din { font-size: 1.35rem; font-weight: 700; color: var(--oak); font-variant-numeric: tabular-nums; }
+        .bb-eur { font-size: .9rem; color: var(--mu); font-variant-numeric: tabular-nums; }
+        .bb-actions { display: flex; gap: 8px; }
+        .bb-actions button { padding: 9px 16px; }
+        #ghHeaderSave { background: rgba(255,255,255,0.06); color: var(--tx); border: 1px solid rgba(255,236,210,0.2); }
+        .bb-pdf { background: var(--oak); color: var(--on); border-color: var(--oak); }
+        @media (max-width: 600px) {
+            #bottomBar { margin-bottom: 6px; width: calc(100% - 12px); padding: 8px 10px; }
+            .bb-din { font-size: 1.15rem; }
+            .bb-actions { width: 100%; }
+            .bb-actions button { flex: 1; }
+            main { padding-bottom: 150px; }
+            .more-pop { left: auto; right: 0; }
+        }
+        @media print { #bottomBar { display: none; } }
+
+        /* Poruka o izvozu se vidi samo kad ima šta da javi (npr. blokiran prozor za štampu) */
+        #izmsg:empty { display: none; }
+        #infoSection .msg { margin: 4px 0; font-size: .85rem; }
+        #toastMsg { position: fixed; left: 50%; transform: translateX(-50%); bottom: 86px; z-index: 50; max-width: min(560px, calc(100% - 32px)); padding: 9px 14px; border-radius: 10px; background: #1e1915; color: var(--tx); border: 1px solid rgba(210,169,100,0.45); box-shadow: 0 8px 24px rgba(0,0,0,0.5); font-size: .85rem; }
+        #toastMsg[hidden] { display: none; }
+
+        /* Finansije: 8 polja u dva reda (4 kolone), natpis iznad polja */
+        #fin { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 12px; }
+        #fin .row { padding: 0; border: 0; display: block; }
+        #fin .row > label { flex-direction: column !important; align-items: stretch !important; justify-content: flex-start !important; gap: 4px; font-size: .8rem; font-weight: 500; color: var(--mu); }
+        #fin .row > label > span { font-weight: 500 !important; font-size: .8rem; line-height: 1.25; min-height: 2.5em; display: flex; align-items: flex-end; }
+        #fin input[type=number] { width: 100% !important; box-sizing: border-box; text-align: right; }
+        #fin #okovMarkupSel { width: 5.2em; flex: 0 0 auto; padding-left: 4px; padding-right: 2px; }
+        #fin .row > label > div { flex-wrap: nowrap !important; gap: 6px !important; justify-content: stretch !important; }
+        #fin #finOkovInput { flex: 1 1 auto; min-width: 0; width: auto !important; }
+        @media (max-width: 700px) { #fin { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+        /* UKUPNO Din i Eur u jednoj liniji, podeljeno na dva dela */
+        .tot-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .tot-row .tot { margin-top: 0; padding: 9px 14px; font-size: 1.05rem; }
+
+        /* v12: zaglavlje sa kursom desno */
+        /* Zaglavlje iznad ostalih kartica, da padajući meni „Više“ ne ode ispod sledeće sekcije */
+        .header-wrap { position: relative; z-index: 30; }
+        .header-wrap { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 18px; align-items: start !important; }
+        .header-wrap .brand-container { grid-column: 1; }
+        .header-wrap .header-actions { grid-column: 1; }
+        .rate-box { grid-column: 2; grid-row: 1 / span 2; align-self: start; min-width: 168px; padding: 10px 12px !important; border: 1px solid rgba(210,169,100,0.30); border-top: 1px solid rgba(210,169,100,0.30) !important; border-radius: 12px; background: rgba(0,0,0,0.25); text-align: right; }
+        .rate-main { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .rate-cap { font-size: .72rem; letter-spacing: .08em; color: var(--mu); font-weight: 600; }
+        #nbsRateLabel { font-size: 1.25rem; color: var(--oak); font-variant-numeric: tabular-nums; }
+        .rate-refresh { padding: 3px 8px !important; font-size: .9rem; line-height: 1.2; }
+        .rate-sub { font-size: .72rem; color: var(--mu); margin-top: 3px; font-variant-numeric: tabular-nums; }
+        .rate-sub b { color: var(--tx); font-weight: 600; }
+
+        /* Podaci o kupcu: jedan red */
+        .info-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.2fr); gap: 10px; }
+        .info-grid label { display: flex; flex-direction: column; gap: 4px; font-size: .8rem; color: var(--mu); font-weight: 500; }
+        .info-grid input { width: 100%; box-sizing: border-box; text-align: left; }
+        #projectInfoSection h2 { margin-bottom: 8px; }
+
+        /* Napomena, komentar, podsetnik kao dugmad koja se otvaraju */
+        .fold { margin: 8px 0; border: 1px solid rgba(255,236,210,0.14); border-radius: 10px; background: rgba(0,0,0,0.18); }
+        .fold > summary { list-style: none; cursor: pointer; padding: 9px 12px; font-size: .9rem; font-weight: 600; color: var(--tx); }
+        .fold > summary::-webkit-details-marker { display: none; }
+        .fold > summary::after { content: "▸"; float: right; color: var(--mu); }
+        .fold[open] > summary::after { content: "▾"; }
+        .fold[open] > summary { border-bottom: 1px solid var(--bd); color: var(--oak); }
+        .fold textarea { display: block; width: calc(100% - 20px); margin: 10px; box-sizing: border-box; }
+        .fold-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; align-items: start; }
+
+        /* PDF meni u traci: otvara se nagore */
+        .pdf-menu > summary.bb-pdf { padding: 9px 16px; border-radius: 8px; background: var(--oak); color: var(--on); border: 1px solid var(--oak); font-weight: 700; }
+        .pop-up { top: auto; bottom: calc(100% + 8px); left: auto; right: 0; }
+
+        @media (max-width: 700px) {
+            .header-wrap { grid-template-columns: 1fr; }
+            .rate-box { grid-column: 1; grid-row: auto; text-align: left; }
+            .rate-main { justify-content: flex-start; }
+            .info-grid, .fold-row { grid-template-columns: 1fr; }
+            .pdf-menu { flex: 1; }
+            .pdf-menu > summary.bb-pdf { text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -201,34 +353,53 @@
             <label class="file-top">📂 Učitaj CSV krojnu listu<input type="file" id="csv" accept=".csv,text/csv,text/plain"></label>
             <button type="button" class="alt" id="saveProjectBtn">💾 Sačuvaj projekat</button>
             <label class="file-top">📁 Učitaj sačuvani projekat<input type="file" id="loadProjectFile" accept=".json,application/json"></label>
-            <button type="button" class="danger" id="resetProjectBtn">↺ Reset svih polja</button>
-            <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
-            <button type="button" id="ghHeaderSave" title="Sačuvaj cene, nazive, artikle, pravila i napomenu na GitHub (cene.json)">💾 Sačuvaj</button>
-            <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub</button>
-            <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
-            <div class="msg" id="appVersion" style="font-size: 0.7rem; opacity:.75">Verzija aplikacije: 2026-11-25 · v10 (PDF na 1 A4, trebovanje sa komentarom)</div>
+            <details class="more-menu" id="moreMenu">
+                <summary class="more-btn" title="Više opcija">☰ Više ▾</summary>
+                <div class="more-pop">
+                    <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
+                    <button type="button" class="alt" id="settingsBtn">⚙ Podešavanja (kontakt)</button>
+                    <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub podešavanja</button>
+                    <button type="button" class="alt" id="infoBtn">ℹ Info</button>
+                    <button type="button" class="danger" id="resetProjectBtn">↺ Reset svih polja</button>
+                </div>
+            </details>
         </div>
-        <div class="top-rate">
-            <div class="rate-line">
-                <strong>Srednji kurs NBS:</strong>
-                <span id="nbsRateLabel">Učitavanje kursa...</span>
-                <button type="button" class="alt" id="refreshRateBtn">↻ Osveži kurs</button>
+        <!-- Kurs EUR (NBS), desno u zaglavlju -->
+        <div class="top-rate rate-box" id="rateBox" title="Kurs se preuzima iz zvanične kursne liste NBS. Obračun koristi srednji kurs.">
+            <div class="rate-main">
+                <span class="rate-cap">EUR</span>
+                <b id="nbsRateLabel">…</b>
+                <button type="button" class="alt rate-refresh" id="refreshRateBtn" title="Osveži kurs" aria-label="Osveži kurs">↻</button>
             </div>
-            <div class="rate-line" id="nbsBuySell" style="margin-top:4px;font-size:.88rem">
-                <span>Kupovni: <b id="nbsBuy">—</b></span>
-                <span>Prodajni: <b id="nbsSell">—</b></span>
-                <span class="msg" style="margin:0">(devizni kurs NBS, samo za prikaz — obračun koristi srednji kurs)</span>
-            </div>
-            <p class="msg" id="nbsRateMsg">Kurs se preuzima iz zvanične kursne liste NBS.</p>
-            <p class="msg" id="priceSrcMsg" aria-live="polite">Cene: učitavanje...</p>
+            <div class="rate-sub">srednji kurs NBS</div>
+            <div class="rate-sub" id="nbsBuySell">kup. <b id="nbsBuy">—</b> · prod. <b id="nbsSell">—</b></div>
+            <p class="msg" id="nbsRateMsg" hidden></p>
         </div>
     </div>
 
     <section id="projectInfoSection">
         <h2>Podaci o projektu i kupcu</h2>
-        <div class="row"><label for="kupac">Naziv projekta / kupac</label><input id="kupac" type="text" style="width:14em;text-align:left" placeholder="Naziv projekta ili kupca"></div>
-        <div class="row"><label for="telefonKupca">Broj telefona kupca</label><input id="telefonKupca" type="tel" style="width:14em;text-align:left" placeholder="+381..." autocomplete="tel"></div>
-        <div class="row"><label for="rokIsporuke">Dogovoreni rok isporuke / izrade</label><input id="rokIsporuke" type="text" style="width:14em;text-align:left" placeholder="Npr. 30 dana"></div>
+        <div class="info-grid">
+            <label>Naziv projekta / kupac<input id="kupac" type="text" placeholder="Naziv projekta ili kupca"></label>
+            <label>Telefon kupca<input id="telefonKupca" type="tel" placeholder="+381..." autocomplete="tel"></label>
+            <label>Rok isporuke / izrade<input id="rokIsporuke" type="text" placeholder="Npr. 30 dana"></label>
+        </div>
+    </section>
+
+    <section id="infoSection" hidden>
+        <h2>Info</h2>
+        <div class="msg" id="msg">Fajlovi se obrađuju lokalno.</div>
+        <div class="msg" id="priceSrcMsg" aria-live="polite">Cene: učitavanje...</div>
+        <div class="msg" id="appVersion">Verzija aplikacije: 2026-11-25 · v18 (Finansije u dva reda)</div>
+    </section>
+
+    <section id="settingsSection" hidden>
+        <h2>Podešavanja</h2>
+        <div class="row">
+            <label for="kontaktPDF">Kontakt broj u PDF-u</label>
+            <input id="kontaktPDF" type="tel" style="width:14em;text-align:left" value="+381693546820" autocomplete="tel">
+        </div>
+        <p class="msg">Kontakt broj se štampa u ponudi i internom obračunu i čuva se u cene.json (dugme 💾 Sačuvaj).</p>
     </section>
 
     <section id="ghSection" hidden>
@@ -341,48 +512,70 @@
     <section class="sum">
         <h2>Obračun</h2>
         <div id="sum"></div>
-        <div class="tot"><span>UKUPNO Din</span><span id="tdin">0</span></div>
-        <div class="tot"><span>UKUPNO Eur</span><span id="teur">0,00</span></div>
+        <div class="tot-row">
+            <div class="tot"><span>UKUPNO Din</span><span id="tdin">0</span></div>
+            <div class="tot"><span>UKUPNO Eur</span><span id="teur">0,00</span></div>
+        </div>
     </section>
 
     <section>
-        <h2>Izvoz za mušteriju</h2>
-        <div class="row">
+        <h2>Napomene za PDF</h2>
+        <!-- Verziju PDF-a bira meni „📄 PDF“ u traci na dnu; polje ostaje skriveno zbog obračuna. -->
+        <div class="row" style="display:none">
             <label for="verzija">Verzija</label>
             <select id="verzija" style="width: 14em">
                 <option value="m">Za mušteriju</option>
                 <option value="i">Interna (sa zaradom)</option>
             </select>
         </div>
-        <div class="row" style="flex-direction:column;align-items:stretch">
-            <label for="napomenaPDF">Napomena koja se štampa u oba PDF fajla</label>
+        <details class="fold" id="napomenaBox">
+            <summary>📝 Napomena za PDF <span class="rule-badge">(štampa se u oba PDF-a)</span></summary>
             <textarea id="napomenaPDF" spellcheck="true" style="min-height:190px;font-family:inherit;font-size:.95rem">Cena obuhvata izradu nameštaja po meri od oplemenjene iverice, kompletan potreban okov, profesionalno kantovanje, kao i samu izradu.
 Dodatni troškovi i uslovi:
 
 * Prevoz, unos i montaža: Prevoz se obračunava dodatno, u skladu sa lokacijom i obimom posla (po dogovoru).
 * Avans i početak rada: Pre početka izrade projekta uplaćuje se avans u iznosu od 100 € (u dinarskoj protivvrednosti po srednjem kursu NBS na dan uplate, ili prema dogovoru). Uplaćeni avans se u celosti odbija od konačne cene izrade.
 * Rok izrade: Rok izrade se precizno definiše nakon konačne potvrde tehničkog nacrta/projekta i uplate dogovorenog avansa, a zavisi od trenutne opterećenosti proizvodnje i složenosti elemenata.</textarea>
-        </div>
-        <div class="row">
-            <label for="kontaktPDF">Kontakt broj u PDF-u</label>
-            <input id="kontaktPDF" type="tel" style="width:14em;text-align:left" value="+381693546820" autocomplete="tel">
-        </div>
-        <div class="row" style="flex-direction:column;align-items:stretch">
-            <label for="komentar">Komentar (štampa se na kraju PDF-a)</label>
-            <textarea id="komentar" spellcheck="true" style="min-height:80px;font-family:inherit;font-size:.95rem" placeholder="Npr. rok izrade, način plaćanja, napomene o materijalu…"></textarea>
-        </div>
-        <div class="row" style="flex-direction:column;align-items:stretch">
-            <label for="podsetnik">Podsetnik (štampa se na kraju PDF-a)</label>
-            <textarea id="podsetnik" spellcheck="true" style="min-height:80px;font-family:inherit;font-size:.95rem" placeholder="Npr. proveriti mere na licu mesta, naručiti staklo…"></textarea>
+        </details>
+        <div class="fold-row">
+            <details class="fold" id="komentarBox">
+                <summary>💬 Komentar <span class="rule-badge">(kraj PDF-a i trebovanje)</span></summary>
+                <textarea id="komentar" spellcheck="true" style="min-height:80px;font-family:inherit;font-size:.95rem" placeholder="Npr. rok izrade, način plaćanja, napomene o materijalu…"></textarea>
+            </details>
+            <details class="fold" id="podsetnikBox">
+                <summary>📌 Podsetnik <span class="rule-badge">(kraj PDF-a i trebovanje)</span></summary>
+                <textarea id="podsetnik" spellcheck="true" style="min-height:80px;font-family:inherit;font-size:.95rem" placeholder="Npr. proveriti mere na licu mesta, naručiti staklo…"></textarea>
+            </details>
         </div>
         <div class="btns">
-            <button id="izvoz" disabled>Izvezi tekstualni fajl</button> 
-            <button id="pdfBtn" disabled class="alt">Izvezi kao PDF</button>
-            <button id="trebovanjePdfBtn" disabled class="alt">Štampaj trebovanje (PDF)</button>
+            <!-- Izvozi su u meniju „📄 PDF“ u traci na dnu; dugmad ostaju skrivena zbog postojećeg koda. -->
+            <button id="izvoz" disabled hidden>Izvezi tekstualni fajl</button>
+            <button id="pdfBtn" disabled hidden class="alt">Izvezi kao PDF</button>
+            <button id="trebovanjePdfBtn" disabled hidden class="alt">Štampaj trebovanje (PDF)</button>
         </div>
-        <p class="msg" id="izmsg">Priprema izvoza...</p>
+        <p class="msg" id="izmsg" style="margin:4px 0 0"></p>
     </section>
 </main>
+
+<!-- Traka na dnu ekrana: uvek vidljiva ukupna cena i glavne akcije -->
+<div id="bottomBar" role="region" aria-label="Ukupno i akcije">
+    <div class="bb-total">
+        <span class="bb-label">UKUPNO</span>
+        <span class="bb-din"><span id="barDin">0</span> Din</span>
+        <span class="bb-eur">≈ <span id="barEur">0</span> €</span>
+    </div>
+    <div class="bb-actions">
+        <button type="button" id="ghHeaderSave" title="Sačuvaj cene, nazive, artikle, pravila i napomenu na GitHub (cene.json)">💾 Sačuvaj</button>
+        <details class="more-menu pdf-menu" id="pdfMenu">
+            <summary class="bb-pdf" title="Izaberi koji PDF da se napravi">📄 PDF ▾</summary>
+            <div class="more-pop pop-up">
+                <button type="button" class="alt" data-pdf="m">🧾 Ponuda za mušteriju</button>
+                <button type="button" class="alt" data-pdf="i">📊 Interni obračun</button>
+                <button type="button" class="alt" data-pdf="t">📦 Trebovanje materijala</button>
+            </div>
+        </details>
+    </div>
+</div>
 
 <script>
 // Podrazumevana napomena za oba PDF-a (stari tekst se automatski zamenjuje novim).
@@ -997,7 +1190,8 @@ function buildFin() {
     marks.forEach(p => {
         const o = document.createElement("option");
         o.value = p;
-        o.textContent = "uvećanje " + p + "%";
+        o.textContent = "+" + p + "%";
+        o.title = "uvećanje okova " + p + "%";
         if (p === cur) o.selected = true;
         okovSel.appendChild(o);
     });
@@ -1208,6 +1402,7 @@ function calc() {
 
     $("tdin").textContent = fmt(T.din);
     $("teur").textContent = fmt(T.eur);
+    if ($("barDin")) { $("barDin").textContent = fmt(T.din); $("barEur").textContent = fmt(T.eur); }
     applyLabels();
     if (typeof renderElemSpec === "function") renderElemSpec();
     renderOkovSazetak();
@@ -1651,7 +1846,7 @@ $("loadProjectFile").addEventListener("change", event => {
             $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
             try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
             $("verzija").value = data.verzija || "m";
-            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(normalizujElement); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
+            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; syncFolds(); elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(normalizujElement); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
             saveCustomRules(); save();
             buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
             buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles();calc();
@@ -1680,7 +1875,7 @@ $("resetProjectBtn").addEventListener("click", () => {
     elementi = []; elemApplied = elemPrazno(); saveElementi(); buildElementi();
     customArticles.forEach(a => a.qty = 0);
     customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
-    $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("napomenaPDF").value = NAPOMENA_DEF; $("kontaktPDF").value = "+381693546820"; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); localStorage.removeItem("mist_napomena_pdf"); localStorage.removeItem("mist_kontakt_pdf"); } catch (e) {}
+    $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("napomenaPDF").value = NAPOMENA_DEF; $("kontaktPDF").value = "+381693546820"; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; syncFolds(); try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); localStorage.removeItem("mist_napomena_pdf"); localStorage.removeItem("mist_kontakt_pdf"); } catch (e) {}
     buildOkov(); buildFin(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
     buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
     $("msg").textContent = "Obračun je resetovan. Cenovnik i CSV pravila su sačuvani.";
@@ -1717,7 +1912,7 @@ $("csv").addEventListener("change", e => {
 async function refreshNbsRate() {
     const label = $("nbsRateLabel"), msg = $("nbsRateMsg"), btn = $("refreshRateBtn");
     if (btn) btn.disabled = true;
-    if (label) label.textContent = "Preuzimam...";
+    if (label) label.textContent = "…";
     try {
         const response = await fetch("./kurs.json?v=" + Date.now(), { cache: "no-store" });
         if (!response.ok) throw new Error("kurs.json nije dostupan (" + response.status + ")");
@@ -1733,12 +1928,14 @@ async function refreshNbsRate() {
             if (inp) inp.value = rate.toFixed(4);
         }
         save(); calc();
-        if (label) label.textContent = rate.toFixed(4) + " RSD za 1 EUR";
+        if (label) label.textContent = rate.toFixed(4).replace(".", ",");
         if (msg) msg.textContent = "Srednji kurs NBS, važi od " + (data.validFrom || data.date || "datuma iz kursne liste") + (data.listNumber ? " · kursna lista br. " + data.listNumber : "") + ".";
+        if ($("rateBox") && msg) $("rateBox").title = msg.textContent + " Obračun koristi srednji kurs.";
         refreshBuySellRate(data);
     } catch (err) {
-        if (label) label.textContent = "Poslednji sačuvani kurs: " + Number(fin.kurs).toFixed(4) + " RSD";
+        if (label) label.textContent = Number(fin.kurs).toFixed(4).replace(".", ",") + "*";
         if (msg) msg.textContent = "Nije moguće preuzeti najnoviji kurs. Zadržan je poslednji poznati kurs. " + err.message;
+        if ($("rateBox") && msg) $("rateBox").title = "* " + msg.textContent;
         refreshBuySellRate(null);
     } finally { if (btn) btn.disabled = false; }
 }
@@ -1750,8 +1947,8 @@ async function refreshBuySellRate(kursJson) {
     const buyEl = $("nbsBuy"), sellEl = $("nbsSell");
     if (!buyEl || !sellEl) return;
     const show = (buy, sell) => {
-        buyEl.textContent = Number.isFinite(buy) && buy > 0 ? buy.toFixed(4) + " RSD" : "nije dostupan";
-        sellEl.textContent = Number.isFinite(sell) && sell > 0 ? sell.toFixed(4) + " RSD" : "nije dostupan";
+        buyEl.textContent = Number.isFinite(buy) && buy > 0 ? buy.toFixed(4).replace(".", ",") : "—";
+        sellEl.textContent = Number.isFinite(sell) && sell > 0 ? sell.toFixed(4).replace(".", ",") : "—";
     };
     let buy = kursJson ? Number(kursJson.eurBuyingRate) : NaN;
     let sell = kursJson ? Number(kursJson.eurSellingRate) : NaN;
@@ -2285,6 +2482,62 @@ $("izvoz").onclick = async () => {
 };
 
 $("pdfBtn").onclick = stampajPDF;
+// PDF meni u traci na dnu: ponuda za mušteriju, interni obračun ili trebovanje.
+$("pdfMenu").addEventListener("click", e => {
+    const b = e.target.closest("button[data-pdf]");
+    if (!b) return;
+    $("pdfMenu").open = false;
+    if (b.dataset.pdf === "t") { stampajTrebovanjePDF(); return; }
+    $("verzija").value = b.dataset.pdf;
+    stampajPDF();
+});
+$("infoBtn").addEventListener("click", () => {
+    const sec = $("infoSection");
+    sec.hidden = !sec.hidden;
+    if (!sec.hidden) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+// Poruke o radnjama (CSV, čuvanje, greške) su u Info; kratko se prikažu i iznad trake na dnu.
+(function () {
+    const toast = document.createElement("div");
+    toast.id = "toastMsg"; toast.setAttribute("role", "status"); toast.hidden = true;
+    document.body.appendChild(toast);
+    let tmr = null, pocetak = true;
+    setTimeout(() => { pocetak = false; }, 2500); // poruke pri otvaranju stranice se ne prikazuju
+    new MutationObserver(() => {
+        const t = $("msg").textContent.trim();
+        if (!t || pocetak) return;
+        toast.textContent = t; toast.hidden = false;
+        clearTimeout(tmr); tmr = setTimeout(() => { toast.hidden = true; }, 4500);
+    }).observe($("msg"), { childList: true, characterData: true, subtree: true });
+})();
+$("settingsBtn").addEventListener("click", () => {
+    const sec = $("settingsSection");
+    sec.hidden = !sec.hidden;
+    if (!sec.hidden) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+// Meniji („⋯ Više“, „PDF“): zatvaraju se posle izbora stavke ili klika van menija.
+$("moreMenu").addEventListener("click", e => { if (e.target.closest(".more-pop button")) $("moreMenu").open = false; });
+document.addEventListener("click", e => {
+    document.querySelectorAll("details.more-menu[open]").forEach(m => { if (!m.contains(e.target)) m.open = false; });
+});
+
+// Komentar i podsetnik: otvoreni kad imaju tekst, skupljeni u dugme kad su prazni.
+function syncFolds() {
+    [["komentarBox", "komentar"], ["podsetnikBox", "podsetnik"]].forEach(([boxId, taId]) => {
+        const box = $(boxId), ta = $(taId);
+        if (box && ta) box.open = !!ta.value.trim();
+    });
+}
+[["komentarBox", "komentar"], ["podsetnikBox", "podsetnik"]].forEach(([boxId, taId]) => {
+    const box = $(boxId), ta = $(taId);
+    // Dok ima teksta, ne sme da se skupi.
+    box.addEventListener("toggle", () => {
+        if (!box.open && ta.value.trim()) box.open = true;
+        if (box.open && !ta.value.trim()) setTimeout(() => ta.focus(), 0);
+    });
+    // Prazno polje se skupi kad se napusti.
+    ta.addEventListener("blur", () => { if (!ta.value.trim()) box.open = false; });
+});
 $("trebovanjePdfBtn").onclick = stampajTrebovanjePDF;
 
 (async () => {
@@ -2294,7 +2547,7 @@ $("trebovanjePdfBtn").onclick = stampajTrebovanjePDF;
     $("izvoz").disabled = false; 
     $("pdfBtn").disabled = false; 
     $("trebovanjePdfBtn").disabled = false;
-    $("izmsg").textContent = "Izaberi verziju i pritisni dugme za izvoz.";
+    $("izmsg").textContent = "";
 })();
 
 // ===== Obračun po elementima (u razvoju) =====
@@ -2626,252 +2879,4 @@ async function ghPushPrices(c) {
     setPriceSrc("Cene: sačuvane na GitHub-u " + new Date().toLocaleString("sr-RS") + ". Ostali uređaji ih vide za 1–2 minuta.");
 }
 function ghDecodeB64(value) {
-    return decodeURIComponent(Array.prototype.map.call(atob(value.replace(/\n/g, "")), ch => "%" + ("00" + ch.charCodeAt(0).toString(16)).slice(-2)).join(""));
-}
-async function ghFetchRemotePayload(c) {
-    const r = await fetch(ghApi(c, c.path) + "?ref=" + encodeURIComponent(c.branch), { headers: ghHeaders(c), cache: "no-store" });
-    if (!r.ok) throw new Error("GitHub " + r.status);
-    return JSON.parse(ghDecodeB64((await r.json()).content));
-}
-
-// Primena sadržaja cene.json na aplikaciju.
-function applyPricePayload(payload) {
-    if (!payload || typeof payload !== "object") return false;
-    if (Array.isArray(payload.customArticles)) registerArticles(payload.customArticles);
-    if (payload.cene && typeof payload.cene === "object") {
-        const nc = { ...DEF };
-        Object.keys(DEF).forEach(k => {
-            const raw = payload.cene[k];
-            const v = Number(raw);
-            if (raw !== undefined && raw !== null && raw !== "" && Number.isFinite(v) && v >= 0) nc[k] = v;
-        });
-        cene = nc;
-    }
-    if (payload.nazivi && typeof payload.nazivi === "object") {
-        priceLabels = { ...PRICE_LABELS };
-        Object.keys(payload.nazivi).forEach(k => {
-            if (typeof payload.nazivi[k] === "string" && payload.nazivi[k].trim()) priceLabels[k] = payload.nazivi[k].trim();
-        });
-        fixLabelNotes();
-    }
-    if (Array.isArray(payload.customCsvRules)) {
-        const nr = normalizeRules(payload.customCsvRules);
-        // količine iz trenutno učitanog CSV-a ostaju
-        customCsvRules = nr;
-        applyCustomRules();
-    }
-    if (payload.builtinCsvRules && typeof payload.builtinCsvRules === "object" && !Array.isArray(payload.builtinCsvRules)) {
-        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...payload.builtinCsvRules };
-    }
-    if (Number.isFinite(Number(payload.okovProc))) fin.okovProc = Number(payload.okovProc);
-    if (Number.isFinite(Number(payload.procZarade)) && Number(payload.procZarade) > 0) fin.proc = Number(payload.procZarade);
-    if (typeof payload.napomenaPDF === "string") {
-        $("napomenaPDF").value = fixNapomena(payload.napomenaPDF, payload.napomenaVersion);
-        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_napomena_ver", String(NAPOMENA_VER)); } catch (e) {}
-    }
-    const kontakt = typeof payload.kontaktPDF === "string" ? payload.kontaktPDF : (typeof payload.telefon === "string" ? payload.telefon : "");
-    if (kontakt.trim()) {
-        $("kontaktPDF").value = kontakt;
-        try { localStorage.setItem("mist_kontakt_pdf", kontakt); } catch (e) {}
-    }
-    return true;
-}
-function setPriceSrc(text) {
-    const el = $("priceSrcMsg");
-    if (el) el.textContent = text;
-}
-function refreshAfterPriceLoad() {
-    manualSum.okov = null; manualSum.mat = null;
-    buildFin(); buildCene(); buildNewArticles();
-    buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems();
-    buildSpecijalno(); buildAmerickiPlakar();
-    if (typeof buildElementi === "function") buildElementi();
-    calc();
-}
-
-async function loadSharedPrices() {
-    const c = ghLoad();
-    let pushedAt = "";
-    try { pushedAt = localStorage.getItem(PUSHED_AT_KEY) || ""; } catch (e) {}
-    let payload = null, src = "";
-    setPriceSrc("Cene: učitavam cene.json...");
-    // 1) Računar sa tokenom: direktno sa GitHub-a (bez čekanja na objavu GitHub Pages).
-    if (c.owner && c.repo && c.token) {
-        try { payload = await ghFetchRemotePayload(c); src = "GitHub-a"; } catch (e) { payload = null; }
-    }
-    // 2) Računar bez tokena: direktno sa GitHub-a (javni repozitorijum, odmah poslednja verzija).
-    if (!payload && c.owner && c.repo) {
-        try { payload = await ghFetchRemotePayload({ ...c, token: "" }); src = "GitHub-a"; } catch (e) { payload = null; }
-    }
-    // 3) Rezerva: cene.json koji stoji pored index.html (GitHub Pages).
-    if (!payload) {
-        try {
-            const r = await fetch("./" + String(c.path || "cene.json").replace(/^\/+/, "") + "?v=" + Date.now(), { cache: "no-store" });
-            if (r.ok) { payload = await r.json(); src = "cene.json"; }
-        } catch (e) { payload = null; }
-    }
-    const remoteAt = payload ? String(payload.savedAt || payload.updatedAt || "") : "";
-    let stale = false;
-    if (payload && pushedAt && remoteAt && remoteAt < pushedAt) { payload = null; stale = true; }
-
-    if (payload && applyPricePayload(payload)) {
-        setPriceSrc("Cene: učitane iz " + src + (remoteAt ? " (sačuvane " + new Date(remoteAt).toLocaleString("sr-RS") + ")" : "") + ".");
-    } else if (stale) {
-        setPriceSrc("Cene: prikazane su cene koje si upravo sačuvao na ovom uređaju. GitHub Pages još objavljuje novi cene.json (1–2 min).");
-    } else if (location.protocol === "file:") {
-        setPriceSrc("Cene: fajl je otvoren sa diska, pa cene.json nije dostupan. Koriste se cene sačuvane na ovom uređaju. Otvori aplikaciju preko GitHub Pages linka.");
-    } else {
-        setPriceSrc("Cene: cene.json nije pronađen. Koriste se cene sačuvane na ovom uređaju.");
-    }
-    ghLastSig = priceSig();
-    // cene.json sa starom napomenom: na računaru sa automatskim čuvanjem odmah upiši novu napomenu.
-    if (payload && Number(payload.napomenaVersion || 0) < NAPOMENA_VER) ghLastSig = null;
-    pricesReady = true;
-    try { localStorage.setItem(KEY, JSON.stringify(cene)); localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels)); } catch (e) {}
-    refreshAfterPriceLoad();
-}
-
-// Automatsko slanje: samo kad se cene/nazivi/pravila stvarno promene.
-function ghSchedulePush() {
-    if (!pricesReady) return;
-    const c = ghLoad();
-    if (!c.auto || !c.owner || !c.repo || !c.token) return;
-    if (priceSig() === ghLastSig) return;
-    clearTimeout(ghPushTimer);
-    ghPushTimer = setTimeout(async () => {
-        if (priceSig() === ghLastSig) return;
-        if (ghPushing) { ghSchedulePush(); return; }
-        ghPushing = true;
-        try {
-            await ghPushPrices(ghLoad());
-            if ($("ghMsg")) $("ghMsg").textContent = "Cene automatski ažurirane na GitHub-u (" + new Date().toLocaleTimeString("sr-RS") + ").";
-        } catch (err) {
-            if ($("ghMsg")) $("ghMsg").textContent = "Automatsko ažuriranje cena nije uspelo: " + err.message;
-            setPriceSrc("Cene: automatsko čuvanje na GitHub nije uspelo — " + err.message);
-        } finally { ghPushing = false; }
-    }, 1500);
-}
-async function ghPushProject(c, data) {
-    const stamp = new Date().toISOString().replace(/[:.]/g,"-");
-    const name = (data.kupac || data.telefonKupca || "projekat").replace(/[^A-Za-z0-9_-]+/g, "_").slice(0,80) || "projekat";
-    const path = "projektna-historija/" + stamp + "-" + name + ".json";
-    const body = { message: "Istorija projekta: " + (data.kupac || name), content: ghB64(JSON.stringify(data, null, 2)), branch: c.branch };
-    const r = await fetch(ghApi(c, path), { method: "PUT", headers: { ...ghHeaders(c), "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    if (!r.ok) throw new Error("GitHub: " + r.status + " " + ((await r.json().catch(() => ({}))).message || ""));
-    return path;
-}
-async function ghRefreshProjectHistory(c) {
-    if (!c.owner || !c.repo) return;
-    const r = await fetch(ghApi(c, "projektna-historija") + "?ref=" + encodeURIComponent(c.branch), { headers: ghHeaders(c), cache: "no-store" });
-    const list = $("ghHistoryList"), msg = $("ghHistoryMsg");
-    if (!r.ok) { list.innerHTML = '<option value="">Nema sačuvanih projekata</option>'; msg.textContent = r.status === 404 ? "Mapa istorije još ne postoji." : "Istorija nije dostupna: " + r.status; return; }
-    const files = (await r.json()).filter(x => x.type === "file" && x.name.endsWith(".json")).sort((a,b) => b.name.localeCompare(a.name));
-    list.innerHTML = files.length ? files.map(f => `<option value="${f.path.replace(/"/g,"&quot;")}">${escapeHtml(f.name)}</option>`).join("") : '<option value="">Nema sačuvanih projekata</option>';
-    msg.textContent = files.length ? "Pronađeno projekata: " + files.length + "." : "Nema sačuvanih projekata.";
-}
-async function ghSaveNow(c) {
-    const btn = $("ghSaveBtn"), cfgBtn = $("ghHeaderSave"), m = $("msg"), gm = $("ghMsg");
-    btn.disabled = true; if (cfgBtn) { cfgBtn.disabled = true; cfgBtn.textContent = "💾 Čuvam…"; }
-    m.textContent = "Šaljem izmene na GitHub…";
-    clearTimeout(ghPushTimer);
-    try {
-        ghPushing = true;
-        await ghPushPrices(c);
-        localStorage.setItem(GH_KEY, JSON.stringify(c));
-        m.textContent = "Sve izmene su sačuvane na GitHub-u (" + c.path + "). Ostali uređaji ih dobijaju pri sledećem otvaranju.";
-        if (gm) gm.textContent = "Sačuvano: " + new Date().toLocaleTimeString("sr-RS");
-        ghRefreshProjectHistory(c).catch(() => {});
-    } catch (err) {
-        m.textContent = "Čuvanje na GitHub nije uspelo: " + err.message;
-        if (gm) gm.textContent = "Greška: " + err.message + " — proveri token, naziv repozitorijuma i dozvolu Contents: Read and write.";
-        $("ghSection").hidden = false;
-    } finally { ghPushing = false; btn.disabled = false; if (cfgBtn) { cfgBtn.disabled = false; cfgBtn.textContent = "💾 Sačuvaj"; } }
-}
-$("ghCfgBtn").addEventListener("click", () => {
-    const sec = $("ghSection");
-    sec.hidden = !sec.hidden;
-    if (!sec.hidden) { ghFillForm(); sec.scrollIntoView({ behavior: "smooth", block: "start" }); }
-});
-function ghSaveClick() {
-    // Ako je panel otvoren, uzmi ono što je upisano u polja.
-    const c = $("ghSection").hidden ? ghLoad() : ghReadForm();
-    if (!c.owner || !c.repo || !c.token) { $("ghSection").hidden = false; ghFillForm(); $("ghMsg").textContent = "Prvo unesi GitHub podešavanja i token."; $("ghSection").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-    localStorage.setItem(GH_KEY, JSON.stringify(c));
-    ghSaveNow(c);
-}
-$("ghSaveBtn").addEventListener("click", ghSaveClick);
-$("ghHeaderSave").addEventListener("click", ghSaveClick);
-
-// Komentar i podsetnik pamte se lokalno
-(function () {
-    try {
-        $("komentar").value = localStorage.getItem("mist_komentar") || "";
-        $("podsetnik").value = localStorage.getItem("mist_podsetnik") || "";
-        $("napomenaPDF").value = fixNapomena(localStorage.getItem("mist_napomena_pdf"), localStorage.getItem("mist_napomena_ver"));
-        localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_napomena_ver", String(NAPOMENA_VER));
-        $("kontaktPDF").value = localStorage.getItem("mist_kontakt_pdf") || "+381693546820";
-    } catch (e) {}
-    $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
-    $("podsetnik").addEventListener("input", () => { try { localStorage.setItem("mist_podsetnik", $("podsetnik").value); } catch (e) {} });
-    $("napomenaPDF").addEventListener("input", () => {
-        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); } catch (e) {}
-        if (typeof ghSchedulePush === "function") ghSchedulePush();
-    });
-    $("kontaktPDF").addEventListener("input", () => {
-        try { localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
-        if (typeof ghSchedulePush === "function") ghSchedulePush();
-    });
-})();
-
-$("ghHistoryRefresh").addEventListener("click", () => {
-    const c = ghLoad();
-    if (!c.owner || !c.repo) { $("ghHistoryMsg").textContent = "Prvo unesi GitHub podešavanja."; return; }
-    ghRefreshProjectHistory(c);
-});
-$("ghHistoryLoad").addEventListener("click", async () => {
-    const c = ghLoad(), path = $("ghHistoryList").value;
-    if (!path) { $("ghHistoryMsg").textContent = "Izaberi projekat iz istorije."; return; }
-    try {
-        const headers = c.token ? { "Authorization": "Bearer " + c.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } : { "Accept": "application/vnd.github+json" };
-        const api = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) + "/contents/" + path.split("/").map(encodeURIComponent).join("/");
-        const r = await fetch(api + "?ref=" + encodeURIComponent(c.branch), { headers, cache: "no-store" });
-        if (!r.ok) throw new Error("GitHub " + r.status);
-        const data = JSON.parse(ghDecodeB64((await r.json()).content));
-        if (!data || data.format !== "mist-enterijer-project") throw new Error("Izabrani fajl nije MiSt projekat.");
-        registerArticles(data.customArticles);
-        // Cene i nazivi se NE preuzimaju iz projekta (izvor je cene.json); dopunjuju se samo artikli kojih nema.
-            Object.keys(DEF).forEach(k => { if (!(k in cene)) { const v = Number(data.cene && data.cene[k]); cene[k] = Number.isFinite(v) && data.cene[k] !== undefined ? v : DEF[k]; } });
-        Object.keys(data.priceLabels || {}).forEach(k => { if (!(k in priceLabels)) priceLabels[k] = data.priceLabels[k]; }); fixLabelNotes();
-        Object.keys(q).forEach(k => delete q[k]); Object.assign(q, data.q || {});
-        ST.forEach(item => { if (!(item[0] in q)) q[item[0]] = 0; });
-        spec = { ...spec, ...(data.spec || {}) };
-        spec.escajgSirina = normalizeEscajgWidth(spec.escajgSirina); if (spec.maticK && !spec.matice) spec.matice = spec.maticK; delete spec.maticK;
-        fin = { ...fin, ...(data.fin || {}) };
-        manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
-        KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
-        customCsvRules = normalizeRules(data.customCsvRules); lastCsvParts = null;
-        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...(data.builtinCsvRules || {}) };
-        $("kupac").value = data.kupac || "";
-        $("telefonKupca").value = data.telefonKupca || data.telefon || "";
-        $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
-        $("napomenaPDF").value = fixNapomena(data.napomenaPDF, data.napomenaVersion);
-        $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
-        $("verzija").value = data.verzija || "m";
-        $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(normalizujElement); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
-        saveCustomRules(); save();
-        buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
-        buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
-        $("ghHistoryMsg").textContent = "Projekat je uspešno učitan iz GitHub istorije.";
-        $("msg").textContent = "Projekat iz GitHub istorije je učitan.";
-    } catch (err) { $("ghHistoryMsg").textContent = "Učitavanje projekta nije uspelo: " + err.message; }
-});
-
-
-// Pri svakom pokretanju sve količine i iznosi projekta su prazni (cene i podešavanja ostaju).
-customArticles.forEach(a => a.qty = 0);
-customCsvRules.forEach(r => { r.matches = 0; r.items.forEach(i => i.qty = 0); r.newItems.forEach(i => i.qty = 0); });
-fin.tapacirani = 0; fin.manualOkov = null; manualSum.okov = null; manualSum.mat = null;
-
-buildOkov();
-buildFin();
-b
+    return decodeURIComponent(Array.prototype.map.
