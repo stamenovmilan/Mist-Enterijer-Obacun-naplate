@@ -98,7 +98,7 @@ AI & DEVELOPER ARCHITECTURE SPECIFICATION (MIST ENTERIJER KALKULATOR v2.2)
   .badge.warn { background:#fff1d6; color:var(--warn); }
   .badge.err { background:#fde3e6; color:var(--danger); }
   .out-ta { width:100%; min-height:260px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; background:#fafbfc; }
-  .hidden { display:none; }
+  .hidden { display:none !important; }
   .modal-bg { position:fixed; inset:0; background:rgba(15,23,42,.48); display:flex; align-items:center; justify-content:center; padding:16px; z-index:999; }
   .modal-card { width:100%; max-width:920px; max-height:90vh; overflow:auto; background:#fff; border-radius:12px; border:1px solid var(--line); padding:18px 20px; box-shadow:0 16px 40px rgba(0,0,0,.22); }
   .modal-card.narrow { max-width:560px; }
@@ -690,7 +690,12 @@ function utf8ToBase64(str) {
 }
 
 async function sacuvajNaGitHub() {
-  ucitajGhConfig();
+  // Ako je GitHub prozor otvoren, uzmi podatke direktno iz polja (i sačuvaj ih)
+  if (!document.getElementById("modalGitHub").classList.contains("hidden")) {
+    sacuvajGitHubConfig();
+  } else {
+    ucitajGhConfig();
+  }
   if (!ghConfig.owner || !ghConfig.repo || !ghConfig.token) {
     otvoriGitHubModal();
     document.getElementById("ghLog").textContent = "Unesi owner, repo i GitHub Token da bi upis u cene.json radio.";
@@ -834,7 +839,7 @@ function renderElementi() {
         <button type="button" class="danger" onclick="ukloniElement('${el.id}')">Obriši</button>
       </div>
       <div class="row">
-        <div class="col-5"><label>Naziv elementa</label><input value="${esc(el.naziv)}" oninput="azurirajElement('${el.id}','naziv',this.value); renderElementi()"></div>
+        <div class="col-5"><label>Naziv elementa</label><input value="${esc(el.naziv)}" oninput="azurirajElement('${el.id}','naziv',this.value); this.closest('.elem-box').querySelector('.elem-title').textContent='#${idx + 1} – '+this.value"></div>
         <div class="col-2"><label>Količina</label><input type="number" min="1" value="${el.kol}" oninput="azurirajElement('${el.id}','kol',Math.max(1,parseInt(this.value)||1))"></div>
         <div class="col-5"><label>Tip elementa</label>
           <select onchange="azurirajElement('${el.id}','tip',this.value)">
@@ -1432,6 +1437,13 @@ if (dropZone) {
     if (f) handleCsvFile(f);
   });
 }
+
+// Zatvaranje prozora tasterom Esc
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    ["modalCenovnik", "modalCsvPravila", "modalGitHub"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  }
+});
 
 // Inicijalizacija: 1) briše stare ključeve, 2) učitava DEF, 3) povlači svež cene.json, 4) vraća samo tekuće elemente
 (async function init() {
