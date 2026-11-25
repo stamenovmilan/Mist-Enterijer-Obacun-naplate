@@ -1,0 +1,158 @@
+{
+  "format": "mist-enterijer-cene",
+  "version": 2,
+  "updatedAt": "2026-11-25T10:08:00.000Z",
+  "cene": {
+    "sarka": 99,
+    "sarkaBlum": 320,
+    "sraf35": 320,
+    "sraf430": 290,
+    "klizac": 1450,
+    "klizacBlum": 3900,
+    "tipl": 2.5,
+    "ekscentar": 18,
+    "srafKonf": 4,
+    "sraf750": 3.5,
+    "lepak": 650,
+    "silikon": 420,
+    "kant05": 55,
+    "kant2": 140,
+    "kant2Front": 180,
+    "iverica18": 1650,
+    "iverica18Front": 2150,
+    "hdf3": 680,
+    "radnaPloca": 4200,
+    "lajsnaZidna": 950,
+    "nogica": 110,
+    "lajsnaSokla": 750,
+    "spojnicaSokle": 45,
+    "nosacPolice": 35,
+    "amortizer": 680,
+    "podizac": 2400,
+    "ledTraka": 850,
+    "napajanjeLed": 1450,
+    "prekidacLed": 550,
+    "sudopera": 14500,
+    "kanta": 2800,
+    "aspirator": 11500,
+    "rucica": 260,
+    "zavrsnaPloca": 1950,
+    "satnica": 1800
+  },
+  "nazivi": {
+    "sarka": "Klap šarka ravna",
+    "sarkaBlum": "Šarka Blum / premium soft-close",
+    "sraf35": "Šraf 3.5×16 (kutija ~500 kom)",
+    "sraf430": "Šraf 4×30 (kutija ~200 kom)",
+    "klizac": "Klizač fioke (par)",
+    "klizacBlum": "Klizač Blum / tandem (par)",
+    "tipl": "Drveni tipl (kom)",
+    "ekscentar": "Ekscentar spojnica / minifix (kom)",
+    "srafKonf": "Konfirmat / spojni šraf (kom)",
+    "sraf750": "Šraf 7×50 / 8×60 za montažu (kom)",
+    "lepak": "Lepak za drvo / D3 (kom)",
+    "silikon": "Silikon / akril kit (kom)",
+    "kant05": "ABS kant traka 0.5mm (m)",
+    "kant2": "ABS kant traka 2mm korpus (m)",
+    "kant2Front": "ABS kant traka 2mm front (m)",
+    "iverica18": "Univer / iverica 18mm korpus (m²)",
+    "iverica18Front": "Univer / iverica 18mm front (m²)",
+    "hdf3": "HDF leđa 3mm (m²)",
+    "radnaPloca": "Radna ploča (m)",
+    "lajsnaZidna": "Zidna lajsna za radnu ploču (m)",
+    "nogica": "Nogica podesiva za element (kom)",
+    "lajsnaSokla": "Lajsna sokle (m)",
+    "spojnicaSokle": "Spojnica / klip sokle (kom)",
+    "nosacPolice": "Nosač police (kom)",
+    "amortizer": "Gasni amortizer / blažač (kom)",
+    "podizac": "Podizač gornjeg fronta (kom)",
+    "ledTraka": "LED traka (m)",
+    "napajanjeLed": "LED napajanje / trafo (kom)",
+    "prekidacLed": "LED prekidač / senzor (kom)",
+    "sudopera": "Sudopera (kom)",
+    "kanta": "Kanta za otpatke (kom)",
+    "aspirator": "Aspirator (kom)",
+    "rucica": "Ručica (kom)",
+    "zavrsnaPloca": "Završna bočna / maska ploča (m²)",
+    "satnica": "Satnica izrade / montaže (sat)"
+  },
+  "customArticles": [
+    {
+      "id": "art_noga_alu",
+      "naziv": "Noga za sto alu Fi60/720mm",
+      "jed": "kom",
+      "cena": 0
+    },
+    {
+      "id": "art_civiluk_3",
+      "naziv": "Civiluk sa tri nosaca",
+      "jed": "kom",
+      "cena": 0
+    },
+    {
+      "id": "art_podna_lajsna",
+      "naziv": "Podna lajsna za hodnik",
+      "jed": "m",
+      "cena": 0
+    },
+    {
+      "id": "art_fx_civiluk",
+      "naziv": "FX Čiviluk P24022",
+      "jed": "kom",
+      "cena": 0
+    },
+    {
+      "id": "art_aspirator_pio",
+      "naziv": "Aspirator PIO 650 2MIX",
+      "jed": "kom",
+      "cena": 0
+    }
+  ],
+  "builtinCsvRules": [
+    {
+      "id": "front",
+      "label": "Frontovi / vrata",
+      "keywords": "front, vrata, krilo, door",
+      "target": "frontCount",
+      "mult": 1,
+      "deleted": false
+    },
+    {
+      "id": "drawer",
+      "label": "Fioke",
+      "keywords": "fioka, fioke, drawer, ladica",
+      "target": "drawerCount",
+      "mult": 1,
+      "deleted": false
+    },
+    {
+      "id": "shelf",
+      "label": "Police",
+      "keywords": "polica, police, shelf",
+      "target": "shelfCount",
+      "mult": 1,
+      "deleted": false
+    },
+    {
+      "id": "sink",
+      "label": "Sudopera",
+      "keywords": "sudopera, sink, lavabo",
+      "target": "hasSink",
+      "mult": 1,
+      "deleted": false
+    },
+    {
+      "id": "aspirator",
+      "label": "Aspirator",
+      "keywords": "aspirator, napa, hood",
+      "target": "hasAspirator",
+      "mult": 1,
+      "deleted": false
+    }
+  ],
+  "customCsvRules": [],
+  "okovProc": 0,
+  "procZarade": 30,
+  "napomenaPDF": "U cenu je uračunat okov, kantovanje i izrada po meri. Rok izrade se definiše po potvrdi mere i avansa.",
+  "telefon": "+381693546820"
+}
