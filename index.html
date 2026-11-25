@@ -2708,4 +2708,104 @@ function ghSaveClick() {
     // Ako je panel otvoren, uzmi ono što je upisano u polja.
     const c = $("ghSection").hidden ? ghLoad() : ghReadForm();
     if (!c.owner || !c.repo || !c.token) { $("ghSection").hidden = false; ghFillForm(); $("ghMsg").textContent = "Prvo unesi GitHub podešavanja i token."; $("ghSection").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-    localSto
+    localStorage.setItem(GH_KEY, JSON.stringify(c));
+    ghSaveNow(c);
+}
+$("ghSaveBtn").addEventListener("click", ghSaveClick);
+$("ghHeaderSave").addEventListener("click", ghSaveClick);
+
+// Komentar i podsetnik pamte se lokalno
+(function () {
+    try {
+        $("komentar").value = localStorage.getItem("mist_komentar") || "";
+        $("podsetnik").value = localStorage.getItem("mist_podsetnik") || "";
+        $("napomenaPDF").value = fixNapomena(localStorage.getItem("mist_napomena_pdf"), localStorage.getItem("mist_napomena_ver"));
+        localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_napomena_ver", String(NAPOMENA_VER));
+        $("kontaktPDF").value = localStorage.getItem("mist_kontakt_pdf") || "+381693546820";
+    } catch (e) {}
+    $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
+    $("podsetnik").addEventListener("input", () => { try { localStorage.setItem("mist_podsetnik", $("podsetnik").value); } catch (e) {} });
+    $("napomenaPDF").addEventListener("input", () => {
+        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); } catch (e) {}
+        if (typeof ghSchedulePush === "function") ghSchedulePush();
+    });
+    $("kontaktPDF").addEventListener("input", () => {
+        try { localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
+        if (typeof ghSchedulePush === "function") ghSchedulePush();
+    });
+})();
+
+$("ghHistoryRefresh").addEventListener("click", () => {
+    const c = ghLoad();
+    if (!c.owner || !c.repo) { $("ghHistoryMsg").textContent = "Prvo unesi GitHub podešavanja."; return; }
+    ghRefreshProjectHistory(c);
+});
+$("ghHistoryLoad").addEventListener("click", async () => {
+    const c = ghLoad(), path = $("ghHistoryList").value;
+    if (!path) { $("ghHistoryMsg").textContent = "Izaberi projekat iz istorije."; return; }
+    try {
+        const headers = c.token ? { "Authorization": "Bearer " + c.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } : { "Accept": "application/vnd.github+json" };
+        const api = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) + "/contents/" + path.split("/").map(encodeURIComponent).join("/");
+        const r = await fetch(api + "?ref=" + encodeURIComponent(c.branch), { headers, cache: "no-store" });
+        if (!r.ok) throw new Error("GitHub " + r.status);
+        const data = JSON.parse(ghDecodeB64((await r.json()).content));
+        if (!data || data.format !== "mist-enterijer-project") throw new Error("Izabrani fajl nije MiSt projekat.");
+        registerArticles(data.customArticles);
+        // Cene i nazivi se NE preuzimaju iz projekta (izvor je cene.json); dopunjuju se samo artikli kojih nema.
+            Object.keys(DEF).forEach(k => { if (!(k in cene)) { const v = Number(data.cene && data.cene[k]); cene[k] = Number.isFinite(v) && data.cene[k] !== undefined ? v : DEF[k]; } });
+        Object.keys(data.priceLabels || {}).forEach(k => { if (!(k in priceLabels)) priceLabels[k] = data.priceLabels[k]; }); fixLabelNotes();
+        Object.keys(q).forEach(k => delete q[k]); Object.assign(q, data.q || {});
+        ST.forEach(item => { if (!(item[0] in q)) q[item[0]] = 0; });
+        spec = { ...spec, ...(data.spec || {}) };
+        spec.escajgSirina = normalizeEscajgWidth(spec.escajgSirina); if (spec.maticK && !spec.matice) spec.matice = spec.maticK; delete spec.maticK;
+        fin = { ...fin, ...(data.fin || {}) };
+        manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
+        KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
+        customCsvRules = normalizeRules(data.customCsvRules); lastCsvParts = null;
+        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...(data.builtinCsvRules || {}) };
+        $("kupac").value = data.kupac || "";
+        $("telefonKupca").value = data.telefonKupca || data.telefon || "";
+        $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
+        $("napomenaPDF").value = fixNapomena(data.napomenaPDF, data.napomenaVersion);
+        $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
+        $("verzija").value = data.verzija || "m";
+        $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(el => { if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI"; }); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
+        saveCustomRules(); save();
+        buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
+        buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
+        $("ghHistoryMsg").textContent = "Projekat je uspešno učitan iz GitHub istorije.";
+        $("msg").textContent = "Projekat iz GitHub istorije je učitan.";
+    } catch (err) { $("ghHistoryMsg").textContent = "Učitavanje projekta nije uspelo: " + err.message; }
+});
+
+
+// Pri svakom pokretanju sve količine i iznosi projekta su prazni (cene i podešavanja ostaju).
+customArticles.forEach(a => a.qty = 0);
+customCsvRules.forEach(r => { r.matches = 0; r.items.forEach(i => i.qty = 0); r.newItems.forEach(i => i.qty = 0); });
+fin.tapacirani = 0; fin.manualOkov = null; manualSum.okov = null; manualSum.mat = null;
+
+buildOkov();
+buildFin();
+buildCene();
+
+buildBuiltinCsvRulesEditor();
+buildCustomRulesEditor();
+buildCustomCsvItems();
+buildNewArticles();
+
+buildKl();
+buildSpecijalno();
+buildAmerickiPlakar();
+buildElementi();
+calc();
+refreshNbsRate();
+// Zajednički cene.json se učitava na svakom računaru (posle toga se sve ponovo iscrta).
+loadSharedPrices().finally(() => {
+    const gs = ghLoad();
+    if (gs.owner && gs.repo && gs.token) ghRefreshProjectHistory(gs).catch(() => {});
+});
+
+/* Service worker not required in single-file version */
+</script>
+</body>
+</html>
