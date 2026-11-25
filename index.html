@@ -206,6 +206,7 @@
             <button type="button" id="ghHeaderSave" title="Sačuvaj cene, nazive, artikle, pravila i napomenu na GitHub (cene.json)">💾 Sačuvaj</button>
             <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub</button>
             <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
+            <div class="msg" id="appVersion" style="font-size: 0.7rem; opacity:.75">Verzija aplikacije: 2026-11-25 · v9 (šarke GTV, klizač 500)</div>
         </div>
         <div class="top-rate">
             <div class="rate-line">
@@ -2129,7 +2130,7 @@ function stampajPDF() {
 
     const din = T.din;
     const eur = T.eur;
-    let html = `<html><head><title>MiSt Ponuda - ${ime}</title>
+    let html = `<!doctype html><html lang="sr"><head><meta charset="utf-8"><title>MiSt Ponuda - ${escapeHtml(ime)}</title>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; color: #333; line-height: 1.5; padding: 30px; max-width: 800px; margin: auto; }
         .pdf-header { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #b98e4f; padding-bottom: 12px; margin-bottom: 15px; }
@@ -2147,7 +2148,20 @@ function stampajPDF() {
         .summary-box tr:last-child td { border-bottom: none; }
         .note-box { white-space: pre-wrap; border: 1px solid #d6d3cb; border-radius: 6px; padding: 10px 12px; background: #faf9f6; page-break-inside: avoid; }
         @media print { body { padding: 0; } }
-    </style></head><body>`;
+        /* Ponuda za mušteriju: kompaktno, uvek na jednoj A4 strani */
+        @page { size: A4 portrait; margin: 12mm; }
+        body.kupac { font-size: 10.5pt; line-height: 1.35; padding: 0; margin: 0; max-width: 186mm; }
+        body.kupac .pdf-header { padding-bottom: 8px; margin-bottom: 10px; }
+        body.kupac h1 { font-size: 1.25rem; }
+        body.kupac h3 { margin: 10px 0 4px; font-size: 1rem; }
+        body.kupac p { margin: 0 0 8px; }
+        body.kupac .note-box { padding: 7px 10px; }
+        body.kupac .summary-box { margin-top: 10px; }
+        body.kupac table { margin: 0; }
+        body.kupac td, body.kupac th { padding: 4px 8px; }
+        body.kupac .total-row { font-size: 1.05em; }
+        body.kupac * { page-break-inside: avoid; break-inside: avoid; }
+    </style></head><body class="${I ? "" : "kupac"}">`;
     
     html += `<div class="pdf-header">
         <img src="${(document.querySelector(".logo-img") || {}).src || ""}" alt="Logo" class="pdf-logo">
@@ -2216,7 +2230,31 @@ function stampajPDF() {
     win.document.write(html);
     win.document.close();
     win.focus();
-    setTimeout(() => { win.print(); }, 500);
+    setTimeout(() => {
+        if (!I) prilagodiJednojA4(win);
+        win.print();
+    }, 500);
+}
+
+// Ponuda za mušteriju: ako je sadržaj viši od jedne A4 strane (bez margina 12 mm),
+// ceo dokument se srazmerno smanji da stane na jednu stranu.
+function prilagodiJednojA4(win) {
+    try {
+        const body = win.document.body;
+        const mm = 96 / 25.4;                    // CSS px po milimetru
+        const visinaStrane = (297 - 24) * mm - 4; // A4 bez gornje i donje margine (mala rezerva)
+        body.style.zoom = "";
+        const visina = () => {
+            const cs = win.getComputedStyle(body);
+            return body.getBoundingClientRect().height + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+        };
+        let z = 1;
+        // Smanjuj dok ne stane (nekoliko koraka zbog zaokruživanja teksta pri smanjenju).
+        for (let i = 0; i < 6 && visina() > visinaStrane && z > 0.5; i++) {
+            z = Math.max(0.5, z * (visinaStrane / visina()) * 0.99);
+            body.style.zoom = String(z);
+        }
+    } catch (e) {}
 }
 
 $("izvoz").onclick = async () => {
