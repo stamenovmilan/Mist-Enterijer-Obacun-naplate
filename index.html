@@ -323,7 +323,7 @@
     <section id="elementiSection">
         <details>
             <summary>Obračun po elementima <span class="rule-badge">(u razvoju)</span></summary>
-            <p class="msg">Unesi elemente (mere u cm). Aplikacija računa okov iz sekcije Okov (šarke, klizači, nogice, nosači, tiple, šrafovi, žica, aspirator…). Pločasti materijal, kant i HDF računaš u SketchUp-u. Čim dodaš, izmeniš ili obrišeš element, izračunate količine se <b>automatski upisuju u sekciju Okov</b> i ulaze u obračun i PDF.</p>
+            <p class="msg">Unesi elemente (tip, količinu, frontove, fioke i police; žicu, rernu i aspirator štikliraš ispod). Aplikacija računa okov iz sekcije Okov (šarke, klizači, nogice, nosači, tiple, šrafovi, žica, aspirator…). Pločasti materijal, kant i HDF računaš u SketchUp-u. Čim dodaš, izmeniš ili obrišeš element, izračunate količine se <b>automatski upisuju u sekciju Okov</b> i ulaze u obračun i PDF.</p>
             <div id="elementiLista" style="margin-top:10px"></div>
             <div class="btns"><button type="button" id="addElemBtn">＋ Dodaj element</button></div>
             <h3 class="price-category">Specifikacija iz elemenata</h3>
@@ -390,11 +390,11 @@ const NAPOMENA_DEF = "Cena obuhvata izradu nameštaja po meri od oplemenjene ive
 const NAPOMENA_VER = 2;
 const fixNapomena = (v, ver) => (Number(ver) >= NAPOMENA_VER && v && String(v).trim()) ? v : NAPOMENA_DEF;
 const ST = [
-    ["sarke", "GTV Klap šarka", "Klap šarka ravna"],
-    ["spolu", "Klap šarka polu koleno", "Klap šarka polu koleno"],
-    ["skoleno", "Klap šarka koleno", "Klap šarka koleno"],
-    ["sslepi", "Klap šarka slepi ugao", "Klap šarka slepi ugao"],
-    ["szaba", "GTV Šarka slide on 175 žaba", "Klap šarka žaba"],
+    ["sarke", "GTV Klap šarka RAVNA sa usporivačem (soft close)", "Klap šarka ravna"],
+    ["spolu", "GTV Klap šarka POLUKOLENO sa usporivačem (soft close)", "Klap šarka polu koleno"],
+    ["skoleno", "GTV Klap šarka KOLENO sa usporivačem (soft close)", "Klap šarka koleno"],
+    ["sslepi", "GTV Klap šarka SLEPI UGAO sa usporivačem (soft close)", "Klap šarka slepi ugao"],
+    ["szaba", "GTV Šarka slide on 175° ŽABA", "Klap šarka žaba"],
    ["pvcKonektor", "PVC Vinkla sa 4 rupe", "PVC ugaoni konektor"],
     ["coklaH100", "PVC cokla H100, 4 m", "PVC cokla H100, 4 m"],
     ["crevoF100", "Crevo za aspirator F100", "Crevo za aspirator F100"],
@@ -439,11 +439,11 @@ const DEF = {
 };
 
 const PRICE_LABELS = {
-    "Klap šarka ravna": "GTV Klap šarka",
-    "Klap šarka polu koleno": "Nameštajska šarka polukoleno 110° sa usporivačem (soft close)",
-    "Klap šarka koleno": "Nameštajska šarka koleno 110° sa usporivačem (soft close)",
-    "Klap šarka slepi ugao": "Nameštajska šarka za slepi ugao sa usporivačem",
-    "Klap šarka žaba": "GTV Šarka slide on 175 žaba",
+    "Klap šarka ravna": "GTV Klap šarka RAVNA sa usporivačem (soft close)",
+    "Klap šarka polu koleno": "GTV Klap šarka POLUKOLENO sa usporivačem (soft close)",
+    "Klap šarka koleno": "GTV Klap šarka KOLENO sa usporivačem (soft close)",
+    "Klap šarka slepi ugao": "GTV Klap šarka SLEPI UGAO sa usporivačem (soft close)",
+    "Klap šarka žaba": "GTV Šarka slide on 175° ŽABA",
    "PVC ugaoni konektor": "PVC Vinkla sa 4 rupe",
     "PVC cokla H100, 4 m": "PVC cokla H100, 4 m",
     "Crevo za aspirator F100": "Crevo za aspirator F100",
@@ -691,8 +691,11 @@ function fixLabelNotes() {
         "DuoPower tipla 10×80": ["DuoPower tipla 10×80", "DuoPower tipla 10×80 mm"],
         "Vinkla": ["Vinkla", "Metalni ugaoni spojnik za nameštaj sa rupama za šrafove"],
         ...Object.fromEntries([200,250,300,350,400,450,500].map(d => ["Klizač " + d + " mm (po paru)", ["Klizač " + d + " mm (po paru)", "Teleskopski kuglični klizač za fioku " + d + " mm, par"]])),
-        "Klap šarka ravna": ["Klap šarka ravna", "Nameštajska šarka ravna 110° sa usporivačem (soft close)"],
-        "Klap šarka žaba": ["Klap šarka žaba", "Nameštajska šarka žaba sa oprugom"],
+        "Klap šarka ravna": ["Klap šarka ravna", "Nameštajska šarka ravna 110° sa usporivačem (soft close)", "GTV Klap šarka"],
+        "Klap šarka žaba": ["Klap šarka žaba", "Nameštajska šarka žaba sa oprugom", "GTV Šarka slide on 175 žaba"],
+        "Klap šarka polu koleno": ["Klap šarka polu koleno", "Nameštajska šarka polukoleno 110° sa usporivačem (soft close)"],
+        "Klap šarka koleno": ["Klap šarka koleno", "Nameštajska šarka koleno 110° sa usporivačem (soft close)"],
+        "Klap šarka slepi ugao": ["Klap šarka slepi ugao", "Nameštajska šarka za slepi ugao sa usporivačem"],
         "Dvonavojna matica": ["Dvonavojna matica", "Dvonavojna matica za nameštaj, proveriti dimenziju navoja"],
         "Nogica štelujuća 10mm": ["Nogica štelujuća 10mm", "Podesiva nivelaciona nogica za nameštaj, M10"]
     };
@@ -1647,7 +1650,7 @@ $("loadProjectFile").addEventListener("change", event => {
             $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
             try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
             $("verzija").value = data.verzija || "m";
-            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(el => { if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI"; }); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
+            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(normalizujElement); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
             saveCustomRules(); save();
             buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
             buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles();calc();
@@ -2257,17 +2260,28 @@ const ELEM_KEY = "mist_elementi_v1";
 const ELEM_ASPIRATOR_ART = "Aspirator PIO 650 2MIX";
 // [kod, naziv, podrazumevane vrednosti pri izboru tipa]
 const ELEM_TIPOVI = [
-    ["DONJI", "Donji element (nogice)", { sirina: 60, dubina: 56, visina: 72, frontCount: 1, drawerCount: 0, shelfCount: 1 }],
-    ["KUHINJA", "Kuhinjski donji element", { sirina: 60, dubina: 56, visina: 72, frontCount: 1, drawerCount: 0, shelfCount: 1 }],
-    ["GORNJI", "Gornji viseći element", { sirina: 60, dubina: 32, visina: 72, frontCount: 1, drawerCount: 0, shelfCount: 1 }],
-    ["ASPIRATOR", "Element za aspirator (viseći)", { sirina: 60, dubina: 32, visina: 36, frontCount: 1, drawerCount: 0, shelfCount: 0 }],
-    ["RERNA", "Element za ugradnu rernu", { sirina: 60, dubina: 56, visina: 72, frontCount: 0, drawerCount: 0, shelfCount: 0 }],
-    ["ZICA", "Element sa izvlačnom žicom (flaše)", { sirina: 20, dubina: 56, visina: 72, frontCount: 1, drawerCount: 0, shelfCount: 0 }],
-    ["PLAKAR", "Plakar / visoki ormar", { sirina: 100, dubina: 60, visina: 220, frontCount: 2, drawerCount: 0, shelfCount: 4 }]
+    ["DONJI", "Donji element (nogice)", { frontCount: 1, drawerCount: 0, shelfCount: 1 }],
+    ["KUHINJA", "Kuhinjski donji element", { frontCount: 1, drawerCount: 0, shelfCount: 1 }],
+    ["GORNJI", "Gornji viseći element", { frontCount: 1, drawerCount: 0, shelfCount: 1 }],
+    ["PLAKAR", "Plakar / visoki ormar", { frontCount: 2, drawerCount: 0, shelfCount: 4 }]
 ];
-const ELEM_DONJI = ["DONJI", "KUHINJA", "RERNA", "ZICA"];
-const ELEM_VISECI = ["GORNJI", "ASPIRATOR"];
-const ELEM_CHECKS = [["hasSink", "Sudopera"], ["led", "LED rasveta"], ["amortizer", "Amortizer"]];
+const ELEM_DONJI = ["DONJI", "KUHINJA"];
+const ELEM_VISECI = ["GORNJI"];
+const ELEM_KLIZACI = [300, 350, 400, 450, 500];
+const ELEM_CHECKS = [
+    ["hasSink", "Sudopera"], ["led", "LED rasveta"], ["amortizer", "Amortizer"],
+    ["zica", "Izvlačna žica (flaše)"], ["rerna", "Ugradna rerna"], ["aspirator", "Aspirator"]
+];
+// Elementi iz ranijih verzija: žica, rerna i aspirator su bili tipovi, sada su čekboksovi.
+function normalizujElement(el) {
+    if (el.tip === "ZICA") { el.tip = "DONJI"; el.zica = true; }
+    if (el.tip === "RERNA") { el.tip = "DONJI"; el.rerna = true; }
+    if (el.tip === "ASPIRATOR") { el.tip = "GORNJI"; el.aspirator = true; }
+    if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI";
+    if (!ELEM_KLIZACI.includes(Number(el.klizac))) el.klizac = 500;
+    if (el.led && !(Number(el.ledM) > 0)) el.ledM = Math.round((Number(el.sirina) || 60)) / 100;
+    return el;
+}
 // Polja iz sekcije Okov → artikal iz cenovnika i jedinica.
 const ELEM_SPEC_FIELDS = {
     crevoAspiratorKol: ["Crevo za aspirator", "kom"], zicaKol: ["Žičana korpa za korpus", "kom"],
@@ -2275,21 +2289,13 @@ const ELEM_SPEC_FIELDS = {
     ledM: ["LED traka (po m)", "m"], ledNapajanjeKol: ["LED napajanje 12V", "kom"], ledDaljinski: ["Daljinska kontrola LED", "kom"]
 };
 let elementi = []; // pri pokretanju uvek prazno (elementi se čuvaju samo u projektu)
-// Elementi iz ranije verzije: radna ploča više ne postoji.
-elementi.forEach(el => { if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI"; });
-
 function noviElement(o) {
     return { id: "el_" + Math.random().toString(36).slice(2, 8), naziv: "Donji element", kol: 1, tip: "DONJI",
-        ...ELEM_TIPOVI[0][2], hasSink: false, led: false, amortizer: false, ...(o || {}) };
+        ...ELEM_TIPOVI[0][2], klizac: 500, ledM: 0,
+        hasSink: false, led: false, amortizer: false, zica: false, rerna: false, aspirator: false, ...(o || {}) };
 }
 function saveElementi() {
     try { localStorage.setItem(ELEM_KEY, JSON.stringify({ elementi })); } catch (e) {}
-}
-// Klizač po dubini elementa: najduži standardni klizač koji staje (dubina − 50 mm).
-function klizacZaDubinu(dubinaCm) {
-    const raspolozivo = (Number(dubinaCm) || 0) * 10 - 50;
-    for (const m of [500, 450, 400, 350, 300, 250, 200]) if (raspolozivo >= m) return m;
-    return 200;
 }
 
 // Rezultat: q (polja osnovnog okova), spec (specijalni okov), kl (klizači po dužini), art (novi artikli)
@@ -2298,25 +2304,30 @@ function obracunElemenata() {
     const aq = (k, n) => { if (n > 0) R.q[k] = (R.q[k] || 0) + n; };
     const as = (k, n) => { if (n > 0) R.spec[k] = (R.spec[k] || 0) + n; };
     elementi.forEach(el => {
+        normalizujElement(el);
         const k = Math.max(1, Number(el.kol) || 1);
-        const w = (Number(el.sirina) || 0) / 100, h = (Number(el.visina) || 0) / 100;
         const fr = Number(el.frontCount) || 0, fi = Number(el.drawerCount) || 0, po = Number(el.shelfCount) || 0;
+        const fioke = fi + (el.rerna ? 1 : 0); // ugradna rerna: jedna fioka ispod rerne
 
-        // Element sa žicom nema šarke (front ide na izvlačnu korpu).
-        if (el.tip !== "ZICA") aq("sarke", fr * (h > 1.4 ? 3 : 2) * k);
-        if (fi > 0) { const d = klizacZaDubinu(el.dubina); R.kl[d] = (R.kl[d] || 0) + fi * k; }
+        // Šarke: 2 po frontu, plakar 3. Element sa žicom ili rernom nema šarke.
+        if (!el.zica && !el.rerna) aq("sarke", fr * (el.tip === "PLAKAR" ? 3 : 2) * k);
+        const addKl = (d, n) => { if (n > 0) R.kl[d] = (R.kl[d] || 0) + n; };
+        addKl(Number(el.klizac) || 500, fi * k);
+        if (el.rerna) addKl(450, k);
         aq("pinovi", po * 4 * k);
-        aq("rucice", (fr + fi) * k);
-        aq("srucica", (fr + fi) * 2 * k);
+        aq("rucice", (fr + fioke) * k);
+        aq("srucica", (fr + fioke) * 2 * k);
         if (ELEM_DONJI.includes(el.tip)) aq("nogice", 4 * k);
-        if (ELEM_VISECI.includes(el.tip)) { aq("nosaci", 2 * k); aq("tipl1080", 2 * k); aq("s680", 2 * k); }
-        if (el.tip === "ASPIRATOR") { R.art[ELEM_ASPIRATOR_ART] = (R.art[ELEM_ASPIRATOR_ART] || 0) + k; as("crevoAspiratorKol", k); }
-        if (el.tip === "ZICA") as("zicaKol", k);
+        // Viseći element ili aspirator: nosači, DuoPower tiple i šrafovi 5×80 (ne duplo).
+        if (ELEM_VISECI.includes(el.tip) || el.aspirator) { aq("nosaci", 2 * k); aq("tipl1080", 2 * k); aq("s680", 2 * k); }
+        if (el.aspirator) { R.art[ELEM_ASPIRATOR_ART] = (R.art[ELEM_ASPIRATOR_ART] || 0) + k; as("crevoAspiratorKol", k); }
+        if (el.zica) as("zicaKol", k);
         if (el.hasSink) { as("sudoperaKol", k); as("kantaKol", k); aq("silikon", k); }
         if (el.amortizer) as("amortizerKol", k);
-        if (el.led) { as("ledM", Math.round(w * k * 10) / 10); as("ledNapajanjeKol", k); as("ledDaljinski", k); }
-        aq("s164", (25 + fr * 8 + fi * 10) * k);
-        aq("s430", (12 + fi * 8) * k);
+        if (el.led) { as("ledM", Math.round((Number(el.ledM) || 0) * k * 100) / 100); as("ledNapajanjeKol", k); as("ledDaljinski", k); }
+        aq("s164", (25 + fr * 8 + fioke * 10) * k);
+        // Šraf 4×30: 12 po elementu, 8 po fioci + 3 za vezivanje fronta za fioku.
+        aq("s430", (12 + fioke * (8 + 3)) * k);
     });
     Object.keys(R.q).forEach(k => R.q[k] = Math.ceil(R.q[k] - 1e-9));
     Object.keys(R.kl).forEach(d => R.kl[d] = Math.ceil(R.kl[d] - 1e-9));
@@ -2447,25 +2458,35 @@ function buildElementi() {
             // Ako naziv nije menjan ručno, preuzima naziv tipa.
             if (!el.naziv || (staro && el.naziv === staro[1]) || /^Element \d+$/.test(el.naziv)) el.naziv = novo[1];
             el.tip = tip.value;
-            Object.assign(el, novo[2]); // podrazumevane mere i broj frontova/fioka/polica za taj tip
+            Object.assign(el, novo[2]); // podrazumevani broj frontova/fioka/polica za taj tip
             elemChanged(true);
         });
+        normalizujElement(el);
+        const klizac = document.createElement("select");
+        klizac.title = "Dužina klizača za fioke ovog elementa";
+        ELEM_KLIZACI.forEach(d => { const o = new Option(d + " mm", d); if (Number(el.klizac) === d) o.selected = true; klizac.appendChild(o); });
+        klizac.addEventListener("change", () => { el.klizac = Number(klizac.value); elemChanged(false); });
         field("Tip", tip);
         field("Količina", numIn("kol"));
-        field("Širina (cm)", numIn("sirina", "0.5"));
-        field("Dubina (cm)", numIn("dubina", "0.5"));
-        field("Visina (cm)", numIn("visina", "0.5"));
         field("Frontova", numIn("frontCount"));
         field("Fioka", numIn("drawerCount"));
         field("Polica", numIn("shelfCount"));
+        field("Klizač za fioke", klizac);
         card.appendChild(grid);
 
         const checks = ruleEl("div", "elem-checks");
         ELEM_CHECKS.forEach(([prop, txt]) => {
             const l = document.createElement("label");
             const c = document.createElement("input"); c.type = "checkbox"; c.checked = !!el[prop];
-            c.addEventListener("change", () => { el[prop] = c.checked; elemChanged(false); });
+            // LED: kad je štiklirano, rebuild prikazuje polje za metre.
+            c.addEventListener("change", () => { el[prop] = c.checked; elemChanged(prop === "led"); });
             l.append(c, txt); checks.appendChild(l);
+            if (prop === "led" && el.led) {
+                const m = document.createElement("input"); m.type = "number"; m.min = "0"; m.step = "0.1"; m.value = el.ledM || 0;
+                m.title = "Dužina LED trake u metrima"; m.style.width = "5.5em";
+                m.addEventListener("input", () => { el.ledM = parseFloat(m.value) || 0; elemChanged(false); });
+                const ml = document.createElement("label"); ml.append("LED (m)", m); checks.appendChild(ml);
+            }
         });
         card.appendChild(checks);
         box.appendChild(card);
@@ -2792,7 +2813,7 @@ $("ghHistoryLoad").addEventListener("click", async () => {
         $("napomenaPDF").value = fixNapomena(data.napomenaPDF, data.napomenaVersion);
         $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
         $("verzija").value = data.verzija || "m";
-        $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(el => { if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI"; }); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
+        $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(normalizujElement); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
         saveCustomRules(); save();
         buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
         buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
