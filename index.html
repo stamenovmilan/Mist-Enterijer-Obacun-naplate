@@ -164,6 +164,8 @@
         .elem-spec-row { display:grid; grid-template-columns:minmax(0,1fr) 7em 8em; gap:8px; padding:6px 0; border-bottom:1px solid var(--bd); font-size:.9rem; }
         .elem-spec-row span:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
         .elem-spec-row.total { font-weight:700; border-bottom:0; }
+        .elem-collapsed { padding:6px 12px; margin:6px 0; }
+        .elem-collapsed .elem-sum-name { flex:1; min-width:8em; font-weight:600; }
 
         @media(max-width:600px) {
             .elem-grid { grid-template-columns:1fr 1fr; }
@@ -201,6 +203,7 @@
             <label class="file-top">📁 Učitaj sačuvani projekat<input type="file" id="loadProjectFile" accept=".json,application/json"></label>
             <button type="button" class="danger" id="resetProjectBtn">↺ Reset svih polja</button>
             <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
+            <button type="button" id="ghHeaderSave" title="Sačuvaj cene, nazive, artikle, pravila i napomenu na GitHub (cene.json)">💾 Sačuvaj</button>
             <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub</button>
             <div class="msg" id="msg" style="font-size: 0.75rem;">Fajlovi se obrađuju lokalno.</div>
         </div>
@@ -209,6 +212,11 @@
                 <strong>Srednji kurs NBS:</strong>
                 <span id="nbsRateLabel">Učitavanje kursa...</span>
                 <button type="button" class="alt" id="refreshRateBtn">↻ Osveži kurs</button>
+            </div>
+            <div class="rate-line" id="nbsBuySell" style="margin-top:4px;font-size:.88rem">
+                <span>Kupovni: <b id="nbsBuy">—</b></span>
+                <span>Prodajni: <b id="nbsSell">—</b></span>
+                <span class="msg" style="margin:0">(devizni kurs NBS, samo za prikaz — obračun koristi srednji kurs)</span>
             </div>
             <p class="msg" id="nbsRateMsg">Kurs se preuzima iz zvanične kursne liste NBS.</p>
             <p class="msg" id="priceSrcMsg" aria-live="polite">Cene: učitavanje...</p>
@@ -231,7 +239,7 @@
         <div class="row"><label for="ghPath">Putanja fajla</label><input id="ghPath" type="text" style="width:14em;text-align:left" autocomplete="off"></div>
         <div class="row"><label for="ghToken">Token</label><input id="ghToken" type="password" style="width:14em;text-align:left" autocomplete="off"></div>
         <div class="row"><label for="ghAuto">Sačuvaj kao podrazumevano i automatski ažuriraj cene na GitHub-u</label><input id="ghAuto" type="checkbox"></div>
-        <div class="btns"><button type="button" id="ghCfgSave">Sačuvaj podešavanja i pošalji cene</button></div>
+        <p class="msg">Posle unosa podataka klikni <b>💾 Sačuvaj</b> na vrhu stranice: sačuvaće GitHub podešavanja na ovom uređaju i poslati sve izmene (cene, nazive, artikle, pravila, napomenu, kontakt i procente) u cene.json.</p>
         <p class="msg" id="ghMsg" aria-live="polite"></p>
         <h3 class="price-category">Istorija projekata na GitHub-u</h3>
         <div class="rate-line">
@@ -313,14 +321,11 @@
     <section id="elementiSection">
         <details>
             <summary>Obračun po elementima <span class="rule-badge">(u razvoju)</span></summary>
-            <p class="msg">Unesi elemente (mere u cm). Aplikacija računa okov iz sekcije Okov (šarke, klizači, nogice, nosači, tiple, šrafovi, žica, aspirator…). Pločasti materijal, kant i HDF računaš u SketchUp-u. Dugme <b>„Prenesi u Okov“</b> upisuje izračunate količine u sekciju Okov i tada ulaze u obračun i PDF.</p>
+            <p class="msg">Unesi elemente (mere u cm). Aplikacija računa okov iz sekcije Okov (šarke, klizači, nogice, nosači, tiple, šrafovi, žica, aspirator…). Pločasti materijal, kant i HDF računaš u SketchUp-u. Čim dodaš, izmeniš ili obrišeš element, izračunate količine se <b>automatski upisuju u sekciju Okov</b> i ulaze u obračun i PDF.</p>
             <div id="elementiLista" style="margin-top:10px"></div>
             <div class="btns"><button type="button" id="addElemBtn">＋ Dodaj element</button></div>
             <h3 class="price-category">Specifikacija iz elemenata</h3>
             <div id="elemSpec"></div>
-            <div class="btns">
-                <button type="button" id="elemToOkov">→ Prenesi u Okov</button>
-            </div>
             <p class="msg" id="elemMsg" aria-live="polite"></p>
         </details>
     </section>
@@ -379,7 +384,9 @@ Dodatni troškovi i uslovi:
 <script>
 // Podrazumevana napomena za oba PDF-a (stari tekst se automatski zamenjuje novim).
 const NAPOMENA_DEF = "Cena obuhvata izradu nameštaja po meri od oplemenjene iverice, kompletan potreban okov, profesionalno kantovanje, kao i samu izradu.\nDodatni troškovi i uslovi:\n\n* Prevoz, unos i montaža: Prevoz se obračunava dodatno, u skladu sa lokacijom i obimom posla (po dogovoru).\n* Avans i početak rada: Pre početka izrade projekta uplaćuje se avans u iznosu od 100 € (u dinarskoj protivvrednosti po srednjem kursu NBS na dan uplate, ili prema dogovoru). Uplaćeni avans se u celosti odbija od konačne cene izrade.\n* Rok izrade: Rok izrade se precizno definiše nakon konačne potvrde tehničkog nacrta/projekta i uplate dogovorenog avansa, a zavisi od trenutne opterećenosti proizvodnje i složenosti elemenata.";
-const fixNapomena = v => (!v || !String(v).trim() || String(v).trim() === "Projekat zvanično započinje nakon uplate avansa za nabavku potrebnog materijala.") ? NAPOMENA_DEF : v;
+// Napomena sačuvana pre verzije 2 (bilo koji stari tekst) zamenjuje se novom podrazumevanom.
+const NAPOMENA_VER = 2;
+const fixNapomena = (v, ver) => (Number(ver) >= NAPOMENA_VER && v && String(v).trim()) ? v : NAPOMENA_DEF;
 const ST = [
     ["sarke", "GTV Klap šarka", "Klap šarka ravna"],
     ["spolu", "Klap šarka polu koleno", "Klap šarka polu koleno"],
@@ -1585,7 +1592,7 @@ function projectSnapshot() {
         kupac: $("kupac").value, verzija: $("verzija").value,
         telefon: $("telefonKupca").value, telefonKupca: $("telefonKupca").value,
         rokIsporuke: $("rokIsporuke").value,
-        napomenaPDF: $("napomenaPDF").value, kontaktPDF: $("kontaktPDF").value,
+        napomenaPDF: $("napomenaPDF").value, napomenaVersion: NAPOMENA_VER, kontaktPDF: $("kontaktPDF").value,
         komentar: $("komentar").value, podsetnik: $("podsetnik").value,
         elementi
     };
@@ -1633,11 +1640,11 @@ $("loadProjectFile").addEventListener("change", event => {
             $("kupac").value = data.kupac || "";
             $("telefonKupca").value = data.telefonKupca || data.telefon || "";
             $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
-            $("napomenaPDF").value = fixNapomena(data.napomenaPDF);
+            $("napomenaPDF").value = fixNapomena(data.napomenaPDF, data.napomenaVersion);
             $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
             try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
             $("verzija").value = data.verzija || "m";
-            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; saveElementi(); buildElementi();
+            $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; elementi.forEach(el => { if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI"; }); elemApplied = obracunElemenata(); saveElementi(); buildElementi();
             saveCustomRules(); save();
             buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
             buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles();calc();
@@ -1663,7 +1670,7 @@ $("resetProjectBtn").addEventListener("click", () => {
     manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null };
     KL = [{ d:400, n:0 }];
     lastCsvParts = null;
-    elementi = []; saveElementi(); buildElementi();
+    elementi = []; elemApplied = elemPrazno(); saveElementi(); buildElementi();
     customArticles.forEach(a => a.qty = 0);
     customCsvRules.forEach(rule => { rule.matches = 0; rule.items.forEach(i => i.qty = 0); rule.newItems.forEach(i => i.qty = 0); });
     $("kupac").value = ""; $("telefonKupca").value = ""; $("rokIsporuke").value = ""; $("napomenaPDF").value = NAPOMENA_DEF; $("kontaktPDF").value = "+381693546820"; $("verzija").value = "m"; $("csv").value = ""; $("komentar").value = ""; $("podsetnik").value = ""; try { localStorage.removeItem("mist_komentar"); localStorage.removeItem("mist_podsetnik"); localStorage.removeItem("mist_napomena_pdf"); localStorage.removeItem("mist_kontakt_pdf"); } catch (e) {}
@@ -1679,6 +1686,8 @@ $("csv").addEventListener("change", e => {
     rd.onload = () => {
         try {
             const n = analiza(rd.result);
+            elemApplied.q = {}; elemApplied.kl = {};
+            if (elementi.length) syncElementiUOkov();
             buildOkov();
             buildCustomRulesEditor();
             buildCustomCsvItems();
@@ -1719,10 +1728,41 @@ async function refreshNbsRate() {
         save(); calc();
         if (label) label.textContent = rate.toFixed(4) + " RSD za 1 EUR";
         if (msg) msg.textContent = "Srednji kurs NBS, važi od " + (data.validFrom || data.date || "datuma iz kursne liste") + (data.listNumber ? " · kursna lista br. " + data.listNumber : "") + ".";
+        refreshBuySellRate(data);
     } catch (err) {
         if (label) label.textContent = "Poslednji sačuvani kurs: " + Number(fin.kurs).toFixed(4) + " RSD";
         if (msg) msg.textContent = "Nije moguće preuzeti najnoviji kurs. Zadržan je poslednji poznati kurs. " + err.message;
+        refreshBuySellRate(null);
     } finally { if (btn) btn.disabled = false; }
+}
+
+// Kupovni i prodajni (devizni) kurs NBS — samo za prikaz; obračun i dalje koristi srednji kurs (fin.kurs).
+// Ako ih kurs.json sadrži (eurBuyingRate / eurSellingRate), koriste se odatle,
+// a u suprotnom se preuzimaju sa javnog servisa kurs.resenje.org (zvanična kursna lista NBS).
+async function refreshBuySellRate(kursJson) {
+    const buyEl = $("nbsBuy"), sellEl = $("nbsSell");
+    if (!buyEl || !sellEl) return;
+    const show = (buy, sell) => {
+        buyEl.textContent = Number.isFinite(buy) && buy > 0 ? buy.toFixed(4) + " RSD" : "nije dostupan";
+        sellEl.textContent = Number.isFinite(sell) && sell > 0 ? sell.toFixed(4) + " RSD" : "nije dostupan";
+    };
+    let buy = kursJson ? Number(kursJson.eurBuyingRate) : NaN;
+    let sell = kursJson ? Number(kursJson.eurSellingRate) : NaN;
+    if (!(buy > 0) || !(sell > 0)) {
+        try {
+            const r = await fetch("https://kurs.resenje.org/api/v1/currencies/eur/rates/today", { cache: "no-store" });
+            if (r.ok) {
+                const d = await r.json();
+                buy = Number(d.exchange_buy);
+                sell = Number(d.exchange_sell);
+                try { localStorage.setItem("mist_kurs_kup_prod", JSON.stringify({ buy, sell, date: d.date })); } catch (e) {}
+            }
+        } catch (e) {}
+    }
+    if (!(buy > 0) || !(sell > 0)) {
+        try { const s = JSON.parse(localStorage.getItem("mist_kurs_kup_prod") || "null"); if (s) { buy = Number(s.buy); sell = Number(s.sell); } } catch (e) {}
+    }
+    show(buy, sell);
 }
 $("refreshRateBtn").addEventListener("click", refreshNbsRate);
 
@@ -2211,11 +2251,7 @@ const ELEM_SPEC_FIELDS = {
     sudoperaKol: ["Sudopera", "kom"], kantaKol: ["Kanta za đubre", "kom"], amortizerKol: ["Amortizer", "kom"],
     ledM: ["LED traka (po m)", "m"], ledNapajanjeKol: ["LED napajanje 12V", "kom"], ledDaljinski: ["Daljinska kontrola LED", "kom"]
 };
-let elementi = [];
-try {
-    const se = JSON.parse(localStorage.getItem(ELEM_KEY) || "null");
-    if (se && Array.isArray(se.elementi)) elementi = se.elementi;
-} catch (e) {}
+let elementi = []; // pri pokretanju uvek prazno (elementi se čuvaju samo u projektu)
 // Elementi iz ranije verzije: radna ploča više ne postoji.
 elementi.forEach(el => { if (!ELEM_TIPOVI.some(t => t[0] === el.tip)) el.tip = "DONJI"; });
 
@@ -2293,45 +2329,91 @@ function renderElemSpec() {
         box.appendChild(ruleEl("p", "msg", "Artikal „" + ELEM_ASPIRATOR_ART + "“ nije u cenovniku, pa se aspirator ne može preneti."));
 }
 
-// Upis u sekciju Okov: za stavke koje elementi računaju, količina se zamenjuje izračunatom.
-function prenesiElementeUOkov() {
+// Automatski prenos u sekciju Okov: svaka promena elemenata odmah menja količine u Okovu.
+// Pamti se šta su elementi već dodali (elemApplied), pa se upisuje samo razlika: količine iz CSV-a
+// i ručno upisane vrednosti ostaju, a brisanje elementa oduzima tačno njegov okov.
+const elemPrazno = () => ({ q: {}, spec: {}, kl: {}, art: {} });
+let elemApplied = elemPrazno();
+function syncElementiUOkov() {
     const R = obracunElemenata();
-    const rows = elemRows(R);
-    if (!rows.length) { $("elemMsg").textContent = "Nema šta da se prenese."; return; }
-    if (!confirm("Upisati količine iz elemenata u sekciju Okov? Za " + rows.length + " stavki postojeće količine (npr. iz CSV-a) biće zamenjene.")) return;
-    Object.keys(R.q).forEach(k => { q[k] = R.q[k]; });
-    if (Object.keys(R.kl).length) KL = Object.keys(R.kl).sort((a, b) => a - b).map(d => ({ d: +d, n: R.kl[d] }));
-    Object.keys(R.spec).forEach(f => { spec[f] = R.spec[f]; });
-    if (R.spec.ledM) spec.ledProfM = R.spec.ledM;
-    Object.keys(R.art).forEach(key => { const a = customArticles.find(x => x.key === key); if (a) a.qty = R.art[key]; });
+    const P = elemApplied;
+    const nova = (cur, a, b) => Math.max(0, Math.round(((Number(cur) || 0) - (Number(a) || 0) + (Number(b) || 0)) * 100) / 100);
+    const kljucevi = (x, y) => [...new Set([...Object.keys(x), ...Object.keys(y)])];
+
+    kljucevi(P.q, R.q).forEach(k => { q[k] = nova(q[k], P.q[k], R.q[k]); });
+    kljucevi(P.spec, R.spec).forEach(f => { spec[f] = nova(spec[f], P.spec[f], R.spec[f]); });
+    if (P.spec.ledM || R.spec.ledM) spec.ledProfM = nova(spec.ledProfM, P.spec.ledM, R.spec.ledM);
+    const dKl = kljucevi(P.kl, R.kl);
+    dKl.forEach(d => {
+        const e = KL.find(x => String(x.d) === String(d));
+        const n = nova(e ? e.n : 0, P.kl[d], R.kl[d]);
+        if (e) e.n = n; else if (n > 0) KL.push({ d: +d, n });
+    });
+    if (dKl.length) {
+        KL = KL.filter(x => x.n > 0);
+        if (!KL.length) KL = [{ d: 400, n: 0 }];
+        KL.sort((a, b) => a.d - b.d);
+    }
+    kljucevi(P.art, R.art).forEach(key => {
+        const a = customArticles.find(x => x.key === key);
+        if (a) a.qty = nova(a.qty, P.art[key], R.art[key]);
+    });
+    elemApplied = R;
     manualSum.okov = null; manualSum.mat = null;
-    save();
     buildOkov(); buildSpecijalno(); buildNewArticles(); buildKl(); // buildKl poziva calc()
-    $("elemMsg").textContent = "Preneto u sekciju Okov: " + rows.length + " stavki.";
+    const rows = elemRows(R);
+    if ($("elemMsg")) $("elemMsg").textContent = rows.length ? "Količine iz elemenata su upisane u sekciju Okov (" + rows.length + " stavki)." : "";
+}
+// Promena elemenata: sačuvaj, prenesi u Okov, osveži prikaz.
+function elemChanged(rebuild) {
+    saveElementi();
+    syncElementiUOkov();
+    if (rebuild) buildElementi(); else renderElemSpec();
 }
 
+// Otvoreni (prošireni) elementi; ostali su skupljeni na naziv i količinu.
+let elemOpen = new Set();
 function buildElementi() {
     const box = $("elementiLista");
     if (!box) return;
     box.innerHTML = "";
     if (!elementi.length) box.appendChild(ruleEl("p", "msg", "Nema elemenata. Klikni „＋ Dodaj element“."));
     elementi.forEach((el, idx) => {
-        const card = ruleEl("div", "rule-card");
+        if (!el.id) el.id = "el_" + Math.random().toString(36).slice(2, 8);
+        const otvoren = elemOpen.has(el.id);
+        const card = ruleEl("div", "rule-card" + (otvoren ? "" : " elem-collapsed"));
         const head = ruleEl("div", "rule-head");
         const title = ruleEl("strong", "", "#" + (idx + 1));
+        const toggle = ruleEl("button", "alt", otvoren ? "▴ Skupi" : "✎ Otvori");
+        toggle.type = "button"; toggle.title = otvoren ? "Skupi element" : "Otvori element za izmene";
+        toggle.onclick = () => { if (otvoren) elemOpen.delete(el.id); else elemOpen.add(el.id); buildElementi(); };
+        const del = removeBtn("Obriši element", () => {
+            if (!confirm("Obrisati element „" + (el.naziv || "#" + (idx + 1)) + "“?")) return;
+            elemOpen.delete(el.id);
+            elementi.splice(idx, 1); elemChanged(true);
+        });
+        if (!otvoren) {
+            // Skupljen prikaz: samo naziv i količina (klik na red otvara element).
+            const tipNaziv = (ELEM_TIPOVI.find(t => t[0] === el.tip) || ["", ""])[1];
+            const naziv = ruleEl("span", "elem-sum-name", el.naziv || tipNaziv || "Element");
+            const kol = ruleEl("span", "rule-badge", "Količina: " + (Number(el.kol) || 1));
+            head.append(title, naziv, kol, toggle, del);
+            head.style.cursor = "pointer";
+            head.addEventListener("click", e => { if (e.target.closest("button")) return; elemOpen.add(el.id); buildElementi(); });
+            card.appendChild(head);
+            box.appendChild(card);
+            return;
+        }
         const naziv = document.createElement("input"); naziv.type = "text"; naziv.value = el.naziv || ""; naziv.placeholder = "Naziv elementa";
         naziv.addEventListener("input", () => { el.naziv = naziv.value; saveElementi(); });
-        head.append(title, naziv, removeBtn("Obriši element", () => {
-            if (!confirm("Obrisati element „" + (el.naziv || "#" + (idx + 1)) + "“?")) return;
-            elementi.splice(idx, 1); saveElementi(); buildElementi();
-        }));
+        head.append(title, naziv, toggle, del);
         card.appendChild(head);
 
         const grid = ruleEl("div", "elem-grid");
         const field = (label, inputEl) => { const l = document.createElement("label"); l.append(label, inputEl); grid.appendChild(l); };
         const numIn = (prop, step) => {
             const i = document.createElement("input"); i.type = "number"; i.min = "0"; i.step = step || "1"; i.value = el[prop];
-            i.addEventListener("input", () => { el[prop] = parseFloat(i.value) || 0; saveElementi(); renderElemSpec(); });
+            i.addEventListener("input", () => { el[prop] = parseFloat(i.value) || 0; elemChanged(false); });
             return i;
         };
         const tip = document.createElement("select");
@@ -2343,7 +2425,7 @@ function buildElementi() {
             if (!el.naziv || (staro && el.naziv === staro[1]) || /^Element \d+$/.test(el.naziv)) el.naziv = novo[1];
             el.tip = tip.value;
             Object.assign(el, novo[2]); // podrazumevane mere i broj frontova/fioka/polica za taj tip
-            saveElementi(); buildElementi();
+            elemChanged(true);
         });
         field("Tip", tip);
         field("Količina", numIn("kol"));
@@ -2359,7 +2441,7 @@ function buildElementi() {
         ELEM_CHECKS.forEach(([prop, txt]) => {
             const l = document.createElement("label");
             const c = document.createElement("input"); c.type = "checkbox"; c.checked = !!el[prop];
-            c.addEventListener("change", () => { el[prop] = c.checked; saveElementi(); renderElemSpec(); });
+            c.addEventListener("change", () => { el[prop] = c.checked; elemChanged(false); });
             l.append(c, txt); checks.appendChild(l);
         });
         card.appendChild(checks);
@@ -2368,10 +2450,13 @@ function buildElementi() {
     renderElemSpec();
 }
 $("addElemBtn").addEventListener("click", () => {
-    elementi.push(noviElement({ naziv: "Element " + (elementi.length + 1) }));
-    saveElementi(); buildElementi();
+    const novi = noviElement({ naziv: "Element " + (elementi.length + 1) });
+    elementi.push(novi);
+    elemOpen = new Set([novi.id]); // novi element otvoren, prethodni se skupljaju
+    elemChanged(true);
+    const kartice = $("elementiLista").querySelectorAll(".rule-card");
+    if (kartice.length) kartice[kartice.length - 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
-$("elemToOkov").addEventListener("click", prenesiElementeUOkov);
 
 // ===== Cene: zajednički cene.json na GitHub-u (GitHub REST API: Contents) =====
 // Redosled pri otvaranju na SVAKOM računaru:
@@ -2402,7 +2487,7 @@ function ghFillForm() {
     const c = ghLoad();
     $("ghOwner").value = c.owner; $("ghRepo").value = c.repo; $("ghBranch").value = c.branch; $("ghPath").value = c.path; $("ghToken").value = c.token;
     $("ghAuto").checked = !!c.auto;
-    ["ghOwner","ghRepo","ghBranch","ghPath","ghToken","ghAuto","ghCfgSave"].forEach(id => { if ($(id)) $(id).disabled = false; });
+    ["ghOwner","ghRepo","ghBranch","ghPath","ghToken","ghAuto"].forEach(id => { if ($(id)) $(id).disabled = false; });
 }
 function ghReadForm() {
     return { owner: $("ghOwner").value.trim(), repo: $("ghRepo").value.trim(), branch: $("ghBranch").value.trim() || "main", path: ($("ghPath").value.trim() || "cene.json").replace(/^\/+/, ""), token: $("ghToken").value.trim(), auto: $("ghAuto").checked, history: true };
@@ -2426,7 +2511,7 @@ function pricePayload() {
         format: "mist-enterijer-cene", version: 2, savedAt: new Date().toISOString(),
         cene, nazivi: priceLabels, customArticles: articlesForExport(), customCsvRules: rulesForExport(), builtinCsvRules,
         okovProc: fin.okovProc, procZarade: fin.proc,
-        napomenaPDF: $("napomenaPDF").value, kontaktPDF: $("kontaktPDF").value
+        napomenaPDF: $("napomenaPDF").value, napomenaVersion: NAPOMENA_VER, kontaktPDF: $("kontaktPDF").value
     };
 }
 function priceSig() {
@@ -2492,9 +2577,9 @@ function applyPricePayload(payload) {
     }
     if (Number.isFinite(Number(payload.okovProc))) fin.okovProc = Number(payload.okovProc);
     if (Number.isFinite(Number(payload.procZarade)) && Number(payload.procZarade) > 0) fin.proc = Number(payload.procZarade);
-    if (typeof payload.napomenaPDF === "string" && payload.napomenaPDF.trim()) {
-        $("napomenaPDF").value = fixNapomena(payload.napomenaPDF);
-        try { localStorage.setItem("mist_napomena_pdf", payload.napomenaPDF); } catch (e) {}
+    if (typeof payload.napomenaPDF === "string") {
+        $("napomenaPDF").value = fixNapomena(payload.napomenaPDF, payload.napomenaVersion);
+        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); localStorage.setItem("mist_napomena_ver", String(NAPOMENA_VER)); } catch (e) {}
     }
     const kontakt = typeof payload.kontaktPDF === "string" ? payload.kontaktPDF : (typeof payload.telefon === "string" ? payload.telefon : "");
     if (kontakt.trim()) {
@@ -2526,7 +2611,11 @@ async function loadSharedPrices() {
     if (c.owner && c.repo && c.token) {
         try { payload = await ghFetchRemotePayload(c); src = "GitHub-a"; } catch (e) { payload = null; }
     }
-    // 2) Svi ostali računari: cene.json koji stoji pored index.html (GitHub Pages), bez tokena.
+    // 2) Računar bez tokena: direktno sa GitHub-a (javni repozitorijum, odmah poslednja verzija).
+    if (!payload && c.owner && c.repo) {
+        try { payload = await ghFetchRemotePayload({ ...c, token: "" }); src = "GitHub-a"; } catch (e) { payload = null; }
+    }
+    // 3) Rezerva: cene.json koji stoji pored index.html (GitHub Pages).
     if (!payload) {
         try {
             const r = await fetch("./" + String(c.path || "cene.json").replace(/^\/+/, "") + "?v=" + Date.now(), { cache: "no-store" });
@@ -2547,6 +2636,8 @@ async function loadSharedPrices() {
         setPriceSrc("Cene: cene.json nije pronađen. Koriste se cene sačuvane na ovom uređaju.");
     }
     ghLastSig = priceSig();
+    // cene.json sa starom napomenom: na računaru sa automatskim čuvanjem odmah upiši novu napomenu.
+    if (payload && Number(payload.napomenaVersion || 0) < NAPOMENA_VER) ghLastSig = null;
     pricesReady = true;
     try { localStorage.setItem(KEY, JSON.stringify(cene)); localStorage.setItem(PRICE_LABEL_KEY, JSON.stringify(priceLabels)); } catch (e) {}
     refreshAfterPriceLoad();
@@ -2591,128 +2682,30 @@ async function ghRefreshProjectHistory(c) {
     msg.textContent = files.length ? "Pronađeno projekata: " + files.length + "." : "Nema sačuvanih projekata.";
 }
 async function ghSaveNow(c) {
-    const btn = $("ghSaveBtn"), cfgBtn = $("ghCfgSave"), m = $("msg"), gm = $("ghMsg");
-    btn.disabled = true; if (cfgBtn) cfgBtn.disabled = true;
-    m.textContent = "Šaljem cene na GitHub…";
+    const btn = $("ghSaveBtn"), cfgBtn = $("ghHeaderSave"), m = $("msg"), gm = $("ghMsg");
+    btn.disabled = true; if (cfgBtn) { cfgBtn.disabled = true; cfgBtn.textContent = "💾 Čuvam…"; }
+    m.textContent = "Šaljem izmene na GitHub…";
     clearTimeout(ghPushTimer);
     try {
         ghPushing = true;
         await ghPushPrices(c);
         localStorage.setItem(GH_KEY, JSON.stringify(c));
-        m.textContent = "Cene su sačuvane na GitHub-u (" + c.path + "). Ostali uređaji ih vide posle 1–2 minuta.";
+        m.textContent = "Sve izmene su sačuvane na GitHub-u (" + c.path + "). Ostali uređaji ih dobijaju pri sledećem otvaranju.";
         if (gm) gm.textContent = "Sačuvano: " + new Date().toLocaleTimeString("sr-RS");
         ghRefreshProjectHistory(c).catch(() => {});
     } catch (err) {
         m.textContent = "Čuvanje na GitHub nije uspelo: " + err.message;
         if (gm) gm.textContent = "Greška: " + err.message + " — proveri token, naziv repozitorijuma i dozvolu Contents: Read and write.";
         $("ghSection").hidden = false;
-    } finally { ghPushing = false; btn.disabled = false; if (cfgBtn) cfgBtn.disabled = false; }
+    } finally { ghPushing = false; btn.disabled = false; if (cfgBtn) { cfgBtn.disabled = false; cfgBtn.textContent = "💾 Sačuvaj"; } }
 }
 $("ghCfgBtn").addEventListener("click", () => {
     const sec = $("ghSection");
     sec.hidden = !sec.hidden;
     if (!sec.hidden) { ghFillForm(); sec.scrollIntoView({ behavior: "smooth", block: "start" }); }
 });
-$("ghCfgSave").addEventListener("click", () => {
-    const c = ghReadForm();
-    if (!c.owner || !c.repo || !c.token) { $("ghMsg").textContent = "Popuni korisnika, repozitorijum i token."; return; }
-    localStorage.setItem(GH_KEY, JSON.stringify(c));
-    ghSaveNow(c);
-});
-$("ghSaveBtn").addEventListener("click", () => {
+function ghSaveClick() {
     // Ako je panel otvoren, uzmi ono što je upisano u polja.
     const c = $("ghSection").hidden ? ghLoad() : ghReadForm();
     if (!c.owner || !c.repo || !c.token) { $("ghSection").hidden = false; ghFillForm(); $("ghMsg").textContent = "Prvo unesi GitHub podešavanja i token."; $("ghSection").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-    localStorage.setItem(GH_KEY, JSON.stringify(c));
-    ghSaveNow(c);
-});
-
-// Komentar i podsetnik pamte se lokalno
-(function () {
-    try {
-        $("komentar").value = localStorage.getItem("mist_komentar") || "";
-        $("podsetnik").value = localStorage.getItem("mist_podsetnik") || "";
-        $("napomenaPDF").value = fixNapomena(localStorage.getItem("mist_napomena_pdf"));
-        $("kontaktPDF").value = localStorage.getItem("mist_kontakt_pdf") || "+381693546820";
-    } catch (e) {}
-    $("komentar").addEventListener("input", () => { try { localStorage.setItem("mist_komentar", $("komentar").value); } catch (e) {} });
-    $("podsetnik").addEventListener("input", () => { try { localStorage.setItem("mist_podsetnik", $("podsetnik").value); } catch (e) {} });
-    $("napomenaPDF").addEventListener("input", () => {
-        try { localStorage.setItem("mist_napomena_pdf", $("napomenaPDF").value); } catch (e) {}
-        if (typeof ghSchedulePush === "function") ghSchedulePush();
-    });
-    $("kontaktPDF").addEventListener("input", () => {
-        try { localStorage.setItem("mist_kontakt_pdf", $("kontaktPDF").value); } catch (e) {}
-        if (typeof ghSchedulePush === "function") ghSchedulePush();
-    });
-})();
-
-$("ghHistoryRefresh").addEventListener("click", () => {
-    const c = ghLoad();
-    if (!c.owner || !c.repo) { $("ghHistoryMsg").textContent = "Prvo unesi GitHub podešavanja."; return; }
-    ghRefreshProjectHistory(c);
-});
-$("ghHistoryLoad").addEventListener("click", async () => {
-    const c = ghLoad(), path = $("ghHistoryList").value;
-    if (!path) { $("ghHistoryMsg").textContent = "Izaberi projekat iz istorije."; return; }
-    try {
-        const headers = c.token ? { "Authorization": "Bearer " + c.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } : { "Accept": "application/vnd.github+json" };
-        const api = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) + "/contents/" + path.split("/").map(encodeURIComponent).join("/");
-        const r = await fetch(api + "?ref=" + encodeURIComponent(c.branch), { headers, cache: "no-store" });
-        if (!r.ok) throw new Error("GitHub " + r.status);
-        const data = JSON.parse(ghDecodeB64((await r.json()).content));
-        if (!data || data.format !== "mist-enterijer-project") throw new Error("Izabrani fajl nije MiSt projekat.");
-        registerArticles(data.customArticles);
-        // Cene i nazivi se NE preuzimaju iz projekta (izvor je cene.json); dopunjuju se samo artikli kojih nema.
-            Object.keys(DEF).forEach(k => { if (!(k in cene)) { const v = Number(data.cene && data.cene[k]); cene[k] = Number.isFinite(v) && data.cene[k] !== undefined ? v : DEF[k]; } });
-        Object.keys(data.priceLabels || {}).forEach(k => { if (!(k in priceLabels)) priceLabels[k] = data.priceLabels[k]; }); fixLabelNotes();
-        Object.keys(q).forEach(k => delete q[k]); Object.assign(q, data.q || {});
-        ST.forEach(item => { if (!(item[0] in q)) q[item[0]] = 0; });
-        spec = { ...spec, ...(data.spec || {}) };
-        spec.escajgSirina = normalizeEscajgWidth(spec.escajgSirina); if (spec.maticK && !spec.matice) spec.matice = spec.maticK; delete spec.maticK;
-        fin = { ...fin, ...(data.fin || {}) };
-        manualSum = { okov:null, mat:null, zar:null, prevoz:null, izrada:null, ...(data.manualSum || {}) };
-        KL = Array.isArray(data.KL) && data.KL.length ? data.KL : [{ d:400, n:0 }];
-        customCsvRules = normalizeRules(data.customCsvRules); lastCsvParts = null;
-        builtinCsvRules = { ...JSON.parse(JSON.stringify(BUILTIN_RULE_DEFAULTS)), ...(data.builtinCsvRules || {}) };
-        $("kupac").value = data.kupac || "";
-        $("telefonKupca").value = data.telefonKupca || data.telefon || "";
-        $("rokIsporuke").value = data.rokIsporuke || data.rok || "";
-        $("napomenaPDF").value = fixNapomena(data.napomenaPDF);
-        $("kontaktPDF").value = data.kontaktPDF || "+381693546820";
-        $("verzija").value = data.verzija || "m";
-        $("komentar").value = data.komentar || ""; $("podsetnik").value = data.podsetnik || ""; elementi = Array.isArray(data.elementi) ? data.elementi : []; saveElementi(); buildElementi();
-        saveCustomRules(); save();
-        buildOkov(); buildFin(); buildCene(); buildKl(); buildSpecijalno(); buildAmerickiPlakar();
-        buildBuiltinCsvRulesEditor(); buildCustomRulesEditor(); buildCustomCsvItems(); buildNewArticles(); calc();
-        $("ghHistoryMsg").textContent = "Projekat je uspešno učitan iz GitHub istorije.";
-        $("msg").textContent = "Projekat iz GitHub istorije je učitan.";
-    } catch (err) { $("ghHistoryMsg").textContent = "Učitavanje projekta nije uspelo: " + err.message; }
-});
-
-
-buildOkov();
-buildFin();
-buildCene();
-
-buildBuiltinCsvRulesEditor();
-buildCustomRulesEditor();
-buildCustomCsvItems();
-buildNewArticles();
-
-buildKl();
-buildSpecijalno();
-buildAmerickiPlakar();
-buildElementi();
-calc();
-refreshNbsRate();
-// Zajednički cene.json se učitava na svakom računaru (posle toga se sve ponovo iscrta).
-loadSharedPrices().finally(() => {
-    const gs = ghLoad();
-    if (gs.owner && gs.repo && gs.token) ghRefreshProjectHistory(gs).catch(() => {});
-});
-
-/* Service worker not required in single-file version */
-</script>
-</body>
-</html>
+    localSto
