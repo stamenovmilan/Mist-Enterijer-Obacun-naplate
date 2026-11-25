@@ -274,6 +274,15 @@
 
         /* Poruka o izvozu se vidi samo kad ima šta da javi (npr. blokiran prozor za štampu) */
         #izmsg:empty { display: none; }
+
+        /* VMCene kao posebna stranica */
+        .page-overlay { position: fixed; inset: 0; z-index: 60; overflow-y: auto; margin: 0 !important; border-radius: 0 !important;
+            padding: 0 max(16px, calc((100vw - 920px) / 2)) 40px !important; background-color: #1a1512 !important; backdrop-filter: none; }
+        .page-overlay[hidden] { display: none; }
+        .page-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 0 12px; margin-bottom: 8px; background: #1a1512; border-bottom: 1px solid var(--bd); }
+        body.page-open { overflow: hidden; }
+        body.page-open #bottomBar, body.page-open #toastMsg { display: none; }
+        #cene h3[hidden] { display: none; }
         #infoSection .msg { margin: 4px 0; font-size: .85rem; }
         #toastMsg { position: fixed; left: 50%; transform: translateX(-50%); bottom: 86px; z-index: 50; max-width: min(560px, calc(100% - 32px)); padding: 9px 14px; border-radius: 10px; background: #1e1915; color: var(--tx); border: 1px solid rgba(210,169,100,0.45); box-shadow: 0 8px 24px rgba(0,0,0,0.5); font-size: .85rem; }
         #toastMsg[hidden] { display: none; }
@@ -356,6 +365,7 @@
             <details class="more-menu" id="moreMenu">
                 <summary class="more-btn" title="Više opcija">☰ Više ▾</summary>
                 <div class="more-pop">
+                    <button type="button" class="alt" id="pricePageBtn">💲 VMCene – izmena cena</button>
                     <button type="button" class="alt" id="rulesToggleBtn">⚙ Pravila CSV okova</button>
                     <button type="button" class="alt" id="settingsBtn">⚙ Podešavanja (kontakt)</button>
                     <button type="button" class="alt" id="ghCfgBtn" title="GitHub podešavanja" aria-label="GitHub podešavanja">⚙ GitHub podešavanja</button>
@@ -390,7 +400,7 @@
         <h2>Info</h2>
         <div class="msg" id="msg">Fajlovi se obrađuju lokalno.</div>
         <div class="msg" id="priceSrcMsg" aria-live="polite">Cene: učitavanje...</div>
-        <div class="msg" id="appVersion">Verzija aplikacije: 2026-11-25 · v18 (Finansije u dva reda)</div>
+        <div class="msg" id="appVersion">Verzija aplikacije: 2026-11-25 · v19 (VMCene kao posebna stranica)</div>
     </section>
 
     <section id="settingsSection" hidden>
@@ -434,9 +444,14 @@
         <p class="msg" id="rulesMsg"></p>
     </section>
 
-    <section>
-        <details>
-            <summary>VMCene - Cene okova i materijala</summary>
+    <!-- VMCene: posebna stranica za izmenu cena (otvara se iz menija ☰ Više) -->
+    <section id="pricePage" class="page-overlay" hidden>
+        <div class="page-bar">
+            <button type="button" class="alt" id="pricePageBack">← Nazad</button>
+            <h2 style="margin:0">VMCene – cene okova i materijala</h2>
+            <input id="priceSearch" type="search" placeholder="Traži artikal…" aria-label="Traži artikal" style="margin-left:auto;width:min(16em,40%);text-align:left">
+        </div>
+        <div>
             <p class="msg">Nazive artikala menjaš direktno u poljima levo, a cenu u polju desno. Promena naziva ne prekida postojeće veze sa obračunom.</p>
             <div id="cene" style="margin-top: 12px"></div>
             <div class="btns"><button type="button" id="addArticleBtn">＋ Dodaj novi artikal</button><button id="reset" class="alt">Vrati podrazumevane</button></div>
@@ -450,16 +465,21 @@
                 </div>
                 <p class="msg" id="newArtMsg" aria-live="polite">Artikal se dodaje na kraj cenovnika i odmah je dostupan u pravilima CSV-a i u sekciji Okov.</p>
             </div>
-            <p class="msg" style="margin-top: 12px;">Za prenos na drugi uređaj: kopiraj tekst ispod, a na drugom uređaju ga nalepi i pritisni Primeni.</p>
-            <textarea id="json" spellcheck="false" style="margin-top: 6px;"></textarea>
-            <div class="btns">
-                <button id="exp" class="alt">Prikaži cene kao tekst</button>
-                <button id="imp">Primeni nalepljene cene</button>
-            </div>
+            <details class="fold" style="margin-top:14px">
+                <summary>⇄ Prenos cena kao tekst</summary>
+                <div style="padding:0 10px 10px">
+                    <p class="msg" style="margin-top: 8px;">Za prenos na drugi uređaj: kopiraj tekst ispod, a na drugom uređaju ga nalepi i pritisni Primeni.</p>
+                    <textarea id="json" spellcheck="false" style="margin-top: 6px;"></textarea>
+                    <div class="btns">
+                        <button id="exp" class="alt">Prikaži cene kao tekst</button>
+                        <button id="imp">Primeni nalepljene cene</button>
+                    </div>
+                </div>
+            </details>
             <div class="btns" style="border-top:1px solid var(--bd);padding-top:12px">
                 <button type="button" id="ghSaveBtn">☁ Sačuvaj kao podrazumevano na GitHub</button>
             </div>
-        </details>
+        </div>
     </section>
 
     <section>
@@ -2490,6 +2510,43 @@ $("pdfMenu").addEventListener("click", e => {
     if (b.dataset.pdf === "t") { stampajTrebovanjePDF(); return; }
     $("verzija").value = b.dataset.pdf;
     stampajPDF();
+});
+// VMCene kao posebna stranica (preko cele aplikacije). Dugme „Nazad“ ili taster Esc je zatvara;
+// adresa dobija #cene, pa i dugme „nazad“ u pregledaču vraća na kalkulator.
+function otvoriCenovnik(push) {
+    $("pricePage").hidden = false;
+    document.body.classList.add("page-open");
+    window.scrollTo(0, 0);
+    if (push !== false && location.hash !== "#cene") history.pushState({ cene: true }, "", "#cene");
+    setTimeout(() => $("priceSearch").focus(), 50);
+}
+function zatvoriCenovnik(fromPop) {
+    if ($("pricePage").hidden) return;
+    $("pricePage").hidden = true;
+    document.body.classList.remove("page-open");
+    if (!fromPop && location.hash === "#cene") history.back();
+}
+$("pricePageBtn").addEventListener("click", () => otvoriCenovnik());
+$("pricePageBack").addEventListener("click", () => zatvoriCenovnik());
+window.addEventListener("popstate", () => { if (location.hash === "#cene") otvoriCenovnik(false); else zatvoriCenovnik(true); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("pricePage").hidden) zatvoriCenovnik(); });
+if (location.hash === "#cene") setTimeout(() => otvoriCenovnik(false), 0);
+// Pretraga u cenovniku: filtrira redove po nazivu.
+$("priceSearch").addEventListener("input", () => {
+    const qq = norm($("priceSearch").value);
+    const box = $("cene");
+    let h3 = null, vidljivih = 0;
+    [...box.children].forEach(el => {
+        if (el.tagName === "H3") {
+            if (h3) h3.hidden = qq && !vidljivih;
+            h3 = el; vidljivih = 0; return;
+        }
+        const inp = el.querySelector(".price-name-input");
+        const ok = !qq || (inp && norm(inp.value).includes(qq));
+        el.style.display = ok ? "" : "none";
+        if (ok) vidljivih++;
+    });
+    if (h3) h3.hidden = qq && !vidljivih;
 });
 $("infoBtn").addEventListener("click", () => {
     const sec = $("infoSection");
